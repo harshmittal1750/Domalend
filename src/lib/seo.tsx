@@ -32,7 +32,7 @@ const siteConfig = {
   name: "DreamLend Finance",
   description:
     "The future of decentralized lending. A peer-to-peer lending platform built on Somnia L1.",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "https://dreamlend.finance",
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://catalex.finance",
   ogImage: "/og-image.png",
   twitterHandle: "@DreamlendFi",
   creator: "DreamLend Team",
@@ -204,13 +204,13 @@ export const generateOrganizationSchema = () => ({
   sameAs: [
     "https://twitter.com/dreamlendFi",
     "https://x.com/DreamlendFi",
-    // "https://github.com/dreamlend",
-    // "https://discord.gg/dreamlend"
+    // "https://github.com/catalex",
+    // "https://discord.gg/catalex"
   ],
   contactPoint: {
     "@type": "ContactPoint",
     contactType: "Customer Service",
-    email: "harsh@dreamlend.finance",
+    email: "harsh@catalex.finance",
     availableLanguage: ["English"],
   },
 });

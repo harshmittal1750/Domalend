@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const SUBGRAPH_URL =
   process.env.NEXT_PUBLIC_SUBGRAPH_URL ||
-  "https://api.subgraph.somnia.network/api/public/d5671b32-2846-489e-a577-e7d9702dd17b/subgraphs/dreamlend-graph/v0.0.1/";
+  "https://api.subgraph.somnia.network/api/public/d5671b32-2846-489e-a577-e7d9702dd17b/subgraphs/catalex-graph/v0.0.1/";
 
 export async function POST(req: NextRequest) {
   try {

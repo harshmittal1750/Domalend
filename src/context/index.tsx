@@ -12,8 +12,8 @@ const metadata = {
   name: "DreamLend Finance",
   description:
     "DreamLend Finance a secure , smart and permission less  way to lend/borrow",
-  url: "https://www.dreamlend.finance", // origin must match your domain & subdomain
-  icons: ["https://www.dreamlend.finance/logo.png"],
+  url: "https://www.catalex.finance", // origin must match your domain & subdomain
+  icons: ["https://www.catalex.finance/logo.png"],
 };
 
 // Create the modal

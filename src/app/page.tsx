@@ -35,7 +35,7 @@ const financialProductSchema = generateFinancialProductSchema({
   name: "DreamLend P2P Crypto Lending",
   description:
     "Peer-to-peer cryptocurrency lending platform offering secure loans and high-yield earning opportunities",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "https://dreamlend.finance",
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://catalex.finance",
   provider: "DreamLend Finance",
   category: "Permissionless Lending/Borrowing",
   interestRate: "Up to 150% APY",

@@ -1,8 +1,7 @@
 import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || "https://dreamlend.finance";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://catalex.finance";
 
   // Static pages
   const staticPages = [
