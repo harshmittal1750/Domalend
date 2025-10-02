@@ -8,7 +8,22 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./SomniaConfig.sol";
-import "./RewardsDistributor.sol";
+
+/**
+ * @notice Interface for DomaRank oracle to get token valuations
+ */
+interface IDomaRankOracle {
+    function getTokenValue(
+        address fractionalTokenAddress
+    ) external view returns (uint256 price);
+}
+
+/**
+ * @notice Interface for DomaOwnership token compliance checks
+ */
+interface IDomaOwnershipToken {
+    function lockStatusOf(uint256 id) external view returns (bool);
+}
 
 /**
  * @title DreamLend
@@ -46,6 +61,8 @@ contract DreamLend is ReentrancyGuard, Ownable {
         uint256 liquidationThresholdBPS; // Collateralization ratio below which loan can be liquidated (e.g., 12000 for 120%)
         uint256 maxPriceStaleness; // Maximum age of oracle price data (in seconds)
         uint256 repaidAmount; // Amount already repaid (for partial repayments)
+        bool isDomaCollateral; // True if collateral is a Doma fractional domain token
+        uint256 domainTokenId; // Original NFT tokenId for compliance checks (0 if not Doma)
     }
 
     // ============ Constants ============
@@ -71,8 +88,10 @@ contract DreamLend is ReentrancyGuard, Ownable {
     // Mapping to store price feed contracts for tokens
     mapping(address => AggregatorV3Interface) public tokenPriceFeeds;
 
+    // DomaRank oracle address for fractional token valuations
+    address public domaRankOracleAddress;
+
     // Rewards distributor contract for liquidity mining
-    RewardsDistributor public rewardsDistributor;
 
     // ============ Events ============
 
@@ -124,6 +143,8 @@ contract DreamLend is ReentrancyGuard, Ownable {
         address indexed tokenAddress,
         address indexed feedAddress
     );
+
+    event DomaRankOracleSet(address indexed newOracleAddress);
 
     event RewardsDistributorSet(
         address indexed oldDistributor,
@@ -199,20 +220,14 @@ contract DreamLend is ReentrancyGuard, Ownable {
     }
 
     /**
-     * @notice Sets the rewards distributor contract for liquidity mining
+     * @notice Sets the DomaRank oracle address for fractional token valuations
      * @dev Only callable by the contract owner
-     * @param _distributorAddress The address of the RewardsDistributor contract
+     * @param _oracleAddress The address of the DomaRank oracle contract
      */
-    function setRewardsDistributor(
-        address _distributorAddress
-    ) external onlyOwner {
-        require(
-            _distributorAddress != address(0),
-            "Invalid distributor address"
-        );
-        address oldDistributor = address(rewardsDistributor);
-        rewardsDistributor = RewardsDistributor(payable(_distributorAddress));
-        emit RewardsDistributorSet(oldDistributor, _distributorAddress);
+    function setDomaRankOracle(address _oracleAddress) external onlyOwner {
+        require(_oracleAddress != address(0), "Invalid oracle address");
+        domaRankOracleAddress = _oracleAddress;
+        emit DomaRankOracleSet(_oracleAddress);
     }
 
     /**
@@ -418,6 +433,10 @@ contract DreamLend is ReentrancyGuard, Ownable {
             _amount
         );
 
+        // Determine if this is Doma collateral (uses DomaRank oracle)
+        bool isDoma = domaRankOracleAddress != address(0) &&
+            address(tokenPriceFeeds[_collateralAddress]) == address(0);
+
         // Create new loan struct
         Loan memory newLoan = Loan({
             id: currentLoanId,
@@ -434,7 +453,9 @@ contract DreamLend is ReentrancyGuard, Ownable {
             minCollateralRatioBPS: _minCollateralRatioBPS,
             liquidationThresholdBPS: _liquidationThresholdBPS,
             maxPriceStaleness: _maxPriceStaleness,
-            repaidAmount: 0 // Initialize repaid amount to 0
+            repaidAmount: 0, // Initialize repaid amount to 0
+            isDomaCollateral: isDoma,
+            domainTokenId: 0 // Will be set by borrower when accepting loan (could be extracted from token metadata)
         });
 
         // Store the loan
@@ -540,11 +561,27 @@ contract DreamLend is ReentrancyGuard, Ownable {
     ) internal view returns (uint256 currentCollateralRatio, bool priceStale) {
         Loan storage loan = loans[loanId];
 
-        // Get prices for collateral and loan tokens
-        (uint256 collateralPrice, bool collateralStale) = _getLatestPrice(
-            tokenPriceFeeds[loan.collateralAddress],
-            loan.maxPriceStaleness
-        );
+        // Get price for collateral - use DomaRank oracle for fractional tokens
+        uint256 collateralPrice;
+        bool collateralStale;
+
+        if (
+            domaRankOracleAddress != address(0) &&
+            address(tokenPriceFeeds[loan.collateralAddress]) == address(0)
+        ) {
+            // Use DomaRank oracle for fractional tokens without standard price feeds
+            collateralPrice = IDomaRankOracle(domaRankOracleAddress)
+                .getTokenValue(loan.collateralAddress);
+            collateralStale = false;
+        } else {
+            // Use Chainlink price feed for standard tokens
+            (collateralPrice, collateralStale) = _getLatestPrice(
+                tokenPriceFeeds[loan.collateralAddress],
+                loan.maxPriceStaleness
+            );
+        }
+
+        // Get price for loan token (always uses Chainlink)
         (uint256 loanTokenPrice, bool tokenStale) = _getLatestPrice(
             tokenPriceFeeds[loan.tokenAddress],
             loan.maxPriceStaleness
@@ -643,12 +680,6 @@ contract DreamLend is ReentrancyGuard, Ownable {
         loan.startTime = block.timestamp;
         loan.status = LoanStatus.Active;
 
-        // Start rewards for both lender and borrower if rewards distributor is set
-        if (address(rewardsDistributor) != address(0)) {
-            rewardsDistributor.startAccruingRewards(loan.lender, loan.amount);
-            rewardsDistributor.startAccruingRewards(msg.sender, loan.amount);
-        }
-
         // Remove from active loan offers array (gas efficient swap and pop)
         _removeLoanFromActiveOffers(loanId);
 
@@ -688,12 +719,6 @@ contract DreamLend is ReentrancyGuard, Ownable {
         uint256 interest = (annualizedAmount * timeElapsed) / 31557600; // 365.25 * 24 * 60 * 60 = 31557600 seconds per year
 
         uint256 totalRepayment = loan.amount + interest;
-
-        // Stop rewards for both lender and borrower BEFORE changing loan status
-        if (address(rewardsDistributor) != address(0)) {
-            rewardsDistributor.stopAccruingRewards(loan.lender, loan.amount);
-            rewardsDistributor.stopAccruingRewards(loan.borrower, loan.amount);
-        }
 
         // Transfer repayment from borrower to lender
         IERC20(loan.tokenAddress).safeTransferFrom(
@@ -886,16 +911,6 @@ contract DreamLend is ReentrancyGuard, Ownable {
         // If fully repaid, return collateral and mark as repaid
         if (newRemainingAmount == 0) {
             // Stop rewards for both lender and borrower BEFORE changing loan status
-            if (address(rewardsDistributor) != address(0)) {
-                rewardsDistributor.stopAccruingRewards(
-                    loan.lender,
-                    loan.amount
-                );
-                rewardsDistributor.stopAccruingRewards(
-                    loan.borrower,
-                    loan.amount
-                );
-            }
 
             // Return collateral to borrower
             IERC20(loan.collateralAddress).safeTransfer(
@@ -960,12 +975,6 @@ contract DreamLend is ReentrancyGuard, Ownable {
             timeDefaulted || priceDefaulted,
             "Loan has not defaulted yet (time or price)"
         );
-
-        // Stop rewards for both lender and borrower BEFORE changing loan status
-        if (address(rewardsDistributor) != address(0)) {
-            rewardsDistributor.stopAccruingRewards(loan.lender, loan.amount);
-            rewardsDistributor.stopAccruingRewards(loan.borrower, loan.amount);
-        }
 
         // Calculate liquidator fee and remaining collateral for lender
         uint256 liquidatorFee = (loan.collateralAmount * LIQUIDATION_FEE_BPS) /
@@ -1292,6 +1301,97 @@ contract DreamLend is ReentrancyGuard, Ownable {
         require(loan.status == LoanStatus.Active, "Loan is not active");
 
         return _getCollateralizationRatio(loanId);
+    }
+
+    /**
+     * @notice Check if a loan uses Doma fractional token as collateral
+     * @param loanId The loan ID to check
+     * @return True if the loan uses Doma collateral, false otherwise
+     */
+    function isDomaBackedLoan(uint256 loanId) external view returns (bool) {
+        require(loans[loanId].id != 0, "Loan does not exist");
+        return loans[loanId].isDomaCollateral;
+    }
+
+    /**
+     * @notice Get the domain token ID for a Doma-backed loan
+     * @param loanId The loan ID to query
+     * @return The domain NFT token ID (0 if not Doma-backed or not set)
+     */
+    function getDomainTokenId(uint256 loanId) external view returns (uint256) {
+        require(loans[loanId].id != 0, "Loan does not exist");
+        return loans[loanId].domainTokenId;
+    }
+
+    /**
+     * @notice Get all Doma-backed loan IDs from an array of loan IDs
+     * @param loanIds Array of loan IDs to filter
+     * @return Array of Doma-backed loan IDs
+     */
+    function filterDomaBackedLoans(
+        uint256[] memory loanIds
+    ) external view returns (uint256[] memory) {
+        // Count Doma-backed loans
+        uint256 domaCount = 0;
+        for (uint256 i = 0; i < loanIds.length; i++) {
+            if (
+                loans[loanIds[i]].id != 0 && loans[loanIds[i]].isDomaCollateral
+            ) {
+                domaCount++;
+            }
+        }
+
+        // Create result array
+        uint256[] memory domaLoans = new uint256[](domaCount);
+        uint256 index = 0;
+        for (uint256 i = 0; i < loanIds.length; i++) {
+            if (
+                loans[loanIds[i]].id != 0 && loans[loanIds[i]].isDomaCollateral
+            ) {
+                domaLoans[index] = loanIds[i];
+                index++;
+            }
+        }
+
+        return domaLoans;
+    }
+
+    /**
+     * @notice Check domain lock status for compliance (future feature)
+     * @dev This demonstrates integration with IDomaOwnershipToken for compliance checks
+     * @param loanId The loan ID to check
+     * @param domaOwnershipAddress The address of the DomaOwnership NFT contract
+     * @return isLocked True if the underlying domain NFT is locked
+     * @return domainId The domain token ID (0 if not available)
+     */
+    function checkDomainLockStatus(
+        uint256 loanId,
+        address domaOwnershipAddress
+    ) external view returns (bool isLocked, uint256 domainId) {
+        require(loans[loanId].id != 0, "Loan does not exist");
+        Loan storage loan = loans[loanId];
+
+        // Return false if not Doma collateral or token ID not set
+        if (!loan.isDomaCollateral || loan.domainTokenId == 0) {
+            return (false, 0);
+        }
+
+        // Return false if DomaOwnership address not provided
+        if (domaOwnershipAddress == address(0)) {
+            return (false, loan.domainTokenId);
+        }
+
+        // Check lock status via IDomaOwnershipToken interface
+        try
+            IDomaOwnershipToken(domaOwnershipAddress).lockStatusOf(
+                loan.domainTokenId
+            )
+        returns (bool locked) {
+            return (locked, loan.domainTokenId);
+        } catch {
+            // If the call fails, return false (assume not locked)
+            return (false, loan.domainTokenId);
+        }
     }
 
     // ============ Internal Functions ============
