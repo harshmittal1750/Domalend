@@ -1,0 +1,37 @@
+{
+    "name": "catalex-backend",
+    "version": "1.0.0",
+    "description": "Backend service for DomaRank oracle data collection and price updates",
+    "main": "src/index.js",
+    "type": "module",
+    "scripts": {
+        "start": "node src/orchestrator.js start",
+        "start:once": "node src/orchestrator.js once",
+        "dev": "nodemon src/orchestrator.js start",
+        "backend": "node src/oracle-backend.js",
+        "backend:dev": "nodemon src/oracle-backend.js",
+        "test-backend": "node src/test-backend.js",
+        "info": "node src/index.js",
+        "collect": "node src/dataCollector.js",
+        "test-pricing": "node src/testPricing.js",
+        "test-oracle": "node src/oracleUpdater.js",
+        "test-oracle-tx": "node src/test-oracle-tx.js",
+        "test-subgraph": "node src/subgraphQueries.js"
+    },
+    "keywords": [
+        "doma",
+        "oracle",
+        "subgraph"
+    ],
+    "author": "",
+    "license": "MIT",
+    "dependencies": {
+        "graphql-request": "^6.1.0",
+        "dotenv": "^16.4.5",
+        "ethers": "^6.11.1",
+        "axios": "^1.6.7"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.0"
+    }
+}

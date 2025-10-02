@@ -1,3 +1,6 @@
 contracts/lib/
 contracts/broadcast/Deploy.s.sol
 coverage
+node_modules/
+node_modules
+backend/config.js
