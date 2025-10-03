@@ -279,7 +279,7 @@ export default function OffersPage() {
         <div>
           <h1 className="text-3xl font-bold">Available Loan Offers</h1>
           <p className="text-muted-foreground mt-2">
-            Browse and accept loan offers from lenders on DreamLend
+            Browse and accept loan offers from lenders on DomaLend
           </p>
         </div>
         <div className="flex items-center space-x-3">

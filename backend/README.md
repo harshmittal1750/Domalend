@@ -622,7 +622,7 @@ Congratulations! You now have a complete oracle system:
 ### ✅ Smart Contracts
 
 - **DomaRankOracle.sol** - On-chain price storage
-- **IDomaRankOracle** - Interface for DreamLend integration
+- **IDomaRankOracle** - Interface for DomaLend integration
 - **IDomaOwnershipToken** - Compliance checking interface
 
 ### ✅ Backend Services
@@ -634,7 +634,7 @@ Congratulations! You now have a complete oracle system:
 
 ### ✅ Integration
 
-- **DreamLend** - Modified to use DomaRank for fractional tokens
+- **DomaLend** - Modified to use DomaRank for fractional tokens
 - **Dual Oracle Support** - Chainlink for standard tokens, DomaRank for fractional
 
 ### 🔄 The Complete Flow
@@ -648,7 +648,7 @@ Fractional Domain Token (NFT)
          ↓
    DomaRank Oracle (on-chain)
          ↓
-   DreamLend Contract
+   DomaLend Contract
          ↓
    Accepts as Collateral!
 ```
@@ -684,4 +684,4 @@ Fractional Domain Token (NFT)
 
 ---
 
-**Built with ❤️ for the Doma and DreamLend ecosystems**
+**Built with ❤️ for the Doma and DomaLend ecosystems**

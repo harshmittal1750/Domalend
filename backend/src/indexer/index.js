@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 dotenv.config();
 
 /**
- * Main entry point for the DreamLend Indexer
+ * Main entry point for the DomaLend Indexer
  * Indexes loan events and serves them via REST/GraphQL API
  */
 
@@ -30,16 +30,16 @@ const CONFIG = {
   corsOrigin: process.env.INDEXER_CORS_ORIGIN || "*",
 };
 
-// Load DreamLend ABI
+// Load DomaLend ABI
 let dreamLendABI;
 try {
   const abiPath = path.join(__dirname, "./Dreamlend.json");
   const abiFile = fs.readFileSync(abiPath, "utf8");
   const abiJson = JSON.parse(abiFile);
   dreamLendABI = abiJson.abi;
-  console.log("✓ Loaded DreamLend ABI");
+  console.log("✓ Loaded DomaLend ABI");
 } catch (error) {
-  console.error("Error loading DreamLend ABI:", error.message);
+  console.error("Error loading DomaLend ABI:", error.message);
   console.error("Please ensure the contract is compiled:");
   console.error("  cd contracts && forge build");
   process.exit(1);
@@ -51,7 +51,7 @@ if (
   CONFIG.contractAddress === "YOUR_DEPLOYED_CONTRACT_ADDRESS"
 ) {
   console.error("❌ Error: DREAM_LEND_CONTRACT_ADDRESS not set in .env");
-  console.error("Please set your deployed DreamLend contract address");
+  console.error("Please set your deployed DomaLend contract address");
   process.exit(1);
 }
 
@@ -153,7 +153,7 @@ async function main() {
     // Start server
     await server.start();
 
-    console.log("✅ DreamLend Indexer is running!");
+    console.log("✅ DomaLend Indexer is running!");
     console.log("   - Indexing blockchain events");
     console.log("   - Serving data via GraphQL and REST APIs");
     console.log(`   - Access: http://localhost:${CONFIG.serverPort}`);

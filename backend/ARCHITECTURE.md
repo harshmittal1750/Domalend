@@ -11,14 +11,14 @@ The DomaRank Oracle is a fully automated system that bridges off-chain domain da
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                        User Interface                            │
-│                     (DreamLend Frontend)                         │
+│                     (DomaLend Frontend)                         │
 └──────────────────────────────┬──────────────────────────────────┘
                                │
                                ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                    Smart Contracts Layer                         │
 │  ┌──────────────┐    ┌──────────────┐    ┌─────────────────┐  │
-│  │  DreamLend   │───▶│ DomaRank     │    │  Fractional     │  │
+│  │  DomaLend   │───▶│ DomaRank     │    │  Fractional     │  │
 │  │  Contract    │    │  Oracle      │    │  Domain Tokens  │  │
 │  └──────────────┘    └──────┬───────┘    └─────────────────┘  │
 └───────────────────────────────┼──────────────────────────────────┘
@@ -299,10 +299,10 @@ function getTokenValue(address _tokenAddress) external view returns (uint256)
 mapping(address => uint256) public tokenPrices;
 ```
 
-**Integration with DreamLend:**
+**Integration with DomaLend:**
 
 ```solidity
-// In DreamLend.sol
+// In DomaLend.sol
 function _getCollateralizationRatio(uint256 loanId) internal view {
   if (domaRankOracleAddress != address(0) &&
       address(tokenPriceFeeds[loan.collateralAddress]) == address(0)) {

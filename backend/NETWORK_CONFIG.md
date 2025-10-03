@@ -170,7 +170,7 @@ For cross-chain operations, use the Cross Chain Gateway:
 Doma Testnet Gateway: 0xCE1476C791ff195e462632bf9Eb22f3d3cA07388
 ```
 
-## DreamLend Deployment
+## DomaLend Deployment
 
 ### Deployment Steps on Doma Testnet
 
@@ -190,15 +190,15 @@ forge create src/DomaRankOracle.sol:DomaRankOracle \
   --private-key $PRIVATE_KEY
 ```
 
-3. **Deploy DreamLend:**
+3. **Deploy DomaLend:**
 
 ```bash
-forge create src/DreamLend.sol:DreamLend \
+forge create src/DomaLend.sol:DomaLend \
   --rpc-url https://rpc-testnet.doma.xyz \
   --private-key $PRIVATE_KEY
 ```
 
-4. **Set DomaRank Oracle in DreamLend:**
+4. **Set DomaRank Oracle in DomaLend:**
 
 ```bash
 cast send $DREAM_LEND_ADDRESS \

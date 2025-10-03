@@ -14,7 +14,7 @@ import {
   DOMA_RANK_ORACLE_ADDRESS,
 } from "@/lib/contracts";
 
-// DreamLend contract ABI for price-related functions
+// DomaLend contract ABI for price-related functions
 const DREAMLEND_ABI = [
   {
     inputs: [{ name: "loanId", type: "uint256" }],
@@ -115,7 +115,7 @@ export interface CollateralCalculation {
   };
 }
 
-const DREAMLEND_ADDRESS = "0xe268b4ff6Ced7330353eB26015a34fF78e06C8b3"; // DreamLend contract address
+const DREAMLEND_ADDRESS = "0xe268b4ff6Ced7330353eB26015a34fF78e06C8b3"; // DomaLend contract address
 
 export function useTokenPrices(tokens: TokenInfo[]) {
   const [prices, setPrices] = useState<Map<string, TokenPrice>>(new Map());
@@ -135,7 +135,6 @@ export function useTokenPrices(tokens: TokenInfo[]) {
   const fetchPrices = useCallback(async () => {
     if (tokens.length === 0) return;
 
-   
     setIsLoading(true);
     setError(null);
 
@@ -388,7 +387,7 @@ export function useCollateralCalculation(
     return `${loanToken.address}-${collateralToken.address}`;
   }, [loanToken?.address, collateralToken?.address]);
 
-  // Fetch recommended parameters from DreamLend contract
+  // Fetch recommended parameters from DomaLend contract
   useEffect(() => {
     const fetchRecommendedParams = async () => {
       if (!loanToken || !collateralToken) {

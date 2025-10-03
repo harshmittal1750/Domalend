@@ -1,8 +1,8 @@
-# 🚀 Quick Start: DreamLend Indexer
+# 🚀 Quick Start: DomaLend Indexer
 
 ## What is this?
 
-A custom blockchain indexer that replaces The Graph subgraph. It indexes your DreamLend loan events and serves them via an API that's **100% compatible** with your existing frontend code - no frontend changes needed!
+A custom blockchain indexer that replaces The Graph subgraph. It indexes your DomaLend loan events and serves them via an API that's **100% compatible** with your existing frontend code - no frontend changes needed!
 
 ## ⚡ 5-Minute Setup
 
@@ -11,7 +11,7 @@ A custom blockchain indexer that replaces The Graph subgraph. It indexes your Dr
 Add these to your `backend/.env`:
 
 ```bash
-# Your deployed DreamLend contract address (REQUIRED)
+# Your deployed DomaLend contract address (REQUIRED)
 DREAM_LEND_CONTRACT_ADDRESS=0xYourContractAddressHere
 
 # Blockchain RPC (REQUIRED)

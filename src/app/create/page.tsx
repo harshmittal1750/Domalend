@@ -495,7 +495,7 @@ export default function CreateLoanOfferPage() {
             Create Loan Offer
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Create a loan offer on DreamLend. Your tokens will be securely
+            Create a loan offer on DomaLend. Your tokens will be securely
             escrowed until the offer is accepted or cancelled.
           </p>
         </div>

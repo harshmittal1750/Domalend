@@ -23,24 +23,24 @@ const faqs = [
     icon: HelpCircle,
     questions: [
       {
-        question: "What is DreamLend Finance?",
+        question: "What is DomaLend Finance?",
         answer:
-          "DreamLend Finance is a peer-to-peer (P2P) cryptocurrency lending platform built on Doma. It allows users to lend their crypto assets to earn interest or borrow crypto by providing collateral, all through secure smart contracts.",
+          "DomaLend Finance is a peer-to-peer (P2P) cryptocurrency lending platform built on Doma. It allows users to lend their crypto assets to earn interest or borrow crypto by providing collateral, all through secure smart contracts.",
       },
       {
-        question: "How do I get started with DreamLend?",
+        question: "How do I get started with DomaLend?",
         answer:
           "To get started, simply connect your Web3 wallet (like MetaMask) to our platform. Once connected, you can browse loan offers to borrow crypto or create your own loan offers to start lending and earning interest.",
       },
       {
         question: "What wallets are supported?",
         answer:
-          "DreamLend supports all major Web3 wallets including MetaMask, WalletConnect, Coinbase Wallet, and any wallet compatible with WalletConnect protocol.",
+          "DomaLend supports all major Web3 wallets including MetaMask, WalletConnect, Coinbase Wallet, and any wallet compatible with WalletConnect protocol.",
       },
       {
         question: "Do I need to create an account?",
         answer:
-          "No, you don't need to create a traditional account. DreamLend is fully decentralized - you just need to connect your Web3 wallet to start using the platform.",
+          "No, you don't need to create a traditional account. DomaLend is fully decentralized - you just need to connect your Web3 wallet to start using the platform.",
       },
     ],
   },
@@ -51,12 +51,12 @@ const faqs = [
       {
         question: "How much interest can I earn by lending?",
         answer:
-          "Interest rates on DreamLend are market-driven and can vary based on supply and demand. Lenders typically earn between 5-15% APY, depending on the loan terms, duration, and market conditions.",
+          "Interest rates on DomaLend are market-driven and can vary based on supply and demand. Lenders typically earn between 5-15% APY, depending on the loan terms, duration, and market conditions.",
       },
       {
         question: "What tokens can I lend?",
         answer:
-          "DreamLend supports a variety of popular cryptocurrencies including stablecoins (USDC, USDT), major tokens (WETH, WBTC), and other selected ERC-20 tokens. The supported token list is regularly updated based on market demand and security assessments.",
+          "DomaLend supports a variety of popular cryptocurrencies including stablecoins (USDC, USDT), major tokens (WETH, WBTC), and other selected ERC-20 tokens. The supported token list is regularly updated based on market demand and security assessments.",
       },
       {
         question: "How do I create a loan offer?",
@@ -75,9 +75,9 @@ const faqs = [
     icon: Zap,
     questions: [
       {
-        question: "How do crypto loans work on DreamLend?",
+        question: "How do crypto loans work on DomaLend?",
         answer:
-          "Crypto loans on DreamLend are collateralized, meaning you must deposit crypto assets as collateral to secure your loan. The collateral value must exceed the loan value by a certain ratio to protect lenders.",
+          "Crypto loans on DomaLend are collateralized, meaning you must deposit crypto assets as collateral to secure your loan. The collateral value must exceed the loan value by a certain ratio to protect lenders.",
       },
       {
         question: "What can I use as collateral?",
@@ -101,14 +101,14 @@ const faqs = [
     icon: Shield,
     questions: [
       {
-        question: "How secure is DreamLend Finance?",
+        question: "How secure is DomaLend Finance?",
         answer:
-          "DreamLend prioritizes security with multi-signature wallets, audited smart contracts, and institutional-grade security protocols. All funds are secured by smart contracts, and we never have custody of your assets.",
+          "DomaLend prioritizes security with multi-signature wallets, audited smart contracts, and institutional-grade security protocols. All funds are secured by smart contracts, and we never have custody of your assets.",
       },
       {
         question: "Are smart contracts audited?",
         answer:
-          "Yes, all DreamLend smart contracts undergo rigorous security audits by reputable firms. We also implement additional security measures like time-locks and multi-signature requirements for critical functions.",
+          "Yes, all DomaLend smart contracts undergo rigorous security audits by reputable firms. We also implement additional security measures like time-locks and multi-signature requirements for critical functions.",
       },
       {
         question: "What happens if there's a smart contract bug?",
@@ -118,7 +118,7 @@ const faqs = [
       {
         question: "How are prices determined for liquidations?",
         answer:
-          "DreamLend uses Chainlink price oracles to get real-time, accurate market prices for all supported tokens. This ensures fair and transparent pricing for collateral valuations and liquidations.",
+          "DomaLend uses Chainlink price oracles to get real-time, accurate market prices for all supported tokens. This ensures fair and transparent pricing for collateral valuations and liquidations.",
       },
     ],
   },
@@ -127,19 +127,19 @@ const faqs = [
     icon: Clock,
     questions: [
       {
-        question: "What fees does DreamLend charge?",
+        question: "What fees does DomaLend charge?",
         answer:
-          "DreamLend charges a small platform fee (typically 0.5-1%) on successful loans to maintain and improve the platform. All fees are clearly displayed before you confirm any transaction.",
+          "DomaLend charges a small platform fee (typically 0.5-1%) on successful loans to maintain and improve the platform. All fees are clearly displayed before you confirm any transaction.",
       },
       {
         question: "Are there any hidden fees?",
         answer:
-          "No, DreamLend believes in complete transparency. All fees, including platform fees and network gas costs, are clearly displayed before you confirm any transaction.",
+          "No, DomaLend believes in complete transparency. All fees, including platform fees and network gas costs, are clearly displayed before you confirm any transaction.",
       },
       {
         question: "How much are gas fees?",
         answer:
-          "Gas fees depend on network congestion and are paid to the blockchain network, not DreamLend. Built on Doma, our platform offers significantly lower gas fees compared to Ethereum mainnet.",
+          "Gas fees depend on network congestion and are paid to the blockchain network, not DomaLend. Built on Doma, our platform offers significantly lower gas fees compared to Ethereum mainnet.",
       },
       {
         question: "Do I pay fees for cancelled offers?",
@@ -168,9 +168,9 @@ const faqs = [
           "For support, you can reach us through our Discord community, send an email to harsh@catalex.finance, or use the help chat feature on our website.",
       },
       {
-        question: "Can I use DreamLend on mobile?",
+        question: "Can I use DomaLend on mobile?",
         answer:
-          "Yes, DreamLend is fully responsive and works on mobile devices. You can use it through mobile Web3 browsers or wallet apps like MetaMask mobile.",
+          "Yes, DomaLend is fully responsive and works on mobile devices. You can use it through mobile Web3 browsers or wallet apps like MetaMask mobile.",
       },
     ],
   },
@@ -196,7 +196,7 @@ export default function FAQ() {
             Frequently Asked Questions
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Find answers to common questions about DreamLend &apos; s P2P crypto
+            Find answers to common questions about DomaLend &apos; s P2P crypto
             lending platform. Learn about lending, borrowing, security, fees,
             and more.
           </p>
@@ -242,7 +242,7 @@ export default function FAQ() {
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Can &apos;t find the answer you &apos;re looking for? Our support
-            team is here to help you get the most out of DreamLend Finance.
+            team is here to help you get the most out of DomaLend Finance.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a

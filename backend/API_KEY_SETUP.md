@@ -11,7 +11,7 @@ The Doma Subgraph GraphQL API requires authentication to query fractional token 
 1. **Join Doma Discord**: https://discord.gg/doma
 2. **Request API Access**: Post in #developer-support or #api-access channel
 3. **Provide Details**:
-   - Your project name: "DreamLend Oracle Integration"
+   - Your project name: "DomaLend Oracle Integration"
    - Use case: "Querying fractional token data for lending protocol"
    - GitHub: Your repository URL
    - Expected usage: "Querying every 10 minutes for price updates"
@@ -28,18 +28,18 @@ The Doma Subgraph GraphQL API requires authentication to query fractional token 
 
 Send an email to: developers@doma.xyz (check official docs for correct email)
 
-**Subject**: API Key Request - DreamLend Oracle Integration
+**Subject**: API Key Request - DomaLend Oracle Integration
 
 **Body**:
 
 ```
 Hi Doma Team,
 
-I'm building a lending protocol (DreamLend) that integrates with Doma's
+I'm building a lending protocol (DomaLend) that integrates with Doma's
 fractional domain tokens. I need API access to query the Subgraph for
 token data to power my oracle system.
 
-Project: DreamLend P2P Lending + DomaRank Oracle
+Project: DomaLend P2P Lending + DomaRank Oracle
 GitHub: [your-repo]
 Use Case: Automated token price updates every 10 minutes
 Expected QPS: ~0.002 (1 query per 10 minutes)

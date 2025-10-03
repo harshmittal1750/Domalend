@@ -524,7 +524,7 @@ export default function AnalyticsPage() {
       <div className="container mx-auto px-4 py-8">
         <Card>
           <CardHeader>
-            <CardTitle>DreamLend Analytics</CardTitle>
+            <CardTitle>DomaLend Analytics</CardTitle>
             <CardDescription>
               Connect your wallet to view platform analytics
             </CardDescription>
@@ -548,7 +548,7 @@ export default function AnalyticsPage() {
         <div>
           <h1 className="text-3xl font-bold">Platform Analytics</h1>
           <p className="text-gray-600 mt-2">
-            Real-time insights into DreamLend protocol activity
+            Real-time insights into DomaLend protocol activity
           </p>
           <p className="text-sm text-gray-500 mt-1">
             Analyzing data from the last ~2000 blocks (due to RPC limitations)

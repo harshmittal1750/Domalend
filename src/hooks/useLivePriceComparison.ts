@@ -1,7 +1,7 @@
 /**
  * @file useLivePriceComparison.ts
  * @description React hook for comparing historical loan prices with live oracle prices
- * @author DreamLend Team
+ * @author harshmittal.dev
  */
 
 import React, { useState, useCallback, useMemo, useRef } from "react";

@@ -1,15 +1,28 @@
 "use client";
 
-import { useState, useImperativeHandle, forwardRef } from "react";
+import { useState, useImperativeHandle, forwardRef, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, Check, Wallet, RefreshCw } from "lucide-react";
+import {
+  ChevronDown,
+  Check,
+  Wallet,
+  RefreshCw,
+  Search,
+  X,
+  Sparkles,
+  TrendingUp,
+} from "lucide-react";
 import {
   TokenInfo,
   getAllSupportedTokens,
@@ -48,6 +61,7 @@ export const TokenSelector = forwardRef<TokenSelectorRef, TokenSelectorProps>(
     ref
   ) => {
     const [open, setOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
     const allTokens = getAllSupportedTokens();
 
     // // Fetch balance for selected token
@@ -83,7 +97,27 @@ export const TokenSelector = forwardRef<TokenSelectorRef, TokenSelectorProps>(
     const handleSelect = (token: TokenInfo) => {
       onTokenSelect(token);
       setOpen(false);
+      setSearchQuery(""); // Reset search on close
     };
+
+    // Filter tokens based on search query
+    const filteredTokens = useMemo(() => {
+      if (!searchQuery.trim()) return availableTokens;
+
+      const query = searchQuery.toLowerCase();
+      return availableTokens.filter(
+        (token) =>
+          token.name.toLowerCase().includes(query) ||
+          token.symbol.toLowerCase().includes(query) ||
+          token.address.toLowerCase().includes(query)
+      );
+    }, [availableTokens, searchQuery]);
+
+    // Get popular tokens (domain tokens)
+    const popularTokens = useMemo(
+      () => availableTokens.filter((t) => t.category === "domain").slice(0, 4),
+      [availableTokens]
+    );
 
     // Expose refresh function to parent component
     // useImperativeHandle(
@@ -99,14 +133,14 @@ export const TokenSelector = forwardRef<TokenSelectorRef, TokenSelectorProps>(
         <Label htmlFor="token-selector" className="text-base font-medium">
           {label}
         </Label>
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
             <Button
               id="token-selector"
               variant="outline"
               role="combobox"
               aria-expanded={open}
-              className="w-full justify-between h-auto p-3"
+              className="w-full justify-between h-auto p-4 hover:bg-accent/50 transition-all duration-300 hover:scale-[1.01] luxury-shadow-sm"
             >
               {selectedToken ? (
                 <div className="flex items-center justify-between w-full">
@@ -161,94 +195,224 @@ export const TokenSelector = forwardRef<TokenSelectorRef, TokenSelectorProps>(
               ) : (
                 <span className="text-muted-foreground">{placeholder}</span>
               )}
-              <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50 group-hover:opacity-100 transition-opacity" />
             </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[400px] p-0">
-            <div className="max-h-[300px] overflow-y-auto">
-              {Object.entries(TOKEN_CATEGORIES).map(
-                ([categoryKey, category]) => {
-                  const categoryTokens = category.tokens.filter((token) => {
-                    // Exclude tokens with zero address (unassigned placeholders)
-                    if (
-                      token.address ===
-                      "0x0000000000000000000000000000000000000000"
-                    ) {
-                      return false;
-                    }
-                    // Exclude the specified token
-                    if (
-                      excludeToken &&
-                      token.address === excludeToken.address
-                    ) {
-                      return false;
-                    }
-                    return true;
-                  });
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl p-0 gap-0 luxury-shadow-lg">
+            <DialogHeader className="px-6 pt-6 pb-4 border-b border-border">
+              <DialogTitle className="text-2xl font-semibold flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-primary" />
+                Select {label}
+              </DialogTitle>
+              <DialogDescription>
+                Choose from stablecoins, crypto assets, or fractionalized domain
+                tokens
+              </DialogDescription>
+            </DialogHeader>
 
-                  if (categoryTokens.length === 0) return null;
+            {/* Search Bar */}
+            <div className="px-6 py-4 border-b border-border bg-secondary/30">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by name, symbol, or address..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 pr-9 bg-background"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            </div>
 
-                  return (
-                    <div key={categoryKey} className="p-2">
-                      <div className="px-2 py-1 text-sm font-medium text-muted-foreground">
-                        {category.name}
-                      </div>
-                      <div className="text-xs text-muted-foreground px-2 mb-2">
-                        {category.description}
-                      </div>
+            {/* Popular Tokens - Quick Select */}
+            {!searchQuery && popularTokens.length > 0 && (
+              <div className="px-6 py-4 border-b border-border bg-gradient-to-r from-primary/5 to-accent/5">
+                <div className="flex items-center gap-2 mb-3">
+                  <TrendingUp className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-medium text-foreground">
+                    Popular Domain Tokens
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {popularTokens.map((token) => (
+                    <Button
+                      key={token.address}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleSelect(token)}
+                      className={`
+                        transition-all duration-300 hover:scale-105
+                        ${selectedToken?.address === token.address ? "border-primary bg-primary/10" : ""}
+                      `}
+                    >
+                      {token.symbol}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
 
-                      {categoryTokens.map((token) => (
-                        <button
-                          key={token.address}
-                          className="w-full flex items-center justify-between p-2 hover:bg-accent rounded-md transition-colors"
-                          onClick={() => handleSelect(token)}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="flex flex-col items-start">
-                              <div className="flex items-center gap-2">
-                                <span className="font-medium">
-                                  {token.symbol}
-                                </span>
-                                <Badge
-                                  variant="secondary"
-                                  className={`text-xs ${
-                                    RISK_COLORS[token.volatilityTier]
-                                  }`}
-                                >
-                                  {token.volatilityTier}
-                                </Badge>
-                              </div>
-                              <span className="text-sm text-muted-foreground">
-                                {token.name}
+            {/* Token List */}
+            <div className="px-6 py-4 overflow-y-auto max-h-[50vh]">
+              {searchQuery && filteredTokens.length === 0 ? (
+                <div className="py-12 text-center">
+                  <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+                  <p className="text-muted-foreground">
+                    No tokens found matching "{searchQuery}"
+                  </p>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSearchQuery("")}
+                    className="mt-2"
+                  >
+                    Clear search
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {Object.entries(TOKEN_CATEGORIES).map(
+                    ([categoryKey, category]) => {
+                      const categoryTokens = category.tokens.filter((token) => {
+                        // Exclude tokens with zero address (unassigned placeholders)
+                        if (
+                          token.address ===
+                          "0x0000000000000000000000000000000000000000"
+                        ) {
+                          return false;
+                        }
+                        // Exclude the specified token
+                        if (
+                          excludeToken &&
+                          token.address === excludeToken.address
+                        ) {
+                          return false;
+                        }
+                        // Apply search filter
+                        if (searchQuery) {
+                          return filteredTokens.some(
+                            (ft) => ft.address === token.address
+                          );
+                        }
+                        return true;
+                      });
+
+                      if (categoryTokens.length === 0) return null;
+
+                      return (
+                        <div key={categoryKey}>
+                          <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border/50">
+                            <div className="px-3 py-1 rounded-full bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
+                              <span className="text-sm font-semibold text-foreground">
+                                {category.name}
                               </span>
-                              <div className="text-xs text-muted-foreground">
-                                Min Collateral:{" "}
-                                {formatBasisPoints(
-                                  DEFAULT_PARAMETERS[token.volatilityTier]
-                                    .minCollateralRatio
-                                )}
-                              </div>
                             </div>
+                            <span className="text-xs text-muted-foreground">
+                              {category.description}
+                            </span>
                           </div>
 
-                          {selectedToken?.address === token.address && (
-                            <Check className="h-4 w-4 text-primary" />
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  );
-                }
-              )}
+                          <div className="space-y-2">
+                            {categoryTokens.map((token) => {
+                              const isSelected =
+                                selectedToken?.address === token.address;
+                              return (
+                                <button
+                                  key={token.address}
+                                  className={`
+                                    w-full flex items-center justify-between p-4 rounded-xl
+                                    transition-all duration-300 group
+                                    hover:bg-gradient-to-r hover:from-primary/5 hover:to-accent/5
+                                    hover:luxury-shadow-sm hover:scale-[1.01]
+                                    ${isSelected ? "bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary/30" : "border-2 border-transparent"}
+                                  `}
+                                  onClick={() => handleSelect(token)}
+                                >
+                                  <div className="flex items-start gap-4 flex-1">
+                                    {/* Token Icon Placeholder */}
+                                    <div
+                                      className={`
+                                      w-12 h-12 rounded-full flex items-center justify-center
+                                      bg-gradient-to-br from-primary/20 to-accent/20
+                                      border-2 border-primary/30
+                                      group-hover:scale-110 transition-transform duration-300
+                                    `}
+                                    >
+                                      <span className="text-xl font-bold text-foreground">
+                                        {token.symbol[0]}
+                                      </span>
+                                    </div>
 
-              {availableTokens.length === 0 && (
-                <div className="p-4 text-center text-muted-foreground">
-                  No tokens available
+                                    {/* Token Info */}
+                                    <div className="flex flex-col items-start flex-1">
+                                      <div className="flex items-center gap-2 mb-1">
+                                        <span className="font-semibold text-lg text-foreground">
+                                          {token.symbol}
+                                        </span>
+                                        <Badge
+                                          variant="secondary"
+                                          className={`text-xs ${
+                                            RISK_COLORS[token.volatilityTier]
+                                          }`}
+                                        >
+                                          {token.volatilityTier}
+                                        </Badge>
+                                      </div>
+                                      <span className="text-sm text-muted-foreground mb-2">
+                                        {token.name}
+                                      </span>
+                                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                                        <span>
+                                          Min Collateral:{" "}
+                                          <span className="font-medium text-foreground">
+                                            {formatBasisPoints(
+                                              DEFAULT_PARAMETERS[
+                                                token.volatilityTier
+                                              ].minCollateralRatio
+                                            )}
+                                          </span>
+                                        </span>
+                                        {token.isDomainToken && (
+                                          <Badge
+                                            variant="outline"
+                                            className="text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200"
+                                          >
+                                            <Sparkles className="h-3 w-3 mr-1" />
+                                            Domain Token
+                                          </Badge>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {/* Selected Check */}
+                                  {isSelected && (
+                                    <div className="ml-3">
+                                      <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                                        <Check className="h-4 w-4 text-primary-foreground" />
+                                      </div>
+                                    </div>
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    }
+                  )}
                 </div>
               )}
             </div>
-          </PopoverContent>
-        </Popover>
+          </DialogContent>
+        </Dialog>
 
         {/* {selectedToken && (
           <div className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-md">

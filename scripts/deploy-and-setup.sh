@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Deploy and Setup Mock Tokens for DreamLend Testing
+# Deploy and Setup Mock Tokens for DomaLend Testing
 # Usage: ./scripts/deploy-and-setup.sh
 
 set -e
@@ -11,7 +11,7 @@ if [ -f ".env" ]; then
     export $(grep -v '^#' .env | xargs)
 fi
 
-echo "🚀 Starting DreamLend Mock Token Deployment..."
+echo "🚀 Starting DomaLend Mock Token Deployment..."
 
 # Check if required environment variables are set
 if [ -z "$PRIVATE_KEY" ]; then
@@ -74,9 +74,9 @@ node scripts/update-token-addresses.js \
     --marb=$MARB_ADDRESS \
     --msol=$MSOL_ADDRESS
 
-# Step 3: Redeploy DreamLend contract
+# Step 3: Redeploy DomaLend contract
 echo ""
-echo "🏗️  Step 3: Redeploying DreamLend contract with updated configuration..."
+echo "🏗️  Step 3: Redeploying DomaLend contract with updated configuration..."
 cd contracts
 
 DREAMLEND_OUTPUT=$(forge script script/Deploy.s.sol \
@@ -88,7 +88,7 @@ DREAMLEND_OUTPUT=$(forge script script/Deploy.s.sol \
 
 echo "$DREAMLEND_OUTPUT"
 
-DREAMLEND_ADDRESS=$(echo "$DREAMLEND_OUTPUT" | grep "DreamLend deployed to:" | awk '{print $4}')
+DREAMLEND_ADDRESS=$(echo "$DREAMLEND_OUTPUT" | grep "DomaLend deployed to:" | awk '{print $4}')
 
 cd ..
 
@@ -108,7 +108,7 @@ echo ""
 echo "🎉 Deployment completed successfully!"
 echo ""
 echo "📋 Contract Addresses:"
-echo "DreamLend: $DREAMLEND_ADDRESS"
+echo "DomaLend: $DREAMLEND_ADDRESS"
 echo "MockUSDT:  $MUSDT_ADDRESS"
 echo "MockUSDC:  $MUSDC_ADDRESS"
 echo "MockWBTC:  $MWBTC_ADDRESS"

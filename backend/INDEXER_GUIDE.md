@@ -1,8 +1,8 @@
-# DreamLend Indexer Guide
+# DomaLend Indexer Guide
 
 ## Overview
 
-The DreamLend Indexer is a custom blockchain event indexer that replaces The Graph subgraph. It indexes loan events from the DreamLend smart contract and serves them via REST and GraphQL APIs that are **100% compatible** with your existing frontend code.
+The DomaLend Indexer is a custom blockchain event indexer that replaces The Graph subgraph. It indexes loan events from the DomaLend smart contract and serves them via REST and GraphQL APIs that are **100% compatible** with your existing frontend code.
 
 ## Why We Need This
 
@@ -16,7 +16,7 @@ The DreamLend Indexer is a custom blockchain event indexer that replaces The Gra
 
 ```
 ┌─────────────────┐
-│  DreamLend      │
+│  DomaLend      │
 │  Smart Contract │
 └────────┬────────┘
          │ Events
@@ -101,7 +101,7 @@ Add these to your `backend/.env`:
 ```bash
 # === Indexer Configuration ===
 
-# Your deployed DreamLend contract address
+# Your deployed DomaLend contract address
 DREAM_LEND_CONTRACT_ADDRESS=0xYourDeployedContractAddress
 
 # Somnia RPC URL (or your blockchain RPC)
@@ -122,7 +122,7 @@ INDEXER_CORS_ORIGIN=*
 
 ### 3. Compile Smart Contracts
 
-The indexer needs the DreamLend ABI:
+The indexer needs the DomaLend ABI:
 
 ```bash
 cd contracts
@@ -177,7 +177,7 @@ GraphQL: http://localhost:3001/graphql
 REST API: http://localhost:3001/api/*
 ============================================================
 
-✅ DreamLend Indexer is running!
+✅ DomaLend Indexer is running!
 ```
 
 ### Testing the API
@@ -396,7 +396,7 @@ pm2 install pm2-logrotate
 
 1. Wait for indexer to catch up (check `currentBlock` vs blockchain height)
 2. Force resync: Stop indexer, set `INDEXER_START_BLOCK=0`, restart
-3. Check event names match contract: `forge inspect DreamLend events`
+3. Check event names match contract: `forge inspect DomaLend events`
 
 ## Performance Tuning
 

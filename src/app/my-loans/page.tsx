@@ -593,7 +593,7 @@ export default function MyLoansPage() {
         <div>
           <h1 className="text-3xl font-bold">My Loans</h1>
           <p className="text-gray-600 mt-2">
-            Manage your lending and borrowing activity on DreamLend
+            Manage your lending and borrowing activity on DomaLend
           </p>
           <p className="text-sm text-gray-500 font-mono mt-1">
             {address?.slice(0, 6)}...{address?.slice(-4)}

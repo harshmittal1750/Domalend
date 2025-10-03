@@ -1,10 +1,10 @@
-# DreamLend Indexer Implementation Summary
+# DomaLend Indexer Implementation Summary
 
 ## ✅ What Was Built
 
-A complete custom blockchain indexer system that replaces The Graph subgraph for your DreamLend protocol. This indexer:
+A complete custom blockchain indexer system that replaces The Graph subgraph for your DomaLend protocol. This indexer:
 
-1. **Indexes blockchain events** from your DreamLend smart contract
+1. **Indexes blockchain events** from your DomaLend smart contract
 2. **Stores event data** in-memory (upgradeable to database)
 3. **Serves data via REST and GraphQL APIs** that match your existing subgraph schema
 4. **Requires ZERO frontend changes** - drop-in replacement
@@ -227,7 +227,7 @@ NEXT_PUBLIC_SUBGRAPH_URL=http://localhost:3001/graphql
 
 ## 📊 Data Flow
 
-1. **Blockchain Events** → DreamLend contract emits events
+1. **Blockchain Events** → DomaLend contract emits events
 2. **Indexer Polling** → EventIndexer queries for new events
 3. **Event Processing** → Events parsed and stored in memory
 4. **API Serving** → Express server serves data via REST/GraphQL
@@ -449,7 +449,7 @@ sudo systemctl start dreamlend-indexer
 
 You now have a complete custom indexer that:
 
-1. ✅ Indexes all DreamLend loan events
+1. ✅ Indexes all DomaLend loan events
 2. ✅ Serves data via REST and GraphQL APIs
 3. ✅ Works with your existing frontend code
 4. ✅ Supports standard and Doma fractional tokens

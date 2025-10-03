@@ -1,7 +1,7 @@
 /**
  * @file multicall.ts
  * @description Efficient price fetching utility for Doma (no multicall contract needed)
- * @author DreamLend Team
+ * @author harshmittal.dev
  */
 
 import { ethers } from "ethers";

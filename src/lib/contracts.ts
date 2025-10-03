@@ -1,4 +1,4 @@
-// DreamLend Contract Configuration for Doma Testnet
+// DomaLend Contract Configuration for Doma Testnet
 // Read contract address from environment (preferred for client: NEXT_PUBLIC_*, otherwise server-side)
 
 import { defineChain } from "viem";

@@ -48,7 +48,7 @@ async function checkIndexerStatus() {
     !CONTRACT_ADDRESS ||
     CONTRACT_ADDRESS === "YOUR_DEPLOYED_CONTRACT_ADDRESS"
   ) {
-    console.log("   ❌ DreamLend contract address not set!");
+    console.log("   ❌ DomaLend contract address not set!");
     console.log("   Please set DREAM_LEND_CONTRACT_ADDRESS in backend/.env");
     return;
   }
@@ -61,7 +61,7 @@ async function checkIndexerStatus() {
     const code = await provider.getCode(CONTRACT_ADDRESS);
     if (code === "0x") {
       console.log("   ❌ No contract found at this address!");
-      console.log("   Make sure you've deployed DreamLend to Doma testnet");
+      console.log("   Make sure you've deployed DomaLend to Doma testnet");
       return;
     }
     console.log("   ✅ Contract found on chain");

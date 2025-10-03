@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import EventEmitter from "events";
 
 /**
- * EventIndexer - Indexes blockchain events from DreamLend contract
+ * EventIndexer - Indexes blockchain events from DomaLend contract
  * Maintains in-memory cache of all loan events and provides query methods
  */
 export class EventIndexer extends EventEmitter {
@@ -68,7 +68,7 @@ export class EventIndexer extends EventEmitter {
       console.log("⚠️  No start block specified, starting from block 0");
       console.log("   This will index ALL historical events (may take time)");
       console.log("   Set INDEXER_START_BLOCK to skip old blocks");
-      this.currentBlock = 11472883; // DreamLend deployment block on Doma Testnet
+      this.currentBlock = 11472883; // DomaLend deployment block on Doma Testnet
     }
 
     console.log(
