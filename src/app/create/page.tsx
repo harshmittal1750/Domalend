@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -70,6 +70,14 @@ export default function CreateLoanOfferPage() {
   const loanTokenSelectorRef = useRef<TokenSelectorRef>(null);
   const collateralTokenSelectorRef = useRef<TokenSelectorRef>(null);
 
+  // Refs for form fields to enable auto-scroll to errors
+  const tokenAddressRef = useRef<HTMLDivElement>(null);
+  const amountRef = useRef<HTMLDivElement>(null);
+  const interestRateRef = useRef<HTMLDivElement>(null);
+  const durationRef = useRef<HTMLDivElement>(null);
+  const collateralAddressRef = useRef<HTMLDivElement>(null);
+  const collateralAmountRef = useRef<HTMLDivElement>(null);
+
   const [formData, setFormData] = useState<LoanOfferFormData>({
     tokenAddress: "",
     amount: "",
@@ -86,6 +94,61 @@ export default function CreateLoanOfferPage() {
   const [selectedCollateralToken, setSelectedCollateralToken] = useState<
     TokenInfo | undefined
   >();
+
+  // Auto-scroll to first error when validation fails
+  useEffect(() => {
+    if (Object.keys(formErrors).length > 0) {
+      // Map of error fields to their refs
+      const errorRefMap: Record<
+        string,
+        React.RefObject<HTMLDivElement | null>
+      > = {
+        tokenAddress: tokenAddressRef,
+        amount: amountRef,
+        interestRate: interestRateRef,
+        duration: durationRef,
+        collateralAddress: collateralAddressRef,
+        collateralAmount: collateralAmountRef,
+      };
+
+      // Find the first error field in order
+      const fieldOrder = [
+        "tokenAddress",
+        "amount",
+        "interestRate",
+        "duration",
+        "collateralAddress",
+        "collateralAmount",
+      ];
+
+      for (const field of fieldOrder) {
+        if (formErrors[field as keyof LoanOfferFormData]) {
+          const ref = errorRefMap[field];
+          if (ref?.current) {
+            // Scroll to the error with smooth animation and offset for header
+            const yOffset = -100; // Offset to account for fixed header
+            const element = ref.current;
+            const y =
+              element.getBoundingClientRect().top +
+              window.pageYOffset +
+              yOffset;
+
+            window.scrollTo({ top: y, behavior: "smooth" });
+
+            // Focus the input element after scroll
+            setTimeout(() => {
+              const input = element.querySelector("input");
+              if (input) {
+                input.focus();
+              }
+            }, 300);
+
+            break; // Only scroll to first error
+          }
+        }
+      }
+    }
+  }, [formErrors]);
 
   // Get token balances for amount input UX
   const {
@@ -536,7 +599,7 @@ export default function CreateLoanOfferPage() {
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div className="space-y-2">
+                        <div className="space-y-2" ref={tokenAddressRef}>
                           <TokenSelector
                             ref={loanTokenSelectorRef}
                             selectedToken={selectedLoanToken}
@@ -548,7 +611,7 @@ export default function CreateLoanOfferPage() {
                             showBalance={true}
                           />
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-2" ref={amountRef}>
                           <div className="flex items-center justify-between">
                             <Label
                               htmlFor="amount"
@@ -654,7 +717,7 @@ export default function CreateLoanOfferPage() {
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div className="space-y-2">
+                        <div className="space-y-2" ref={interestRateRef}>
                           <Label
                             htmlFor="interestRate"
                             className="text-base font-medium"
@@ -673,7 +736,9 @@ export default function CreateLoanOfferPage() {
                               handleInputChange("interestRate", e.target.value)
                             }
                             className={`h-12 text-base ${
-                              formErrors.interestRate
+                              formErrors.interestRate ||
+                              (formData.interestRate &&
+                                parseFloat(formData.interestRate) > 100)
                                 ? "border-destructive focus-visible:ring-destructive"
                                 : ""
                             }`}
@@ -684,8 +749,21 @@ export default function CreateLoanOfferPage() {
                               {formErrors.interestRate}
                             </p>
                           )}
+                          {/* Real-time warning for interest rate > 100% */}
+                          {!formErrors.interestRate &&
+                            formData.interestRate &&
+                            parseFloat(formData.interestRate) > 100 && (
+                              <Alert className="mt-2 border-destructive/50 bg-destructive/10">
+                                <AlertTriangle className="h-4 w-4 text-destructive" />
+                                <AlertDescription className="text-sm text-destructive font-medium">
+                                  Warning: Annual interest rate cannot exceed
+                                  100%. Please enter a rate between 0.01% and
+                                  100%.
+                                </AlertDescription>
+                              </Alert>
+                            )}
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-2" ref={durationRef}>
                           <Label
                             htmlFor="duration"
                             className="text-base font-medium"
@@ -735,7 +813,7 @@ export default function CreateLoanOfferPage() {
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div className="space-y-2">
+                        <div className="space-y-2" ref={collateralAddressRef}>
                           <TokenSelector
                             ref={collateralTokenSelectorRef}
                             selectedToken={selectedCollateralToken}
@@ -747,7 +825,7 @@ export default function CreateLoanOfferPage() {
                             showBalance={true}
                           />
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-2" ref={collateralAmountRef}>
                           <div className="flex items-center justify-between">
                             <Label
                               htmlFor="collateralAmount"
