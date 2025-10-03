@@ -9,9 +9,9 @@ if (!projectId) {
 
 // Set up metadata
 const metadata = {
-  name: "DreamLend Finance",
+  name: "Catalex Finance",
   description:
-    "DreamLend Finance a secure , smart and permission less  way to lend/borrow",
+    "Catalex Finance a secure , smart and permission less  way to lend/borrow",
   url: "https://www.catalex.finance", // origin must match your domain & subdomain
   icons: ["https://www.catalex.finance/logo.png"],
 };
@@ -23,7 +23,8 @@ export const modal = createAppKit({
   networks,
   metadata,
   chainImages: {
-    50312: "https://somnia.network/images/branding/somnia_logo_color.png",
+    97476:
+      "https://s3.us-east-2.amazonaws.com/assets.rollbridge.app/0f6780a4fb6f540b3f797.png",
   },
 
   themeMode: "dark",

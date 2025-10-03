@@ -1,9 +1,5 @@
 import { Metadata } from "next";
-import {
-  generateSEOMetadata,
-  generateBreadcrumbSchema,
-  StructuredData,
-} from "@/lib/seo";
+
 import {
   Card,
   CardContent,
@@ -27,27 +23,6 @@ import {
   FileText,
   Clock,
 } from "lucide-react";
-
-export const metadata: Metadata = generateSEOMetadata({
-  title: "How DreamLend Works - Complete Guide to P2P Crypto Lending",
-  description:
-    "Learn how DreamLend's P2P crypto lending platform works. Step-by-step guide to lending, borrowing, earning interest, and managing your crypto loans safely.",
-  canonical: "/how-it-works",
-  keywords: [
-    "how crypto lending works",
-    "P2P lending guide",
-    "crypto loan process",
-    "DeFi lending tutorial",
-    "earn interest on crypto",
-    "crypto collateral loans",
-    "decentralized lending guide",
-  ],
-});
-
-const breadcrumbSchema = generateBreadcrumbSchema([
-  { name: "Home", url: "/" },
-  { name: "How It Works", url: "/how-it-works" },
-]);
 
 export default function HowItWorks() {
   const lendingSteps = [
@@ -161,7 +136,6 @@ export default function HowItWorks() {
 
   return (
     <>
-      <StructuredData data={breadcrumbSchema} />
       <div className="max-w-6xl mx-auto space-y-16">
         {/* Hero Section */}
         <section className="text-center space-y-6">

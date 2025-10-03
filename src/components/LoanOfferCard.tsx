@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useP2PLending } from "@/hooks/useP2PLending";
-import { useRewards } from "@/hooks/useRewards";
+
 import { Loan } from "@/lib/contracts";
 import {
   Clock,
@@ -47,12 +47,6 @@ export function LoanOfferCard({
   showAcceptButton = true,
 }: LoanOfferCardProps) {
   const { isConnected, address } = useP2PLending();
-  const {
-    currentRewardsAPR,
-    formatAPR,
-    rewardsSystemAvailable,
-    globalRewardStats,
-  } = useRewards();
 
   // Format loan details
   const formatAmount = (amount: bigint, decimals: number = 6) => {
@@ -68,31 +62,12 @@ export function LoanOfferCard({
     return Math.round(days);
   };
 
-  // Calculate rewards APR for this specific loan
-  const calculateLoanRewardsAPR = () => {
-    if (!rewardsSystemAvailable || !currentRewardsAPR || !globalRewardStats) {
-      return "0";
-    }
-
-    // For individual loans, we use the global rewards APR
-    // In practice, this would be divided among all active participants
-    // This is a simplified calculation for display purposes
-    const globalAPR = formatAPR(currentRewardsAPR);
-
-    // Estimate user's potential share (this is approximate)
-    // In reality, it depends on total active principal when the loan becomes active
-    const estimatedUserShare = parseFloat(globalAPR) * 0.5; // Rough estimate
-
-    return estimatedUserShare.toFixed(2);
-  };
-
   const calculateTotalAPR = () => {
     const interestAPR = parseFloat(formatInterestRate(loan.interestRate));
-    const rewardsAPR = parseFloat(calculateLoanRewardsAPR());
-    return (interestAPR + rewardsAPR).toFixed(2);
+
+    return interestAPR.toFixed(2);
   };
 
-  const loanRewardsAPR = calculateLoanRewardsAPR();
   const totalAPR = calculateTotalAPR();
   const interestAPR = formatInterestRate(loan.interestRate);
 
@@ -125,47 +100,6 @@ export function LoanOfferCard({
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* APR Breakdown */}
-        {rewardsSystemAvailable && (
-          <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="text-sm font-semibold text-purple-700 dark:text-purple-300">
-                APR Breakdown
-              </h4>
-              <Gift className="h-4 w-4 text-purple-500" />
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-2">
-                  <TrendingUp className="h-3 w-3 text-green-500" />
-                  <span className="text-sm">Interest APR</span>
-                </div>
-                <span className="text-sm font-medium">{interestAPR}%</span>
-              </div>
-
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-2">
-                  <Gift className="h-3 w-3 text-purple-500" />
-                  <span className="text-sm">Rewards APR</span>
-                </div>
-                <span className="text-sm font-medium text-purple-600 dark:text-purple-400">
-                  +{loanRewardsAPR}%
-                </span>
-              </div>
-
-              <Separator className="my-2" />
-
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-semibold">Total APR</span>
-                <span className="text-sm font-bold text-green-600">
-                  {totalAPR}%
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Loan Details */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-3">
@@ -215,20 +149,6 @@ export function LoanOfferCard({
             </div>
           </div>
         </div>
-
-        {/* Rewards Info */}
-        {rewardsSystemAvailable && loanRewardsAPR !== "0" && (
-          <div className="bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
-            <div className="flex items-start space-x-2">
-              <Gift className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mt-0.5" />
-              <div className="text-xs text-yellow-700 dark:text-yellow-300">
-                <strong>Liquidity Mining:</strong> Both lenders and borrowers
-                earn additional {loanRewardsAPR}% APR in DREAM tokens while this
-                loan is active. Rewards accrue in real-time!
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Action Buttons */}
         {showAcceptButton && (

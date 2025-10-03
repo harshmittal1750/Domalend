@@ -17,7 +17,7 @@ import { useP2PLending } from "@/hooks/useP2PLending";
 import {
   DREAMLEND_CONTRACT_ADDRESS,
   DREAMLEND_ABI,
-  SOMNIA_TESTNET_CONFIG,
+  DOMA_TESTNET_CONFIG,
   LoanStatus,
 } from "@/lib/contracts";
 import {
@@ -116,7 +116,7 @@ export default function AnalyticsPage() {
   // Create ethers provider for reading blockchain data
   const getProvider = () => {
     return new ethers.JsonRpcProvider(
-      SOMNIA_TESTNET_CONFIG.rpcUrls.default.http[0]
+      DOMA_TESTNET_CONFIG.rpcUrls.default.http[0]
     );
   };
 

@@ -9,6 +9,10 @@ import {
   BigIntMath,
   getTokenDisplayPrecision,
 } from "@/lib/decimals";
+import {
+  DOMA_RANK_ORACLE_ABI,
+  DOMA_RANK_ORACLE_ADDRESS,
+} from "@/lib/contracts";
 
 // DreamLend contract ABI for price-related functions
 const DREAMLEND_ABI = [
@@ -81,6 +85,11 @@ export interface TokenPrice {
   tokenDecimals: number; // Token decimals (from ERC20)
   updatedAt: number; // Timestamp
   isStale: boolean;
+  // Doma-specific fields
+  domaRankPrice?: string; // DomaRank oracle price (AI-adjusted)
+  domaRankPriceRaw?: bigint; // DomaRank oracle price (raw)
+  liveMarketPrice?: string; // Live market price from Doma Subgraph
+  hasDomaRankOracle?: boolean; // Whether this token uses DomaRank oracle
 }
 
 export interface CollateralCalculation {
@@ -131,63 +140,116 @@ export function useTokenPrices(tokens: TokenInfo[]) {
     setError(null);
 
     try {
-      // Use Somnia testnet RPC
+      // Use Doma testnet RPC
       const provider = new ethers.JsonRpcProvider(
-        "https://dream-rpc.somnia.network"
+        "https://rpc-testnet.doma.xyz"
       );
       const newPrices = new Map<string, TokenPrice>();
 
       // Fetch prices for all tokens in parallel
       const pricePromises = tokens.map(async (token) => {
         try {
-          const aggregator = new ethers.Contract(
-            token.priceFeedAddress,
-            AGGREGATOR_ABI,
-            provider
-          );
+          let priceRaw: bigint = 0n;
+          let priceUSD: string = "0";
+          let oracleDecimals: number = 18;
+          let updatedAt: number = 0;
+          let isStale: boolean = false;
 
-          // Fetch latest round data and decimals in parallel
-          const [roundData, decimals] = await Promise.all([
-            aggregator.latestRoundData(),
-            aggregator.decimals(),
-          ]);
+          // Check if this token has a Chainlink price feed
+          const hasChainlinkFeed =
+            token.priceFeedAddress &&
+            token.priceFeedAddress !==
+              "0x0000000000000000000000000000000000000000";
 
-          const [, answer, , updatedAt] = roundData;
-          const oracleDecimals = Number(decimals);
+          if (hasChainlinkFeed) {
+            // Fetch from Chainlink
+            const aggregator = new ethers.Contract(
+              token.priceFeedAddress,
+              AGGREGATOR_ABI,
+              provider
+            );
 
-          // Normalize price to 18 decimals for consistent calculations
-          // Oracle returns price in its own decimal format, we standardize to 18 decimals
-          const normalizedPriceRaw = BigInt(answer);
-          let priceRaw: bigint;
+            const [roundData, decimals] = await Promise.all([
+              aggregator.latestRoundData(),
+              aggregator.decimals(),
+            ]);
 
-          if (oracleDecimals < 18) {
-            // Scale up to 18 decimals
-            priceRaw = normalizedPriceRaw * 10n ** BigInt(18 - oracleDecimals);
-          } else if (oracleDecimals > 18) {
-            // Scale down to 18 decimals
-            priceRaw = normalizedPriceRaw / 10n ** BigInt(oracleDecimals - 18);
-          } else {
-            // Already 18 decimals
-            priceRaw = normalizedPriceRaw;
+            const [, answer, , updatedAtRaw] = roundData;
+            oracleDecimals = Number(decimals);
+            updatedAt = Number(updatedAtRaw);
+
+            // Normalize price to 18 decimals
+            const normalizedPriceRaw = BigInt(answer);
+
+            if (oracleDecimals < 18) {
+              priceRaw =
+                normalizedPriceRaw * 10n ** BigInt(18 - oracleDecimals);
+            } else if (oracleDecimals > 18) {
+              priceRaw =
+                normalizedPriceRaw / 10n ** BigInt(oracleDecimals - 18);
+            } else {
+              priceRaw = normalizedPriceRaw;
+            }
+
+            priceUSD = fromBaseUnit(priceRaw, 18, 4);
+            const now = Math.floor(Date.now() / 1000);
+            isStale = now - updatedAt > 3600;
           }
 
-          // Convert to human-readable USD price
-          const priceUSD = fromBaseUnit(priceRaw, 18, 4); // Show 4 decimal places for prices
+          // Check if DomaRank oracle has a price for this token
+          let domaRankPrice: string | undefined;
+          let domaRankPriceRaw: bigint | undefined;
+          let hasDomaRankOracle = false;
 
-          const now = Math.floor(Date.now() / 1000);
-          const isStale = now - Number(updatedAt) > 3600; // 1 hour staleness threshold
+          if (
+            DOMA_RANK_ORACLE_ADDRESS &&
+            DOMA_RANK_ORACLE_ADDRESS !==
+              "0x0000000000000000000000000000000000000000"
+          ) {
+            try {
+              const domaOracle = new ethers.Contract(
+                DOMA_RANK_ORACLE_ADDRESS,
+                DOMA_RANK_ORACLE_ABI,
+                provider
+              );
+
+              domaRankPriceRaw = await domaOracle.getTokenValue(token.address);
+
+              if (domaRankPriceRaw > 0n) {
+                domaRankPrice = fromBaseUnit(domaRankPriceRaw, 18, 4);
+                hasDomaRankOracle = true;
+              }
+            } catch (domaErr) {
+              // DomaRank oracle might not have this token, that's okay
+              // console.log(`No DomaRank price for ${token.symbol}`);
+            }
+          }
+
+          // If token only has DomaRank oracle (no Chainlink), use DomaRank as main price
+          if (!hasChainlinkFeed && hasDomaRankOracle && domaRankPriceRaw) {
+            priceRaw = domaRankPriceRaw;
+            priceUSD = domaRankPrice || "0";
+          }
 
           return {
             token,
             tokenPrice: {
               address: token.address,
               symbol: token.symbol,
-              priceUSD,
-              priceRaw,
+              priceUSD:
+                hasDomaRankOracle && domaRankPrice ? domaRankPrice : priceUSD, // Use DomaRank for collateral if available
+              priceRaw:
+                hasDomaRankOracle && domaRankPriceRaw
+                  ? domaRankPriceRaw
+                  : priceRaw,
               oracleDecimals,
               tokenDecimals: token.decimals,
               updatedAt: Number(updatedAt),
               isStale,
+              domaRankPrice,
+              domaRankPriceRaw,
+              liveMarketPrice: priceUSD || domaRankPrice, // Market price (Chainlink or DomaRank if no Chainlink)
+              hasDomaRankOracle,
             },
           };
         } catch (err) {
@@ -284,7 +346,7 @@ export function useCollateralCalculation(
       try {
         // console.log('Fetching recommended parameters for:', loanToken.symbol, '->', collateralToken.symbol);
         const provider = new ethers.JsonRpcProvider(
-          "https://dream-rpc.somnia.network"
+          "https://rpc-testnet.doma.xyz"
         );
         const dreamLend = new ethers.Contract(
           DREAMLEND_ADDRESS,

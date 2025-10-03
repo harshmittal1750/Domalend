@@ -1,4 +1,4 @@
-// Somnia L1 Testnet - Supported Tokens Configuration
+// Doma Testnet - Supported Tokens Configuration
 export interface TokenInfo {
   address: string;
   name: string;
@@ -6,24 +6,18 @@ export interface TokenInfo {
   decimals: number;
   logo?: string;
   description: string;
-  category: "stablecoin" | "crypto" | "defi";
+  category: "stablecoin" | "crypto" | "defi" | "domain";
   volatilityTier: "stable" | "moderate" | "high";
   priceFeedAddress: string;
+  hasDomaRankOracle?: boolean; // True if token is indexed by DomaRank AI Oracle
+  isDomainToken?: boolean; // True if this is a Doma fractional domain token
+  domainMetadata?: {
+    image?: string;
+    website?: string;
+    twitterLink?: string;
+  };
 }
 
-// DIA Oracle Addresses on Somnia Testnet
-export const SOMNIA_TESTNET_CONFIG = {
-  diaOracleV2: "0x9206296Ea3aEE3E6bdC07F7AaeF14DfCf33d865D",
-  chainId: 50312,
-  rpcUrl: "https://dream-rpc.somnia.network",
-} as const;
-
-// ⚠️  IMPORTANT: TOKEN ADDRESSES BELOW ARE PLACEHOLDERS ⚠️
-// These addresses MUST be replaced with actual Somnia testnet token addresses before production use.
-// The addresses below match the SomniaConfig.sol placeholders for consistency.
-
-// Mock Tokens for Testing on Somnia Testnet
-// ⚠️ UPDATE ADDRESSES AFTER DEPLOYING MOCK TOKENS ⚠️
 export const SUPPORTED_TOKENS: Record<string, TokenInfo> = {
   MUSDT: {
     address: "0x5C99fEb638C1959144696a77CC900c58A4B4EB6F", // UPDATE WITH DEPLOYED MockUSDT ADDRESS
@@ -74,6 +68,102 @@ export const SUPPORTED_TOKENS: Record<string, TokenInfo> = {
     category: "crypto",
     volatilityTier: "high",
     priceFeedAddress: "0xD5Ea6C434582F827303423dA21729bEa4F87D519", // Real SOL oracle adapter
+    hasDomaRankOracle: false,
+  },
+  // ==================== DOMA FRACTIONAL DOMAIN TOKENS ====================
+  // These are real fractional domain tokens from Doma protocol
+  // Priced by DomaRank AI Oracle
+  SOFTWAREAI: {
+    address: "0xf2dDd2022611cCddFC088d87D355bEEC15B30d7D",
+    name: "software.ai",
+    symbol: "SOFTWAREAI",
+    decimals: 6,
+    description:
+      "The Ultimate Digital Address for AI Innovation. Own and trade an ultra-premium domain in the hottest tech category.",
+    category: "domain",
+    volatilityTier: "high",
+    priceFeedAddress: "0x0000000000000000000000000000000000000000", // Uses DomaRank Oracle
+    hasDomaRankOracle: true,
+    isDomainToken: true,
+    domainMetadata: {
+      image:
+        "https://cdn-testnet.doma.xyz/fractionalization/a3190985-5ad1-4d1b-b28d-aa8bcc6c58a6/image_1758354799873_buoi20?timestamp=1758354799873",
+      website: "https://mizu.xyz",
+      twitterLink: "https://x.com/domaprotocol",
+    },
+  },
+  SEEYOUATKBW: {
+    address: "0xBA1Ac5CF547d1C2bdaE9aAaa588D7f081219Bc62",
+    name: "seeyouatkbw.com",
+    symbol: "SEEYOUATKBW",
+    decimals: 6,
+    description: "Fractional ownership of seeyouatkbw.com domain",
+    category: "domain",
+    volatilityTier: "high",
+    priceFeedAddress: "0x0000000000000000000000000000000000000000", // Uses DomaRank Oracle
+    hasDomaRankOracle: true,
+    isDomainToken: true,
+    domainMetadata: {
+      image:
+        "https://cdn-testnet.doma.xyz/fractionalization/24f39752-f916-4565-b45d-8a7bf71fa378/image_1758391682295_tanqsa?timestamp=1758391682295",
+      website: "https://mizu.xyz",
+      twitterLink: "https://x.com/domaprotocol",
+    },
+  },
+  LABUBURIP: {
+    address: "0xAf56AB93BD19a94136a808Ab3CcD8B61BFa99119",
+    name: "labuburip.com",
+    symbol: "LABUBURIP",
+    decimals: 6,
+    description: "Fractional ownership of labuburip.com domain",
+    category: "domain",
+    volatilityTier: "high",
+    priceFeedAddress: "0x0000000000000000000000000000000000000000", // Uses DomaRank Oracle
+    hasDomaRankOracle: true,
+    isDomainToken: true,
+    domainMetadata: {
+      image:
+        "https://cdn-testnet.doma.xyz/fractionalization/cce0371a-20bf-474f-8fce-e986bd2dca2d/image_1758431243173_2r1j6l?timestamp=1758431243173",
+      website: "https://mizu.xyz",
+      twitterLink: "https://x.com/domaprotocol",
+    },
+  },
+  ILOVEPUMPKINSPICE: {
+    address: "0x2121B21659C60Eadf39a27Fb7B9a8Ec23b215526",
+    name: "ilovepumpkinspice.com",
+    symbol: "ILOVEPUMPKINSPICE",
+    decimals: 6,
+    description: "Fractional ownership of ilovepumpkinspice.com domain",
+    category: "domain",
+    volatilityTier: "high",
+    priceFeedAddress: "0x0000000000000000000000000000000000000000", // Uses DomaRank Oracle
+    hasDomaRankOracle: true,
+    isDomainToken: true,
+    domainMetadata: {
+      image:
+        "https://cdn-testnet.doma.xyz/fractionalization/68ae2ff7-e5a2-4a2c-9d1f-f4c76a835a05/image_1758431790701_007995?timestamp=1758431790701",
+      website: "https://mizu.xyz",
+      twitterLink: "https://x.com/domaprotocol",
+    },
+  },
+  DRINKMIZU: {
+    address: "0xF547543382fe62C6Da7bB862a0765b95E0269661",
+    name: "drinkmizu.com",
+    symbol: "DRINKMIZU.COM",
+    decimals: 6,
+    description:
+      "Drink Mizu — Stay Moist, Bestie. You're 73% water, but actin' like 12%. Fix that with Drink Mizu, the hydration glow-up your cells deserve.",
+    category: "domain",
+    volatilityTier: "high",
+    priceFeedAddress: "0x0000000000000000000000000000000000000000", // Uses DomaRank Oracle
+    hasDomaRankOracle: true,
+    isDomainToken: true,
+    domainMetadata: {
+      image:
+        "https://cdn-testnet.doma.xyz/fractionalization/ccebc3b3-4197-4b3b-b2f8-46587f6cd80d/image_1759385373125_s1qz8p?timestamp=1759385373126",
+      website: "https://mizu.xyz/",
+      twitterLink: "https://x.com/domaprotocol",
+    },
   },
 } as const;
 
@@ -161,7 +251,34 @@ export const TOKEN_CATEGORIES = {
       (t) => t.category === "defi"
     ),
   },
+  domain: {
+    name: "Domain Tokens",
+    description: "Fractional ownership of premium domains (AI-priced)",
+    tokens: Object.values(SUPPORTED_TOKENS).filter(
+      (t) => t.category === "domain" && t.hasDomaRankOracle
+    ),
+  },
 } as const;
+
+// Get tokens with DomaRank oracle support
+export function getDomaRankTokens(): TokenInfo[] {
+  return Object.values(SUPPORTED_TOKENS).filter(
+    (token) => token.hasDomaRankOracle === true
+  );
+}
+
+// Get tokens without DomaRank oracle (standard tokens)
+export function getStandardTokens(): TokenInfo[] {
+  return Object.values(SUPPORTED_TOKENS).filter(
+    (token) => !token.hasDomaRankOracle
+  );
+}
+
+// Check if a token has DomaRank oracle support
+export function hasDomaRankOracleSupport(tokenAddress: string): boolean {
+  const token = getTokenByAddress(tokenAddress);
+  return token?.hasDomaRankOracle === true;
+}
 
 // Risk level colors for UI
 export const RISK_COLORS = {

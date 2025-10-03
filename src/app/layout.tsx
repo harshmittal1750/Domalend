@@ -5,31 +5,6 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import ContextProvider from "@/context";
 import Navigation from "@/components/Navigation";
-import {
-  generateSEOMetadata,
-  generateOrganizationSchema,
-  StructuredData,
-} from "@/lib/seo";
-
-export const metadata: Metadata = {
-  ...generateSEOMetadata({
-    title: "P2P Lending / Borrowing",
-    description:
-      "Lend, borrow, and earn with DreamLend Finance - the most secure P2P crypto lending platform built on Somnia L1. Get instant crypto loans or earn high yields on your digital assets.",
-    canonical: "/",
-    keywords: [
-      "crypto lending platform",
-      "best DeFi lending",
-      "secure crypto loans",
-      "high yield crypto",
-      "Somnia L1 DeFi",
-      "institutional crypto lending",
-    ],
-  }),
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "https://catalex.finance"
-  ),
-};
 
 export default async function RootLayout({
   children,
@@ -44,23 +19,6 @@ export default async function RootLayout({
           rel="preconnect"
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
-        />
-        <StructuredData data={generateOrganizationSchema()} />
-
-        {/* Google Analytics */}
-        <script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=G-NFR4X8L7V8"
-        />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-NFR4X8L7V8');
-            `,
-          }}
         />
       </head>
       <body className="antialiased">

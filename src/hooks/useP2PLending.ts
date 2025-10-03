@@ -9,7 +9,7 @@ import {
   ERC20_ABI,
   Loan,
   LoanStatus,
-  SOMNIA_TESTNET_CONFIG,
+  DOMA_TESTNET_CONFIG,
 } from "@/lib/contracts";
 import { SUPPORTED_TOKENS } from "@/config/tokens";
 
@@ -68,7 +68,7 @@ export const useP2PLending = () => {
   // Create ethers provider and signer
   const getProvider = useCallback(() => {
     return new ethers.JsonRpcProvider(
-      SOMNIA_TESTNET_CONFIG.rpcUrls.default.http[0]
+      DOMA_TESTNET_CONFIG.rpcUrls.default.http[0]
     );
   }, []);
 

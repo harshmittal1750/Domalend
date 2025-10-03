@@ -1,10 +1,5 @@
 import { Metadata } from "next";
-import {
-  generateSEOMetadata,
-  generateFAQSchema,
-  generateBreadcrumbSchema,
-  StructuredData,
-} from "@/lib/seo";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -21,21 +16,6 @@ import {
   AlertTriangle,
   Clock,
 } from "lucide-react";
-
-export const metadata: Metadata = generateSEOMetadata({
-  title: "Frequently Asked Questions - DreamLend Finance",
-  description:
-    "Get answers to common questions about DreamLend's P2P crypto lending platform. Learn about lending, borrowing, security, fees, and more.",
-  canonical: "/faq",
-  keywords: [
-    "crypto lending FAQ",
-    "P2P lending questions",
-    "DeFi lending help",
-    "crypto loan questions",
-    "DreamLend support",
-    "crypto lending safety",
-  ],
-});
 
 const faqs = [
   {
@@ -203,17 +183,9 @@ const allQuestions = faqs.flatMap((category) =>
   }))
 );
 
-const faqSchema = generateFAQSchema(allQuestions);
-const breadcrumbSchema = generateBreadcrumbSchema([
-  { name: "Home", url: "/" },
-  { name: "FAQ", url: "/faq" },
-]);
-
 export default function FAQ() {
   return (
     <>
-      <StructuredData data={faqSchema} />
-      <StructuredData data={breadcrumbSchema} />
       <div className="max-w-4xl mx-auto space-y-12">
         {/* Hero Section */}
         <section className="text-center space-y-6">

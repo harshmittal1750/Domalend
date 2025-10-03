@@ -1,12 +1,5 @@
 "use client";
 
-import { generateBreadcrumbSchema, StructuredData } from "@/lib/seo";
-
-const breadcrumbSchema = generateBreadcrumbSchema([
-  { name: "Home", url: "/" },
-  { name: "Create Loan Offer", url: "/create" },
-]);
-
 import { useState, useRef } from "react";
 import {
   Card,
@@ -496,7 +489,6 @@ export default function CreateLoanOfferPage() {
 
   return (
     <>
-      <StructuredData data={breadcrumbSchema} />
       <div className="">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">

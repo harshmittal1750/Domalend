@@ -1,6 +1,6 @@
 import { EthersAdapter } from "@reown/appkit-adapter-ethers";
 import type { AppKitNetwork } from "@reown/appkit/networks";
-import { SOMNIA_TESTNET_CONFIG } from "@/lib/contracts";
+import { DOMA_TESTNET_CONFIG } from "@/lib/contracts";
 
 // Get projectId from https://cloud.reown.com
 export const projectId =
@@ -11,15 +11,15 @@ if (!projectId) {
 }
 
 // Define Somnia Testnet for AppKit
-const somniaTestnet: AppKitNetwork = {
-  id: SOMNIA_TESTNET_CONFIG.id,
-  name: SOMNIA_TESTNET_CONFIG.name,
-  nativeCurrency: SOMNIA_TESTNET_CONFIG.nativeCurrency,
-  rpcUrls: SOMNIA_TESTNET_CONFIG.rpcUrls,
-  blockExplorers: SOMNIA_TESTNET_CONFIG.blockExplorers,
-  testnet: SOMNIA_TESTNET_CONFIG.testnet,
+const domaTestnet: AppKitNetwork = {
+  id: DOMA_TESTNET_CONFIG.id,
+  name: DOMA_TESTNET_CONFIG.name,
+  nativeCurrency: DOMA_TESTNET_CONFIG.nativeCurrency,
+  rpcUrls: DOMA_TESTNET_CONFIG.rpcUrls,
+  blockExplorers: DOMA_TESTNET_CONFIG.blockExplorers,
+  testnet: DOMA_TESTNET_CONFIG.testnet,
 };
 
-export const networks = [somniaTestnet] as [AppKitNetwork, ...AppKitNetwork[]];
+export const networks = [domaTestnet] as [AppKitNetwork, ...AppKitNetwork[]];
 
 export const ethersAdapter = new EthersAdapter();

@@ -3,13 +3,13 @@ import { ethers } from "ethers";
 import {
   DREAMLEND_CONTRACT_ADDRESS,
   DREAMLEND_ABI,
-  SOMNIA_TESTNET_CONFIG,
+  DOMA_TESTNET_CONFIG,
 } from "@/lib/contracts";
 
 // Create an ethers provider for reading from the blockchain
 const getProvider = () => {
   return new ethers.JsonRpcProvider(
-    SOMNIA_TESTNET_CONFIG.rpcUrls.default.http[0]
+    DOMA_TESTNET_CONFIG.rpcUrls.default.http[0]
   );
 };
 

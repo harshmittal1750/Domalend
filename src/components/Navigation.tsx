@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { ConnectButton } from "@/components/ConnectButton";
 import { FaucetDropdown } from "@/components/FaucetDropdown";
 import { useP2PLending } from "@/hooks/useP2PLending";
-import { useRewards } from "@/hooks/useRewards";
 import {
   Home,
   PlusCircle,
@@ -28,12 +27,7 @@ export function Navigation() {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const { isConnected, address } = useP2PLending();
-  const {
-    pendingRewards,
-    formatDreamAmount,
-    rewardsSystemAvailable,
-    canClaimRewards,
-  } = useRewards();
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
@@ -148,40 +142,6 @@ export function Navigation() {
               <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all duration-300 dark:rotate-0 dark:scale-100" />
               <span className="sr-only">Toggle theme</span>
             </Button>
-
-            {/* Rewards Indicator */}
-            {isConnected &&
-              rewardsSystemAvailable &&
-              pendingRewards &&
-              pendingRewards > 0n && (
-                <div className="hidden sm:block">
-                  <div className="glass px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-500/10 to-blue-500/10 border-purple-200/50 dark:border-purple-800/50">
-                    <div className="flex items-center space-x-2">
-                      <Gift className="h-3 w-3 text-purple-500" />
-                      <Link
-                        href={"/rewards"}
-                        className="text-xs font-medium  text-purple-700 dark:text-purple-300"
-                      >
-                        {formatDreamAmount(pendingRewards).slice(0, 6)} DREAM
-                      </Link>
-                      {/* {canClaimRewards && (
-                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                      )} */}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-            {/* Address Display */}
-            {/* {isConnected && address && (
-              <div className="hidden sm:block">
-                <div className="glass px-3 py-1.5 rounded-xl">
-                  <span className="text-xs font-mono text-muted-foreground">
-                    {address.slice(0, 6)}...{address.slice(-4)}
-                  </span>
-                </div>
-              </div>
-            )} */}
 
             {/* Faucet Button */}
             <div className="hidden md:block">

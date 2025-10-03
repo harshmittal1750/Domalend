@@ -1,7 +1,5 @@
 "use client";
 
-import { generateFinancialProductSchema, StructuredData } from "@/lib/seo";
-
 import Link from "next/link";
 import {
   Card,
@@ -30,16 +28,6 @@ import {
   HelpCircle,
   BookOpen,
 } from "lucide-react";
-
-const financialProductSchema = generateFinancialProductSchema({
-  name: "DreamLend P2P Crypto Lending",
-  description:
-    "Peer-to-peer cryptocurrency lending platform offering secure loans and high-yield earning opportunities",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "https://catalex.finance",
-  provider: "DreamLend Finance",
-  category: "Permissionless Lending/Borrowing",
-  interestRate: "Up to 150% APY",
-});
 
 export default function Home() {
   const { isConnected, activeLoanOfferIds, lenderLoans, borrowerLoans } =
@@ -109,7 +97,6 @@ export default function Home() {
 
   return (
     <>
-      <StructuredData data={financialProductSchema} />
       <div className="relative">
         {/* Hero Section */}
         <section className="relative pt-20 pb-32 overflow-hidden">

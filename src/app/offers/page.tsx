@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/table";
 import { useP2PLending } from "@/hooks/useP2PLending";
 import { Loan, LoanStatus } from "@/lib/contracts";
-import { SOMNIA_TESTNET_CONFIG } from "@/lib/contracts";
+import { DOMA_TESTNET_CONFIG } from "@/lib/contracts";
 import {
   useAllLoansWithStatus,
   ProcessedLoan,
@@ -32,7 +32,7 @@ import {
   useLivePriceComparison,
   LoanWithPriceComparison,
 } from "@/hooks/useLivePriceComparison";
-import { useRewards } from "@/hooks/useRewards";
+
 import { TransactionModal } from "@/components/TransactionModal";
 import {
   CheckCircle,
@@ -72,7 +72,7 @@ const fetchTokenInfo = async (
 ): Promise<TokenInfo | null> => {
   try {
     const provider = new ethers.JsonRpcProvider(
-      SOMNIA_TESTNET_CONFIG.rpcUrls.default.http[0]
+      DOMA_TESTNET_CONFIG.rpcUrls.default.http[0]
     );
     const tokenContract = new ethers.Contract(
       tokenAddress,
@@ -131,14 +131,6 @@ export default function OffersPage() {
     refreshInterval: 120000, // 2 minutes
     enableAutoRefresh: true,
   });
-
-  // Get rewards data
-  const {
-    currentRewardsAPR,
-    formatAPR,
-    rewardsSystemAvailable,
-    globalRewardStats,
-  } = useRewards();
 
   const [selectedLoanId, setSelectedLoanId] = useState<bigint | null>(null);
   const [showStuckMessage, setShowStuckMessage] = useState(false);
@@ -242,22 +234,6 @@ export default function OffersPage() {
   const handleRefresh = () => {
     refreshPrices();
   };
-
-  // Calculate rewards APR for display
-  const calculateRewardsAPR = () => {
-    if (!rewardsSystemAvailable || !currentRewardsAPR || !globalRewardStats) {
-      return "0.00";
-    }
-    return formatAPR(currentRewardsAPR);
-  };
-
-  // const calculateTotalAPR = (interestRate: bigint) => {
-  //   const interestAPR = parseFloat((Number(interestRate) / 100).toFixed(2));
-  //   const rewardsAPR = parseFloat(calculateRewardsAPR());
-  //   return (interestAPR + rewardsAPR).toFixed(2);
-  // };
-
-  // Transaction progress now handled by TransactionModal component
 
   return (
     <div className="container mx-auto px-4 py-8">

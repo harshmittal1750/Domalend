@@ -16,7 +16,9 @@
         "test-pricing": "node src/testPricing.js",
         "test-oracle": "node src/oracleUpdater.js",
         "test-oracle-tx": "node src/test-oracle-tx.js",
-        "test-subgraph": "node src/subgraphQueries.js"
+        "test-subgraph": "node src/subgraphQueries.js",
+        "indexer": "node src/indexer/index.js",
+        "indexer:dev": "nodemon src/indexer/index.js"
     },
     "keywords": [
         "doma",
@@ -29,7 +31,9 @@
         "graphql-request": "^6.1.0",
         "dotenv": "^16.4.5",
         "ethers": "^6.11.1",
-        "axios": "^1.6.7"
+        "axios": "^1.6.7",
+        "express": "^4.18.2",
+        "cors": "^2.8.5"
     },
     "devDependencies": {
         "nodemon": "^3.1.0"
