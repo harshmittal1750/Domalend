@@ -135,7 +135,7 @@ export function useTokenPrices(tokens: TokenInfo[]) {
   const fetchPrices = useCallback(async () => {
     if (tokens.length === 0) return;
 
-    // console.log('Fetching prices for tokens:', tokens.map(t => t.symbol));
+   
     setIsLoading(true);
     setError(null);
 
@@ -146,54 +146,84 @@ export function useTokenPrices(tokens: TokenInfo[]) {
       );
       const newPrices = new Map<string, TokenPrice>();
 
+      // Fetch Doma market prices from GraphQL for domain tokens
+      const domaMarketPrices = new Map<string, number>();
+      try {
+        const domaResponse = await fetch(
+          "https://api-testnet.doma.xyz/graphql",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "API-KEY": process.env.NEXT_PUBLIC_DOMA_API_KEY || "",
+            },
+            body: JSON.stringify({
+              query: `query FractionalTokens {
+                fractionalTokens {
+                  items {
+                    address
+                    currentPrice
+                    params {
+                      decimals
+                    }
+                  }
+                }
+              }`,
+            }),
+          }
+        );
+
+        if (domaResponse.ok) {
+          const domaData = await domaResponse.json();
+          const items = domaData?.data?.fractionalTokens?.items || [];
+          items.forEach((item: any) => {
+            if (item.currentPrice && item.address) {
+              // IMPORTANT: Doma currentPrice is ALWAYS in 8 decimals (not token decimals!)
+              // Token decimals (6) are for token amounts, price is always 8 decimals
+              const priceInUSD =
+                parseFloat(item.currentPrice) / Math.pow(10, 8);
+              const addressLower = item.address.toLowerCase();
+              domaMarketPrices.set(addressLower, priceInUSD);
+              console.log(
+                `💰 Doma market: ${addressLower} = $${priceInUSD.toFixed(2)}`
+              );
+            }
+          });
+          console.log(
+            "✅ Fetched Doma market prices:",
+            domaMarketPrices.size,
+            "tokens"
+          );
+        }
+      } catch (error) {
+        console.warn("Failed to fetch Doma market prices:", error);
+      }
+
       // Fetch prices for all tokens in parallel
       const pricePromises = tokens.map(async (token) => {
         try {
           let priceRaw: bigint = 0n;
           let priceUSD: string = "0";
           let oracleDecimals: number = 18;
-          let updatedAt: number = 0;
+          let updatedAt: number = Math.floor(Date.now() / 1000);
           let isStale: boolean = false;
 
-          // Check if this token has a Chainlink price feed
-          const hasChainlinkFeed =
-            token.priceFeedAddress &&
-            token.priceFeedAddress !==
-              "0x0000000000000000000000000000000000000000";
+          // NOTE: Chainlink price feeds don't exist on Doma testnet
+          // We use Doma GraphQL API for market prices instead
 
-          if (hasChainlinkFeed) {
-            // Fetch from Chainlink
-            const aggregator = new ethers.Contract(
-              token.priceFeedAddress,
-              AGGREGATOR_ABI,
-              provider
-            );
+          // Check if we have a Doma market price for this token
+          const domaMarketPrice = domaMarketPrices.get(
+            token.address.toLowerCase()
+          );
 
-            const [roundData, decimals] = await Promise.all([
-              aggregator.latestRoundData(),
-              aggregator.decimals(),
-            ]);
-
-            const [, answer, , updatedAtRaw] = roundData;
-            oracleDecimals = Number(decimals);
-            updatedAt = Number(updatedAtRaw);
-
-            // Normalize price to 18 decimals
-            const normalizedPriceRaw = BigInt(answer);
-
-            if (oracleDecimals < 18) {
-              priceRaw =
-                normalizedPriceRaw * 10n ** BigInt(18 - oracleDecimals);
-            } else if (oracleDecimals > 18) {
-              priceRaw =
-                normalizedPriceRaw / 10n ** BigInt(oracleDecimals - 18);
-            } else {
-              priceRaw = normalizedPriceRaw;
-            }
-
-            priceUSD = fromBaseUnit(priceRaw, 18, 4);
-            const now = Math.floor(Date.now() / 1000);
-            isStale = now - updatedAt > 3600;
+          if (domaMarketPrice) {
+            // Use live market price from Doma
+            priceUSD = domaMarketPrice.toFixed(4);
+            priceRaw = ethers.parseUnits(priceUSD, 18);
+          } else {
+            // Default price for mock tokens (stablecoins = $1, others = $100)
+            priceUSD = token.symbol.includes("USD") ? "1.00" : "100.00";
+            priceRaw = ethers.parseUnits(priceUSD, 18);
           }
 
           // Check if DomaRank oracle has a price for this token
@@ -207,28 +237,41 @@ export function useTokenPrices(tokens: TokenInfo[]) {
               "0x0000000000000000000000000000000000000000"
           ) {
             try {
+              console.log(
+                `🔮 Fetching DomaRank price for ${token.symbol} from oracle at ${DOMA_RANK_ORACLE_ADDRESS}`
+              );
               const domaOracle = new ethers.Contract(
                 DOMA_RANK_ORACLE_ADDRESS,
                 DOMA_RANK_ORACLE_ABI,
                 provider
               );
 
-              domaRankPriceRaw = await domaOracle.getTokenValue(token.address);
+              const oraclePrice = await domaOracle.getTokenValue(token.address);
+              console.log(
+                `🔮 Oracle returned: ${oraclePrice.toString()} Wei for ${token.symbol}`
+              );
 
-              if (domaRankPriceRaw > 0n) {
-                domaRankPrice = fromBaseUnit(domaRankPriceRaw, 18, 4);
+              if (oraclePrice && oraclePrice > 0n) {
+                domaRankPriceRaw = oraclePrice;
+                domaRankPrice = fromBaseUnit(oraclePrice, 18, 4);
                 hasDomaRankOracle = true;
+                console.log(
+                  `✅ DomaRank price for ${token.symbol}: $${domaRankPrice}`
+                );
+              } else {
+                console.log(`⊘ DomaRank price is 0 for ${token.symbol}`);
               }
-            } catch (domaErr) {
+            } catch (domaErr: any) {
               // DomaRank oracle might not have this token, that's okay
-              // console.log(`No DomaRank price for ${token.symbol}`);
+              console.log(
+                `❌ No DomaRank price for ${token.symbol}:`,
+                domaErr.message
+              );
             }
-          }
-
-          // If token only has DomaRank oracle (no Chainlink), use DomaRank as main price
-          if (!hasChainlinkFeed && hasDomaRankOracle && domaRankPriceRaw) {
-            priceRaw = domaRankPriceRaw;
-            priceUSD = domaRankPrice || "0";
+          } else {
+            console.log(
+              `⚠️ DomaRank oracle address not configured (got: ${DOMA_RANK_ORACLE_ADDRESS})`
+            );
           }
 
           return {
@@ -236,8 +279,9 @@ export function useTokenPrices(tokens: TokenInfo[]) {
             tokenPrice: {
               address: token.address,
               symbol: token.symbol,
+              // Use DomaRank oracle price as main price if available (more conservative for collateral)
               priceUSD:
-                hasDomaRankOracle && domaRankPrice ? domaRankPrice : priceUSD, // Use DomaRank for collateral if available
+                hasDomaRankOracle && domaRankPrice ? domaRankPrice : priceUSD,
               priceRaw:
                 hasDomaRankOracle && domaRankPriceRaw
                   ? domaRankPriceRaw
@@ -248,7 +292,11 @@ export function useTokenPrices(tokens: TokenInfo[]) {
               isStale,
               domaRankPrice,
               domaRankPriceRaw,
-              liveMarketPrice: priceUSD || domaRankPrice, // Market price (Chainlink or DomaRank if no Chainlink)
+              // liveMarketPrice is the actual market price from Doma GraphQL
+              // priceUSD is either the market price or default mock price
+              liveMarketPrice: domaMarketPrice
+                ? domaMarketPrice.toFixed(4)
+                : priceUSD,
               hasDomaRankOracle,
             },
           };
@@ -263,10 +311,15 @@ export function useTokenPrices(tokens: TokenInfo[]) {
       // Process results
       results.forEach((result) => {
         if (result) {
-          newPrices.set(result.token.address, result.tokenPrice);
+          const addressLower = result.token.address.toLowerCase();
+          newPrices.set(addressLower, result.tokenPrice);
+          console.log(
+            `📦 Stored price for ${result.token.symbol} (${addressLower}): $${result.tokenPrice.priceUSD}`
+          );
         }
       });
 
+      console.log(`✅ Total prices stored: ${newPrices.size}`);
       setPrices(newPrices);
     } catch (err) {
       console.error("Failed to fetch token prices:", err);

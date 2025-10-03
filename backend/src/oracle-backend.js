@@ -286,14 +286,13 @@ async function getConsolidatedDomainData() {
     // Get active offers count from Phase 2 data
     const activeOffersCount = nameDetails?.activeOffersCount || 0;
 
-    // Parse current price - IMPORTANT: currentPrice is in token's smallest unit
-    // Must divide by 10^decimals to get actual USD price
-    const decimals = token.params?.decimals || 6;
+    // Parse current price - IMPORTANT: currentPrice is ALWAYS in 8 decimals (Doma standard)
+    // Regardless of token decimals (which are for token amounts, not prices)
     const currentPriceRaw = parseFloat(token.currentPrice || "0");
-    const livePriceUSD = currentPriceRaw / Math.pow(10, decimals);
+    const livePriceUSD = currentPriceRaw / Math.pow(10, 8); // Doma uses 8 decimals for prices
 
     console.log(
-      `  💰 ${domainName}: ${currentPriceRaw} raw → $${livePriceUSD.toFixed(2)} USD (decimals: ${decimals})`
+      `  💰 ${domainName}: ${currentPriceRaw} raw → $${livePriceUSD.toFixed(2)} USD (price decimals: 8)`
     );
 
     consolidatedData.push({

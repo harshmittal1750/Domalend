@@ -334,7 +334,7 @@ a {
   --popover-foreground: oklch(0.09 0.005 285.882);
 
   /* Premium primary - sophisticated blue */
-  --primary: oklch(0.62444 0.10793 187.608);
+  --primary: oklch(0.7282 0.1198 206.06);
   --primary-foreground: oklch(0.99 0.002 106.423);
 
   /* Refined secondary */
@@ -374,7 +374,7 @@ a {
 
 .dark {
   /* Premium dark theme colors */
-  --background: oklch(0.09 0.005 285.882);
+  --background: oklch(0.1462 0.0064 285.58);
   --foreground: oklch(0.95 0.013 106.423);
   --card: oklch(0.13 0.006 285.882);
   --card-foreground: oklch(0.95 0.013 106.423);
@@ -382,11 +382,11 @@ a {
   --popover-foreground: oklch(0.95 0.013 106.423);
 
   /* Sophisticated primary for dark mode */
-  --primary: oklch(0.62444 0.10793 187.608);
+  --primary: oklch(0.7282 0.1198 206.06);
   --primary-foreground: oklch(0.09 0.005 285.882);
 
   /* Refined secondary for dark */
-  --secondary: oklch(0.18 0.008 285.882);
+  --secondary: oklch(0.3945 0.0017 286.32);
   --secondary-foreground: oklch(0.9 0.013 106.423);
 
   /* Dark muted colors */

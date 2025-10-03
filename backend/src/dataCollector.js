@@ -258,10 +258,12 @@ function parseDomainData(token, priceHistory = []) {
   const nameLength = nameWithoutTld.length;
 
   // Calculate market cap
-  // marketCap = totalSupply * currentPrice
+  // IMPORTANT: currentPrice from Doma API is in 8 decimals (not token decimals!)
+  // marketCap = totalSupply * currentPriceUSD
   const totalSupply = parseFloat(token.params?.totalSupply || 0);
-  const currentPrice = parseFloat(token.currentPrice || 0);
-  const marketCap = (totalSupply * currentPrice).toString();
+  const currentPriceRaw = parseFloat(token.currentPrice || 0);
+  const currentPriceUSD = currentPriceRaw / Math.pow(10, 8); // Convert from 8 decimals to USD
+  const marketCap = (totalSupply * currentPriceUSD).toString();
 
   // Convert price history to sales history format
   const salesHistory = priceHistory.map((item, index) => ({
@@ -286,7 +288,8 @@ function parseDomainData(token, priceHistory = []) {
     fractionalToken: {
       address: token.address,
       totalSupply: token.params?.totalSupply || "0",
-      currentPrice: token.currentPrice || "0",
+      currentPrice: currentPriceUSD.toString(), // USD price (converted from 8 decimals)
+      currentPriceRaw: token.currentPrice || "0", // Raw price from API
       symbol: token.params?.symbol || "",
       decimals: token.params?.decimals || 18,
       status: token.status,

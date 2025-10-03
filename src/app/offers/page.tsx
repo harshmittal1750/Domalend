@@ -28,12 +28,9 @@ import {
   ProcessedLoan,
   useProtocolStatsCollection,
 } from "@/hooks/useSubgraphQuery";
-import {
-  useLivePriceComparison,
-  LoanWithPriceComparison,
-} from "@/hooks/useLivePriceComparison";
-
+import { useTokenPrices } from "@/hooks/useTokenPrices";
 import { TransactionModal } from "@/components/TransactionModal";
+import { DualPriceDisplay } from "@/components/DualPriceDisplay";
 import {
   CheckCircle,
   AlertCircle,
@@ -48,7 +45,7 @@ import {
   TrendingDown,
 } from "lucide-react";
 import { ethers } from "ethers";
-import { getTokenByAddress } from "@/config/tokens";
+import { getTokenByAddress, getAllSupportedTokens } from "@/config/tokens";
 
 interface TokenInfo {
   name: string;
@@ -56,7 +53,7 @@ interface TokenInfo {
   decimals: number;
 }
 
-interface LoanOfferWithDetails extends LoanWithPriceComparison {
+interface LoanOfferWithDetails extends ProcessedLoan {
   formattedAmount: string;
   formattedCollateralAmount: string;
   formattedInterestRate: number;
@@ -64,6 +61,8 @@ interface LoanOfferWithDetails extends LoanWithPriceComparison {
   statusText: string;
   tokenInfo?: TokenInfo;
   collateralInfo?: TokenInfo;
+  currentLoanValueUSD?: string;
+  currentCollateralValueUSD?: string;
 }
 
 // Function to fetch token information
@@ -119,18 +118,13 @@ export default function OffersPage() {
     return allLoans.filter((loan) => loan.status === 0); // Pending status
   }, [allLoans]);
 
-  // Get live price comparison data
+  // Get token prices (handles both standard and Doma oracle prices)
   const {
-    loans: loansWithPrices,
-    loading: isLoadingPrices,
+    prices,
+    isLoading: isLoadingPrices,
     error: pricesError,
     refreshPrices,
-    lastUpdated,
-    priceChangeStats,
-  } = useLivePriceComparison(pendingLoans, {
-    refreshInterval: 120000, // 2 minutes
-    enableAutoRefresh: true,
-  });
+  } = useTokenPrices(getAllSupportedTokens());
 
   const [selectedLoanId, setSelectedLoanId] = useState<bigint | null>(null);
   const [showStuckMessage, setShowStuckMessage] = useState(false);
@@ -158,7 +152,12 @@ export default function OffersPage() {
 
   // Format loans with token information for display
   const formattedLoans = React.useMemo(() => {
-    return loansWithPrices.map((loan) => {
+    // Debug: Log available prices
+    if (prices.size > 0) {
+      console.log("📊 Available prices:", Array.from(prices.keys()));
+    }
+
+    return pendingLoans.map((loan) => {
       const tokenInfo = getTokenByAddress(loan.tokenAddress);
       const collateralInfo = getTokenByAddress(loan.collateralAddress);
 
@@ -169,6 +168,43 @@ export default function OffersPage() {
       const formattedCollateralAmount = collateralInfo
         ? ethers.formatUnits(loan.collateralAmount, collateralInfo.decimals)
         : ethers.formatEther(loan.collateralAmount);
+
+      // Calculate USD values from prices
+      const tokenAddressLower = loan.tokenAddress.toLowerCase();
+      const collateralAddressLower = loan.collateralAddress.toLowerCase();
+
+      console.log(`🔍 Looking for token price: ${tokenAddressLower}`);
+      console.log(`🔍 Looking for collateral price: ${collateralAddressLower}`);
+
+      const tokenPrice = prices.get(tokenAddressLower);
+      const collateralPrice = prices.get(collateralAddressLower);
+
+      if (tokenPrice) {
+        console.log(`✅ Found token price:`, tokenPrice);
+      } else {
+        console.log(`❌ Token price not found for ${tokenAddressLower}`);
+      }
+
+      if (collateralPrice) {
+        console.log(`✅ Found collateral price:`, collateralPrice);
+      } else {
+        console.log(
+          `❌ Collateral price not found for ${collateralAddressLower}`
+        );
+      }
+
+      const currentLoanValueUSD = tokenPrice
+        ? (
+            parseFloat(formattedAmount) * parseFloat(tokenPrice.priceUSD)
+          ).toFixed(2)
+        : "0.00";
+
+      const currentCollateralValueUSD = collateralPrice
+        ? (
+            parseFloat(formattedCollateralAmount) *
+            parseFloat(collateralPrice.priceUSD)
+          ).toFixed(2)
+        : "0.00";
 
       return {
         ...loan,
@@ -181,9 +217,11 @@ export default function OffersPage() {
         ],
         tokenInfo,
         collateralInfo,
+        currentLoanValueUSD,
+        currentCollateralValueUSD,
       };
     });
-  }, [loansWithPrices]);
+  }, [pendingLoans, prices]);
 
   const handleAcceptOffer = async (loan: LoanOfferWithDetails) => {
     if (!address) {
@@ -199,7 +237,7 @@ export default function OffersPage() {
     try {
       setSelectedLoanId(loan.id);
       await acceptLoanOffer(loan.id, loan);
-      // Refresh the data after successful acceptance
+      // Refresh prices after successful acceptance
       refreshPrices();
     } catch (error) {
       console.error("Failed to accept loan offer:", error);
@@ -222,7 +260,7 @@ export default function OffersPage() {
     try {
       setSelectedLoanId(loan.id);
       await cancelLoanOffer(loan.id);
-      // Refresh the data after successful cancellation
+      // Refresh prices after successful cancellation
       refreshPrices();
     } catch (error) {
       console.error("Failed to cancel loan offer:", error);
@@ -245,14 +283,6 @@ export default function OffersPage() {
           </p>
         </div>
         <div className="flex items-center space-x-3">
-          {lastUpdated && (
-            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-              <Clock className="h-3 w-3" />
-              <span>
-                Updated {Math.floor((Date.now() - lastUpdated) / 1000)}s ago
-              </span>
-            </div>
-          )}
           <Button
             onClick={handleRefresh}
             variant="outline"
@@ -413,18 +443,13 @@ export default function OffersPage() {
               <CardContent className="pt-6">
                 <div className="flex items-center space-x-2">
                   <TrendingUp className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium">Price Trends</span>
+                  <span className="text-sm font-medium">Available Offers</span>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-lg font-bold text-green-600">
-                    ↑{priceChangeStats.pricesUp}
-                  </p>
-                  <p className="text-lg font-bold text-red-600">
-                    ↓{priceChangeStats.pricesDown}
-                  </p>
+                  <p className="text-2xl font-bold">{formattedLoans.length}</p>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Prices up/down since creation
+                  Total pending loan offers
                 </p>
               </CardContent>
             </Card>
@@ -467,10 +492,10 @@ export default function OffersPage() {
                         Loan ID
                       </TableHead> */}
                       <TableHead className="font-semibold text-muted-foreground">
-                        Amount & Live Value
+                        Loan Amount & Value
                       </TableHead>
                       <TableHead className="font-semibold text-muted-foreground">
-                        Price Change
+                        Token Price Info
                       </TableHead>
                       <TableHead className="font-semibold text-muted-foreground">
                         Interest APR
@@ -523,70 +548,30 @@ export default function OffersPage() {
                           </div>
                         </TableCell> */}
                         <TableCell>
-                          <div className="space-y-1">
-                            <p className="font-semibold text-foreground">
-                              {parseFloat(loan.formattedAmount).toFixed(4)}{" "}
-                              <span className="text-primary font-medium">
-                                {loan.tokenInfo?.symbol || "Tokens"}
-                              </span>
-                            </p>
-                            <div className="space-y-1">
-                              <p className="text-sm text-green-600 font-medium">
+                          <div className="space-y-2">
+                            <div>
+                              <p className="font-semibold text-foreground">
+                                {parseFloat(loan.formattedAmount).toFixed(4)}{" "}
+                                <span className="text-primary font-medium">
+                                  {loan.tokenInfo?.symbol || "Tokens"}
+                                </span>
+                              </p>
+                              <p className="text-sm text-green-600 font-medium mt-1">
                                 ${loan.currentLoanValueUSD}
                               </p>
-                              {/* {loan.historicalAmountUSD && (
-                                <p className="text-xs text-muted-foreground">
-                                  Was $
-                                  {parseFloat(loan.historicalAmountUSD).toFixed(
-                                    2
-                                  )}{" "}
-                                  at creation
-                                </p>
-                              )} */}
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {loan.tokenInfo?.name ||
+                                  `${loan.tokenAddress.slice(0, 6)}...${loan.tokenAddress.slice(-4)}`}
+                              </p>
                             </div>
-                            <p className="text-xs text-muted-foreground">
-                              {loan.tokenInfo?.name ||
-                                `${loan.tokenAddress.slice(0, 6)}...${loan.tokenAddress.slice(-4)}`}
-                            </p>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div className="space-y-1">
-                            {loan.currentTokenPrice?.success ? (
-                              <>
-                                <Badge
-                                  variant="secondary"
-                                  className={`${
-                                    loan.priceChangeIndicator.isPositive
-                                      ? "bg-green-50 text-green-700 border-green-200"
-                                      : loan.loanTokenPriceDirection === "down"
-                                        ? "bg-red-50 text-red-700 border-red-200"
-                                        : "bg-gray-50 text-gray-700 border-gray-200"
-                                  }`}
-                                >
-                                  {loan.loanTokenPriceDirection === "up" && (
-                                    <TrendingUp className="h-3 w-3 mr-1" />
-                                  )}
-                                  {loan.loanTokenPriceDirection === "down" && (
-                                    <TrendingDown className="h-3 w-3 mr-1" />
-                                  )}
-                                  {loan.priceChangeIndicator.percentage}
-                                </Badge>
-                                <p className="text-xs text-muted-foreground">
-                                  Current: ${loan.currentTokenPrice.priceUSD}
-                                </p>
-                                {loan.isStalePrice && (
-                                  <p className="text-xs text-orange-600">
-                                    ⚠ Stale price
-                                  </p>
-                                )}
-                              </>
-                            ) : (
-                              <Badge variant="destructive" className="text-xs">
-                                Price Error
-                              </Badge>
-                            )}
-                          </div>
+                          <DualPriceDisplay
+                            price={prices.get(loan.tokenAddress.toLowerCase())}
+                            showLabel={false}
+                            className="text-sm"
+                          />
                         </TableCell>
                         <TableCell>
                           <Badge
@@ -621,22 +606,31 @@ export default function OffersPage() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div className="space-y-1">
-                            <p className="font-semibold text-foreground">
-                              {parseFloat(
-                                loan.formattedCollateralAmount
-                              ).toFixed(4)}{" "}
-                              <span className="text-primary font-medium">
-                                {loan.collateralInfo?.symbol || "Tokens"}
-                              </span>
-                            </p>
-                            <p className="text-sm text-blue-600 font-medium">
-                              ${loan.currentCollateralValueUSD}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {loan.collateralInfo?.name ||
-                                `${loan.collateralAddress.slice(0, 6)}...${loan.collateralAddress.slice(-4)}`}
-                            </p>
+                          <div className="space-y-2">
+                            <div>
+                              <p className="font-semibold text-foreground">
+                                {parseFloat(
+                                  loan.formattedCollateralAmount
+                                ).toFixed(4)}{" "}
+                                <span className="text-primary font-medium">
+                                  {loan.collateralInfo?.symbol || "Tokens"}
+                                </span>
+                              </p>
+                              <p className="text-sm text-blue-600 font-medium mt-1">
+                                ${loan.currentCollateralValueUSD}
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {loan.collateralInfo?.name ||
+                                  `${loan.collateralAddress.slice(0, 6)}...${loan.collateralAddress.slice(-4)}`}
+                              </p>
+                            </div>
+                            <DualPriceDisplay
+                              price={prices.get(
+                                loan.collateralAddress.toLowerCase()
+                              )}
+                              showLabel={false}
+                              className="text-xs"
+                            />
                           </div>
                         </TableCell>
                         <TableCell>
