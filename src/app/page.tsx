@@ -100,136 +100,138 @@ export default function Home() {
 
   return (
     <>
-      <div className="relative">
+      <div className="relative overflow-hidden">
         {/* Hero Section */}
         <section className="relative pt-20 pb-32 overflow-hidden">
-          <div className="text-center relative z-10">
+          {/* Organic Background Shapes */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div
+              className="absolute -top-1/2 -right-1/4 w-[800px] h-[800px] bg-primary/10 rounded-full blur-3xl"
+              style={{
+                clipPath:
+                  "polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)",
+              }}
+            />
+          </div>
+
+          <div className="text-center relative z-10 px-4">
             {/* Hero Badge */}
-            <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-cyan-500/10 to-primary/10 text-cyan-600 dark:text-cyan-400 px-6 py-3 rounded-full text-sm font-semibold mb-8 border border-cyan-500/30 hover:scale-105 transition-transform duration-300 cursor-pointer">
-              <Brain className="h-4 w-4" />
+            <div className="inline-flex items-center gap-2 bg-primary/10 backdrop-blur-sm border border-primary/20 px-6 py-3 rounded-full text-sm font-medium mb-8">
+              <Brain className="h-4 w-4 text-primary" />
               <span>Powered by DomaRank AI Oracle</span>
               <span className="text-primary">•</span>
-              <span className="text-primary">Built on Doma Testnet</span>
+              <span className="text-muted-foreground">
+                Built on Doma Testnet
+              </span>
             </div>
 
             {/* Main Heading */}
-            <div className="space-y-6 mb-12">
-              <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-foreground via-foreground/90 to-foreground/70 bg-clip-text text-transparent leading-tight">
-                Unlock Liquidity from
-                <br />
-                <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            <div className="space-y-8 mb-12 max-w-5xl mx-auto">
+              <h1 className="text-6xl md:text-8xl font-bold text-foreground leading-[1.1] tracking-tight">
+                Unlock Liquidity from{" "}
+                <span className="text-primary inline-block">
                   Your Doma Domains
                 </span>
               </h1>
 
               <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                The first lending protocol that accepts fractionalized Doma
-                domain tokens as collateral. Get instant loans using your
-                valuable domains, or lend stablecoins backed by premium domain
-                assets valued algorithmically.
+                The first lending protocol that accepts{" "}
+                <span className="text-foreground font-semibold">
+                  fractionalized domain tokens
+                </span>{" "}
+                as collateral
               </p>
             </div>
 
             {/* CTA Buttons */}
-            {!isConnected ? (
-              <div className="space-y-6">
-                <div className="glass px-6 py-4 rounded-2xl inline-block">
-                  <p className="text-muted-foreground mb-4">
-                    Connect your wallet to get started
-                  </p>
-                  <div className="flex items-center justify-center space-x-2 text-sm text-primary">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+              {!isConnected ? (
+                <div className="flex flex-col items-center gap-6">
+                  <div className="flex items-center gap-2 text-muted-foreground">
                     <Lock className="h-4 w-4" />
-                    <span>Secure • Trustless • Transparent</span>
+                    <span className="text-sm">
+                      Connect your wallet to get started
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-6 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <Shield className="h-3 w-3" /> Secure
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Globe className="h-3 w-3" /> Trustless
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Zap className="h-3 w-3" /> Lightning Fast
+                    </span>
                   </div>
                 </div>
-              </div>
-            ) : (
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/create">
-                  <Button
-                    size="lg"
-                    className="btn-premium px-8 py-4 text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
-                  >
-                    <PlusCircle className="h-5 w-5 mr-2" />
-                    Create Loan Offer
-                    <ArrowRight className="h-4 w-4 ml-2" />
-                  </Button>
-                </Link>
-                <Link href="/offers">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="px-8 py-4 text-lg font-semibold rounded-2xl glass hover:bg-accent/50 transition-all duration-300"
-                  >
-                    <List className="h-5 w-5 mr-2" />
-                    Browse Offers
-                  </Button>
-                </Link>
-              </div>
-            )}
-
-            {/* Trust Indicators */}
-            <div className="mt-16 flex flex-wrap justify-center items-center gap-8 opacity-60">
-              <div className="flex items-center space-x-2">
-                <Globe className="h-4 w-4" />
-                <span className="text-sm font-medium">Decentralized</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Shield className="h-4 w-4" />
-                <span className="text-sm font-medium">Audited (soon)</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Zap className="h-4 w-4" />
-                <span className="text-sm font-medium">Lightning Fast</span>
-              </div>
+              ) : (
+                <>
+                  <Link href="/create">
+                    <Button
+                      size="lg"
+                      className="bg-primary hover:bg-primary/90 px-10 py-6 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+                    >
+                      <PlusCircle className="h-5 w-5 mr-2" />
+                      Create Loan Offer
+                      <ArrowRight className="h-5 w-5 ml-2" />
+                    </Button>
+                  </Link>
+                  <Link href="/offers">
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="px-10 py-6 text-lg font-semibold rounded-full hover:bg-accent transition-all duration-300"
+                    >
+                      <List className="h-5 w-5 mr-2" />
+                      Browse Offers
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
-          </div>
-
-          {/* Background Elements */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/5 rounded-full blur-3xl" />
-            <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/5 rounded-full blur-3xl" />
           </div>
         </section>
 
         {/* Stats Section */}
         {isConnected && (
-          <section className="py-16">
-            <div>
-              <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold mb-4">
-                  Your Portfolio Overview
+          <section className="py-24  px-4 relative">
+            <div className="absolute inset-0 bg-primary/5 rounded-[60px] mx-4" />
+            <div className="relative z-10 max-w-6xl mx-auto">
+              <div className="text-center mb-16">
+                <h2 className="text-4xl md:text-5xl font-bold mb-4">
+                  Your Portfolio
                 </h2>
                 <p className="text-muted-foreground text-lg">
-                  Track your lending and borrowing activity
+                  Track your activity
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {stats.map((stat, index) => {
                   const Icon = stat.icon;
                   return (
-                    <Card
-                      key={index}
-                      className="luxury-shadow-lg hover:scale-105 transition-all duration-300"
-                    >
-                      <CardContent className="pt-6">
-                        <div className="flex items-center space-x-4">
-                          <div className={`p-3 rounded-2xl ${stat.bgColor}`}>
-                            <Icon className={`h-6 w-6 ${stat.color}`} />
-                          </div>
-                          <div>
-                            <p className="text-3xl font-bold">{stat.value}</p>
-                            <p className="font-semibold text-foreground">
-                              {stat.label}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {stat.description}
-                            </p>
-                          </div>
+                    <div key={index} className="group relative">
+                      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm rounded-3xl" />
+                      <div className="relative p-8 text-center space-y-4">
+                        <div
+                          className={`inline-flex p-4 rounded-2xl ${stat.bgColor}`}
+                        >
+                          <Icon className={`h-8 w-8 ${stat.color}`} />
                         </div>
-                      </CardContent>
-                    </Card>
+                        <div>
+                          <p className="text-5xl font-bold mb-2">
+                            {stat.value}
+                          </p>
+                          <p className="font-semibold text-foreground text-lg">
+                            {stat.label}
+                          </p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {stat.description}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   );
                 })}
               </div>
@@ -238,40 +240,43 @@ export default function Home() {
         )}
 
         {/* Features Section */}
-        <section className="py-16">
-          <div>
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-6">Why Choose DomaLend?</h2>
+        <section className="py-24 px-4 relative overflow-hidden">
+          {/* Decorative Pattern */}
+          <div className="absolute inset-0 opacity-5 pointer-events-none">
+            <div className="absolute top-0 right-0 w-64 h-64 border-2 border-primary rounded-full" />
+            <div className="absolute bottom-0 left-0 w-96 h-96 border-2 border-primary rounded-full" />
+          </div>
+
+          <div className="max-w-7xl mx-auto relative z-10">
+            <div className="text-center mb-20">
+              <h2 className="text-4xl md:text-6xl font-bold mb-6">
+                Why Choose DomaLend?
+              </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                 The revolutionary way to unlock value from your fractionalized
                 domain token portfolio
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
               {features.map((feature, index) => {
                 const Icon = feature.icon;
                 return (
-                  <Card
-                    key={index}
-                    className="luxury-shadow hover:luxury-shadow-lg transition-all duration-300 group"
-                  >
-                    <CardHeader className="pb-4">
-                      <div className="flex items-center space-x-3 mb-4">
-                        <div className="p-2 rounded-xl bg-background/50 group-hover:scale-110 transition-transform duration-300">
-                          <Icon className={`h-6 w-6 ${feature.color}`} />
-                        </div>
-                        <CardTitle className="text-xl">
-                          {feature.title}
-                        </CardTitle>
+                  <div key={index} className="group relative">
+                    <div className="text-center space-y-6">
+                      <div className="inline-flex p-6 rounded-3xl bg-primary/5 group-hover:bg-primary/10 transition-colors duration-300">
+                        <Icon className="h-12 w-12 text-primary" />
                       </div>
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription className="text-base leading-relaxed">
-                        {feature.description}
-                      </CardDescription>
-                    </CardContent>
-                  </Card>
+                      <div>
+                        <h3 className="text-2xl font-bold mb-4">
+                          {feature.title}
+                        </h3>
+                        <p className="text-base text-muted-foreground leading-relaxed">
+                          {feature.description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 );
               })}
             </div>
@@ -279,106 +284,91 @@ export default function Home() {
         </section>
 
         {/* DomaRank Showcase Section */}
-        <section className="py-20 bg-gradient-to-br from-cyan-500/5 via-primary/5 to-purple-500/5 relative overflow-hidden">
-          {/* Background decoration */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-20 left-20 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" />
+        <section className="py-32 px-4 relative overflow-hidden bg-primary/5">
+          {/* Organic Shapes */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <div
-              className="absolute bottom-20 right-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse"
-              style={{ animationDelay: "1s" }}
+              className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 blur-3xl"
+              style={{
+                clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
+              }}
+            />
+            <div
+              className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-primary/10 blur-3xl"
+              style={{ borderRadius: "30% 70% 70% 30% / 30% 30% 70% 70%" }}
             />
           </div>
 
-          <div className="relative z-10">
-            <div className="text-center mb-12">
-              <Badge className="px-6 py-3 mb-6 bg-gradient-to-r from-cyan-500/20 to-primary/20 border-cyan-500/30 text-lg">
-                <Brain className="h-4 w-4 mr-2" />
-                Revolutionary AI Oracle
-              </Badge>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                Powered by{" "}
-                <span className="bg-gradient-to-r from-cyan-500 to-primary bg-clip-text text-transparent">
-                  DomaRank
-                </span>{" "}
-                AI Oracle
+          <div className="max-w-7xl mx-auto relative z-10">
+            <div className="text-center mb-20">
+              <div className="inline-flex items-center gap-2 bg-background/80 backdrop-blur-sm px-6 py-3 rounded-full mb-8 border border-primary/20">
+                <Brain className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium">
+                  Revolutionary AI Oracle
+                </span>
+              </div>
+              <h2 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
+                Powered by <span className="text-primary">DomaRank</span>
               </h2>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                World's first AI-powered oracle for domain token valuation.
-                Intelligent pricing that analyzes multiple factors to ensure
-                fair, accurate valuations in real-time.
+              <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+                World's first AI-powered oracle for domain token valuation
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-20">
               {[
                 {
                   icon: Brain,
                   title: "AI-Powered Analysis",
                   description:
                     "Machine learning algorithms evaluate 6 key metrics including domain length, social presence, and market activity",
-                  color: "text-cyan-500",
-                  bgColor: "bg-cyan-500/10",
                 },
                 {
                   icon: Activity,
                   title: "Real-Time Updates",
                   description:
                     "Prices updated every 10 minutes with live market data from CoinGecko and Doma Protocol",
-                  color: "text-green-500",
-                  bgColor: "bg-green-500/10",
                 },
                 {
                   icon: BarChart3,
                   title: "Multi-Factor Scoring",
                   description:
                     "DomaRank score (0-100) combines domain quality, liquidity, supply, and launch metrics",
-                  color: "text-purple-500",
-                  bgColor: "bg-purple-500/10",
                 },
               ].map((feature, index) => (
-                <Card
-                  key={index}
-                  className="glass luxury-shadow border-2 border-border hover:border-cyan-500/30 transition-all duration-300 group"
-                >
-                  <CardContent className="p-6 text-center">
-                    <div
-                      className={`w-16 h-16 rounded-xl ${feature.bgColor} flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}
-                    >
-                      <feature.icon className={`h-8 w-8 ${feature.color}`} />
-                    </div>
-                    <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {feature.description}
-                    </p>
-                  </CardContent>
-                </Card>
+                <div key={index} className="text-center space-y-4">
+                  <div className="inline-flex p-5 rounded-full bg-background/80 backdrop-blur-sm border border-primary/20">
+                    <feature.icon className="h-10 w-10 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-bold">{feature.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {feature.description}
+                  </p>
+                </div>
               ))}
             </div>
 
-            {/* DomaRank CTA Card */}
-            <Card className="luxury-shadow-lg glass border-2 border-cyan-500/30 max-w-4xl mx-auto overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-primary/10 to-purple-500/10" />
-              <CardContent className="p-12 text-center relative z-10">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-cyan-500/20 to-primary/20 mb-6 animate-pulse">
-                  <Sparkles className="h-10 w-10 text-cyan-500" />
+            {/* DomaRank CTA */}
+            <div className="max-w-4xl mx-auto text-center">
+              <div className="bg-background/80 backdrop-blur-sm border border-primary/20 rounded-[40px] p-12">
+                <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-primary/10 mb-8">
+                  <Sparkles className="h-12 w-12 text-primary" />
                 </div>
-                <h3 className="text-3xl font-bold mb-4 bg-gradient-to-r from-cyan-500 via-primary to-purple-500 bg-clip-text text-transparent">
+                <h3 className="text-3xl md:text-4xl font-bold mb-6">
                   Discover the DomaRank Revolution
                 </h3>
-                <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+                <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
                   Learn how our groundbreaking AI oracle technology is
-                  transforming DeFi lending. Explore the architecture,
-                  algorithms, and innovation behind intelligent domain token
-                  pricing.
+                  transforming DeFi lending
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link href="/domarank">
                     <Button
                       size="lg"
-                      className="btn-cyan text-lg px-10 py-6 shadow-2xl"
+                      className="bg-primary hover:bg-primary/90 text-lg px-10 py-6 rounded-full"
                     >
                       <Brain className="mr-2 h-5 w-5" />
-                      Explore DomaRank Oracle
+                      Explore DomaRank
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
@@ -386,102 +376,79 @@ export default function Home() {
                     <Button
                       size="lg"
                       variant="outline"
-                      className="glass text-lg px-10 py-6"
+                      className="text-lg px-10 py-6 rounded-full"
                     >
                       <TrendingUp className="mr-2 h-5 w-5" />
                       See Live Prices
                     </Button>
                   </Link>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </section>
 
         {/* Getting Started - Prerequisites */}
-        <section className="py-16 bg-gradient-to-b from-background to-primary/5">
-          <div>
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-6">
+        <section className="py-24 px-4 relative">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-20">
+              <h2 className="text-4xl md:text-6xl font-bold mb-6">
                 Get Started in Minutes
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Follow these simple steps to start lending or borrowing on
-                DomaLend
+                Three simple steps to start lending or borrowing
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
               {/* Step 1: Get Testnet ETH */}
-              <Card className="luxury-shadow-lg border-2 border-primary/20 relative overflow-hidden group hover:border-primary/40 transition-all duration-300">
-                <div className="absolute top-4 right-4">
-                  <Badge className="bg-primary/20 text-primary border-primary/30 font-bold">
-                    Step 1
-                  </Badge>
-                </div>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-3 text-xl">
-                    <div className="p-3 rounded-xl bg-blue-100 dark:bg-blue-900/20">
-                      <Wallet className="h-6 w-6 text-blue-600" />
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-primary/10 rounded-[30px] blur-xl group-hover:bg-primary/20 transition-colors duration-300" />
+                <div className="relative bg-background border border-primary/20 rounded-[30px] p-8">
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="inline-flex p-4 rounded-2xl bg-primary/10">
+                      <Wallet className="h-8 w-8 text-primary" />
                     </div>
-                    <span>Get Testnet ETH</span>
-                  </CardTitle>
-                  <CardDescription>
-                    Bridge Sepolia ETH to Doma Testnet for gas fees
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    <div className="flex items-start space-x-3">
-                      <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-xs font-bold text-blue-600">
-                          1
-                        </span>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Get Sepolia ETH from any Sepolia faucet
-                      </p>
-                    </div>
-                    <div className="flex items-start space-x-3">
-                      <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-xs font-bold text-blue-600">
-                          2
-                        </span>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Visit the Doma Bridge and connect your wallet
-                      </p>
-                    </div>
-                    <div className="flex items-start space-x-3">
-                      <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-xs font-bold text-blue-600">
-                          3
-                        </span>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Bridge ETH from Sepolia to Doma Testnet
-                      </p>
-                    </div>
+                    <span className="text-sm font-bold text-primary px-4 py-1 bg-primary/10 rounded-full">
+                      Step 1
+                    </span>
                   </div>
+                  <h3 className="text-2xl font-bold mb-3">Get Testnet ETH</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Bridge Sepolia ETH to Doma Testnet for gas fees
+                  </p>
+                  <ul className="space-y-3 mb-6">
+                    <li className="flex items-start gap-3 text-sm text-muted-foreground">
+                      <span className="text-primary font-bold">→</span>
+                      Get Sepolia ETH from any faucet
+                    </li>
+                    <li className="flex items-start gap-3 text-sm text-muted-foreground">
+                      <span className="text-primary font-bold">→</span>
+                      Connect wallet to Doma Bridge
+                    </li>
+                    <li className="flex items-start gap-3 text-sm text-muted-foreground">
+                      <span className="text-primary font-bold">→</span>
+                      Bridge ETH to Doma Testnet
+                    </li>
+                  </ul>
                   <a
                     href="https://bridge-testnet.doma.xyz/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block"
                   >
-                    <Button className="w-full btn-premium group-hover:scale-105 transition-transform duration-300">
+                    <Button className="w-full bg-primary hover:bg-primary/90 rounded-full">
                       <Zap className="h-4 w-4 mr-2" />
                       Open Doma Bridge
                       <ArrowRight className="h-4 w-4 ml-2" />
                     </Button>
                   </a>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
 
               {/* Step 2: Buy Domain Tokens */}
-              <Card className="luxury-shadow-lg border-2 border-purple-500/20 relative overflow-hidden group hover:border-purple-500/40 transition-all duration-300">
+              <Card className="border-2 border-primary/20 relative group hover:border-primary/40 transition-all duration-300">
                 <div className="absolute top-4 right-4">
-                  <Badge className="bg-purple-500/20 text-purple-600 border-purple-500/30 font-bold">
+                  <Badge className="bg-primary/10 border-primary/30 font-bold">
                     Step 2
                   </Badge>
                 </div>
@@ -535,7 +502,7 @@ export default function Home() {
                     rel="noopener noreferrer"
                     className="block"
                   >
-                    <Button className="w-full bg-purple-600 hover:bg-purple-700 group-hover:scale-105 transition-transform duration-300">
+                    <Button className="w-full bg-primary hover:bg-primary/90 group-hover:scale-105 transition-transform duration-300">
                       <Sparkles className="h-4 w-4 mr-2" />
                       Explore Mizu DEX
                       <ArrowRight className="h-4 w-4 ml-2" />
@@ -547,16 +514,16 @@ export default function Home() {
 
             {/* Step 3 - Use DomaLend */}
             <div className="mt-8 max-w-4xl mx-auto">
-              <Card className="luxury-shadow-lg border-2 border-green-500/20 hover:border-green-500/40 transition-all duration-300">
+              <Card className="border-2 border-primary/20 hover:border-primary/40 transition-all duration-300">
                 <CardContent className="p-8">
                   <div className="flex items-center justify-between flex-wrap gap-6">
                     <div className="flex items-center space-x-4">
-                      <div className="p-4 rounded-xl bg-green-100 dark:bg-green-900/20">
-                        <CheckCircle className="h-8 w-8 text-green-600" />
+                      <div className="p-4 rounded-xl bg-primary/10 border border-primary/20">
+                        <CheckCircle className="h-8 w-8 text-primary" />
                       </div>
                       <div>
                         <div className="flex items-center space-x-2 mb-2">
-                          <Badge className="bg-green-500/20 text-green-600 border-green-500/30 font-bold">
+                          <Badge className="bg-primary/10 border-primary/30 font-bold">
                             Step 3
                           </Badge>
                           <h3 className="text-2xl font-bold">Ready to Go!</h3>
@@ -569,13 +536,16 @@ export default function Home() {
                     </div>
                     <div className="flex flex-col sm:flex-row gap-3">
                       <Link href="/create">
-                        <Button size="lg" className="btn-premium">
+                        <Button
+                          size="lg"
+                          className="bg-primary hover:bg-primary/90"
+                        >
                           <PlusCircle className="h-5 w-5 mr-2" />
                           Create Loan Offer
                         </Button>
                       </Link>
                       <Link href="/offers">
-                        <Button size="lg" variant="outline" className="glass">
+                        <Button size="lg" variant="outline">
                           <List className="h-5 w-5 mr-2" />
                           Browse Loans
                         </Button>
@@ -599,7 +569,7 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <Card className="luxury-shadow-lg border-l-4 border-l-green-500">
+              <Card className="border hover:border-primary/50 transition-all duration-300">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-3 text-xl">
                     <div className="p-2 rounded-xl bg-green-100 dark:bg-green-900/20">
@@ -633,7 +603,7 @@ export default function Home() {
                 </CardContent>
               </Card>
 
-              <Card className="luxury-shadow-lg border-l-4 border-l-blue-500">
+              <Card className="border hover:border-primary/50 transition-all duration-300">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-3 text-xl">
                     <div className="p-2 rounded-xl bg-blue-100 dark:bg-blue-900/20">
@@ -675,15 +645,15 @@ export default function Home() {
         {/* Benefits Section */}
         <section className="py-16">
           <div>
-            <Card className="luxury-shadow-lg overflow-hidden">
+            <Card className="border">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="p-8">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="p-3 rounded-xl bg-gradient-to-br from-cyan-500/20 to-primary/20">
-                      <Brain className="h-8 w-8 text-cyan-500" />
+                    <div className="p-3 rounded-xl bg-primary/10 border border-primary/20">
+                      <Brain className="h-8 w-8 text-primary" />
                     </div>
                     <div>
-                      <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-500 to-primary bg-clip-text text-transparent">
+                      <h3 className="text-2xl font-bold text-foreground">
                         DomaRank AI Oracle
                       </h3>
                       <p className="text-sm text-muted-foreground">
@@ -708,13 +678,13 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-                <div className="p-8 bg-gradient-to-br from-cyan-500/5 via-primary/5 to-purple-500/5 flex items-center justify-center">
+                <div className="p-8 bg-muted/30 flex items-center justify-center">
                   <div className="text-center space-y-6">
-                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-cyan-500/20 to-primary/20 mb-2">
-                      <Sparkles className="h-10 w-10 text-cyan-500" />
+                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 border border-primary/20 mb-2">
+                      <Sparkles className="h-10 w-10 text-primary" />
                     </div>
                     <div>
-                      <h4 className="text-2xl font-bold mb-2 bg-gradient-to-r from-cyan-500 to-primary bg-clip-text text-transparent">
+                      <h4 className="text-2xl font-bold mb-2 text-foreground">
                         Experience AI-Powered Lending
                       </h4>
                       <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
@@ -724,13 +694,13 @@ export default function Home() {
                     </div>
                     <div className="flex flex-col gap-3">
                       <Link href="/domarank">
-                        <Button className="btn-cyan w-full">
+                        <Button className="bg-primary hover:bg-primary/90 w-full">
                           <Brain className="mr-2 h-4 w-4" />
                           Learn About DomaRank
                         </Button>
                       </Link>
                       {!isConnected && (
-                        <Button variant="outline" className="glass w-full">
+                        <Button variant="outline" className="w-full">
                           Connect Wallet to Start
                         </Button>
                       )}
@@ -756,10 +726,10 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Link href="/how-it-works">
-                <Card className="luxury-shadow hover:luxury-shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group">
+                <Card className="border hover:border-primary/50 transition-all duration-300 hover:scale-105 cursor-pointer group">
                   <CardContent className="p-8 text-center space-y-4">
-                    <div className="p-4 rounded-2xl bg-indigo-100 dark:bg-indigo-900/20 mx-auto w-fit group-hover:scale-110 transition-transform duration-300">
-                      <BookOpen className="h-8 w-8 text-indigo-600" />
+                    <div className="p-4 rounded-xl bg-primary/10 border border-primary/20 mx-auto w-fit group-hover:scale-110 transition-transform duration-300">
+                      <BookOpen className="h-8 w-8 text-primary" />
                     </div>
                     <div>
                       <h3 className="text-xl font-semibold mb-2">
@@ -776,10 +746,10 @@ export default function Home() {
               </Link>
 
               <Link href="/faq">
-                <Card className="luxury-shadow hover:luxury-shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group">
+                <Card className="border hover:border-primary/50 transition-all duration-300 hover:scale-105 cursor-pointer group">
                   <CardContent className="p-8 text-center space-y-4">
-                    <div className="p-4 rounded-2xl bg-amber-100 dark:bg-amber-900/20 mx-auto w-fit group-hover:scale-110 transition-transform duration-300">
-                      <HelpCircle className="h-8 w-8 text-amber-600" />
+                    <div className="p-4 rounded-xl bg-primary/10 border border-primary/20 mx-auto w-fit group-hover:scale-110 transition-transform duration-300">
+                      <HelpCircle className="h-8 w-8 text-primary" />
                     </div>
                     <div>
                       <h3 className="text-xl font-semibold mb-2">FAQ</h3>
@@ -799,7 +769,7 @@ export default function Home() {
         {isConnected && (
           <section className="py-16">
             <div>
-              <Card className="luxury-shadow-lg">
+              <Card className="border">
                 <CardHeader className="text-center">
                   <CardTitle className="text-2xl">Quick Actions</CardTitle>
                   <CardDescription className="text-lg">
@@ -838,10 +808,10 @@ export default function Home() {
                       const Icon = action.icon;
                       return (
                         <Link key={index} href={action.href}>
-                          <Card className="luxury-shadow hover:luxury-shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group">
+                          <Card className="border hover:border-primary/50 transition-all duration-300 hover:scale-105 cursor-pointer group">
                             <CardContent className="p-6 text-center space-y-4">
                               <div
-                                className={`p-3 rounded-2xl ${action.bgColor} mx-auto w-fit group-hover:scale-110 transition-transform duration-300`}
+                                className={`p-3 rounded-xl ${action.bgColor} mx-auto w-fit group-hover:scale-110 transition-transform duration-300`}
                               >
                                 <Icon className={`h-6 w-6 ${action.color}`} />
                               </div>
