@@ -10,7 +10,7 @@ if (!projectId) {
   throw new Error("Project ID is not defined");
 }
 
-// Define Somnia Testnet for AppKit
+// Define Doma Testnet for AppKit
 const domaTestnet: AppKitNetwork = {
   id: DOMA_TESTNET_CONFIG.id,
   name: DOMA_TESTNET_CONFIG.name,

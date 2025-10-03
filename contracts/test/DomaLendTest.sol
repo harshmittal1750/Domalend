@@ -2,14 +2,14 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "forge-std/Test.sol";
-import {DreamLend} from "../src/DreamLend.sol";
+import {DomaLend} from "../src/DomaLend.sol";
 
 /**
- * @title DreamLend Test Suite
- * @dev Basic test suite for DreamLend contract functionality
+ * @title DomaLend Test Suite
+ * @dev Basic test suite for DomaLend contract functionality
  */
 contract DreamLendTest is Test {
-    DreamLend public dreamLend;
+    DomaLend public dreamLend;
     MockERC20 public loanToken;
     MockERC20 public collateralToken;
 
@@ -23,7 +23,7 @@ contract DreamLendTest is Test {
     uint256 public constant MAX_PRICE_STALENESS = 3600; // 1 hour
 
     function setUp() public {
-        dreamLend = new DreamLend();
+        dreamLend = new DomaLend();
 
         // Deploy mock ERC20 tokens
         loanToken = new MockERC20("Loan Token", "LOAN", 18);
@@ -83,7 +83,7 @@ contract DreamLendTest is Test {
 
     function test_GetNonexistentLoan() public {
         // Test getting a loan that doesn't exist returns empty struct
-        DreamLend.Loan memory loan = dreamLend.getLoan(999);
+        DomaLend.Loan memory loan = dreamLend.getLoan(999);
         assertEq(loan.id, 0);
         assertEq(loan.lender, address(0));
         assertEq(loan.borrower, address(0));
@@ -109,12 +109,12 @@ contract DreamLendTest is Test {
         vm.stopPrank();
 
         // Verify loan was created
-        DreamLend.Loan memory loan = dreamLend.getLoan(1);
+        DomaLend.Loan memory loan = dreamLend.getLoan(1);
         assertEq(loan.id, 1);
         assertEq(loan.lender, lender);
         assertEq(loan.amount, 1000 ether);
         assertEq(loan.interestRate, 1500);
-        assertEq(uint256(loan.status), uint256(DreamLend.LoanStatus.Pending));
+        assertEq(uint256(loan.status), uint256(DomaLend.LoanStatus.Pending));
 
         // Verify it's in active offers
         uint256[] memory activeOffers = dreamLend.getActiveLoanOffers();
@@ -146,8 +146,8 @@ contract DreamLendTest is Test {
         assertEq(balanceAfter, balanceBefore + 1000 ether);
 
         // Verify loan status updated
-        DreamLend.Loan memory loan = dreamLend.getLoan(1);
-        assertEq(uint256(loan.status), uint256(DreamLend.LoanStatus.Cancelled));
+        DomaLend.Loan memory loan = dreamLend.getLoan(1);
+        assertEq(uint256(loan.status), uint256(DomaLend.LoanStatus.Cancelled));
 
         // Verify removed from active offers
         uint256[] memory activeOffers = dreamLend.getActiveLoanOffers();
@@ -175,9 +175,9 @@ contract DreamLendTest is Test {
         vm.stopPrank();
 
         // Verify loan updated
-        DreamLend.Loan memory loan = dreamLend.getLoan(1);
+        DomaLend.Loan memory loan = dreamLend.getLoan(1);
         assertEq(loan.borrower, borrower);
-        assertEq(uint256(loan.status), uint256(DreamLend.LoanStatus.Active));
+        assertEq(uint256(loan.status), uint256(DomaLend.LoanStatus.Active));
         assertTrue(loan.startTime > 0);
 
         // Verify tokens transferred
@@ -216,8 +216,8 @@ contract DreamLendTest is Test {
         vm.stopPrank();
 
         // Verify loan status
-        DreamLend.Loan memory loan = dreamLend.getLoan(1);
-        assertEq(uint256(loan.status), uint256(DreamLend.LoanStatus.Repaid));
+        DomaLend.Loan memory loan = dreamLend.getLoan(1);
+        assertEq(uint256(loan.status), uint256(DomaLend.LoanStatus.Repaid));
 
         // Verify collateral returned
         assertEq(collateralToken.balanceOf(borrower), 10000 ether);
@@ -257,8 +257,8 @@ contract DreamLendTest is Test {
         dreamLend.liquidateLoan(1);
 
         // Verify loan status
-        DreamLend.Loan memory loan = dreamLend.getLoan(1);
-        assertEq(uint256(loan.status), uint256(DreamLend.LoanStatus.Defaulted));
+        DomaLend.Loan memory loan = dreamLend.getLoan(1);
+        assertEq(uint256(loan.status), uint256(DomaLend.LoanStatus.Defaulted));
 
         // Verify collateral distribution (1% to liquidator, 99% to lender)
         uint256 expectedFee = (1200 ether * dreamLend.LIQUIDATION_FEE_BPS()) /

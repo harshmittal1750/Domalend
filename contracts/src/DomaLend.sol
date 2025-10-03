@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./SomniaConfig.sol";
 
 /**
  * @notice Interface for DomaRank oracle to get token valuations
@@ -26,11 +25,11 @@ interface IDomaOwnershipToken {
 }
 
 /**
- * @title DreamLend
+ * @title DomaLend
  * @dev A decentralized lending protocol for Doma testnet
  * @notice This contract enables peer-to-peer lending with collateral backing
  */
-contract DreamLend is ReentrancyGuard, Ownable {
+contract DomaLend is ReentrancyGuard, Ownable {
     using SafeERC20 for IERC20;
 
     // ============ Enums ============
@@ -179,26 +178,7 @@ contract DreamLend is ReentrancyGuard, Ownable {
     // ============ Constructor ============
 
     constructor() Ownable(msg.sender) {
-        _setupSupportedTokens();
-    }
-
-    /**
-     * @notice Initialize all supported Somnia testnet tokens and their price feeds
-     * @dev Called during contract deployment to set up USDT, USDC, BTC, ARB, SOL
-     */
-    function _setupSupportedTokens() internal {
-        (address[] memory tokens, address[] memory priceFeeds) = SomniaConfig
-            .getSupportedTokens();
-
-        for (uint256 i = 0; i < tokens.length; i++) {
-            if (tokens[i] != address(0)) {
-                // Only set up tokens that have actual addresses
-                tokenPriceFeeds[tokens[i]] = AggregatorV3Interface(
-                    priceFeeds[i]
-                );
-                emit PriceFeedSet(tokens[i], priceFeeds[i]);
-            }
-        }
+        // Price feeds can be set manually after deployment using setTokenPriceFeed
     }
 
     // ============ Administration Functions ============
@@ -234,9 +214,9 @@ contract DreamLend is ReentrancyGuard, Ownable {
      * @notice Get recommended collateral parameters for a loan asset and collateral asset pair
      * @param loanAsset The token being borrowed
      * @param collateralAsset The token being used as collateral
-     * @return minRatio Recommended minimum collateral ratio in basis points
-     * @return liquidationThreshold Recommended liquidation threshold in basis points
-     * @return maxStaleness Recommended maximum price staleness in seconds
+     * @return minRatio Recommended minimum collateral ratio in basis points (150%)
+     * @return liquidationThreshold Recommended liquidation threshold in basis points (120%)
+     * @return maxStaleness Recommended maximum price staleness in seconds (1 day for testnet)
      */
     function getRecommendedParameters(
         address loanAsset,
@@ -250,19 +230,14 @@ contract DreamLend is ReentrancyGuard, Ownable {
             uint256 maxStaleness
         )
     {
-        (minRatio, liquidationThreshold) = SomniaConfig.getRecommendedRatios(
-            loanAsset,
-            collateralAsset
-        );
+        // Default recommended parameters for Doma testnet
+        minRatio = 15000; // 150%
+        liquidationThreshold = 12000; // 120%
+        maxStaleness = 86400; // 1 day (testnet - use shorter for mainnet)
 
-        // Use the more conservative staleness requirement between the two assets
-        uint256 loanStaleness = SomniaConfig.getRecommendedStaleness(loanAsset);
-        uint256 collateralStaleness = SomniaConfig.getRecommendedStaleness(
-            collateralAsset
-        );
-        maxStaleness = loanStaleness < collateralStaleness
-            ? loanStaleness
-            : collateralStaleness;
+        // Suppress unused parameter warnings
+        loanAsset;
+        collateralAsset;
     }
 
     /**
@@ -282,6 +257,7 @@ contract DreamLend is ReentrancyGuard, Ownable {
 
     /**
      * @notice Get all supported tokens for lending
+     * @dev Returns empty array - tokens are added dynamically via setTokenPriceFeed
      * @return tokens Array of supported token addresses
      */
     function getSupportedTokens()
@@ -289,7 +265,8 @@ contract DreamLend is ReentrancyGuard, Ownable {
         pure
         returns (address[] memory tokens)
     {
-        (tokens, ) = SomniaConfig.getSupportedTokens();
+        // Return empty array - tokens with price feeds can be queried individually
+        tokens = new address[](0);
     }
 
     // ============ External Functions ============

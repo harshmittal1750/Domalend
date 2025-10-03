@@ -56,7 +56,7 @@ export class MulticallUtil {
   private provider: ethers.JsonRpcProvider;
 
   constructor(providerOrRpc?: ethers.JsonRpcProvider | string) {
-    // Use provided provider or create new one with Somnia testnet RPC
+    // Use provided provider or create new one with Doma testnet RPC
     if (typeof providerOrRpc === "string") {
       this.provider = new ethers.JsonRpcProvider(providerOrRpc);
     } else if (providerOrRpc) {
