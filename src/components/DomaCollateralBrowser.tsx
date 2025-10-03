@@ -16,7 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { DomaRankBadge } from "@/components/DomaRankBadge";
 import { DualPriceDisplay } from "@/components/DualPriceDisplay";
 import { useTokenPrices } from "@/hooks/useTokenPrices";
-import { TOKENS, getDomaRankTokens } from "@/config/tokens";
+import { getDomaRankTokens } from "@/config/tokens";
 
 interface DomaCollateralBrowserProps {
   onSelect?: (tokenAddress: string) => void;
@@ -38,8 +38,8 @@ export function DomaCollateralBrowser({
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { prices } = useTokenPrices();
   const domaTokens = getDomaRankTokens();
+  const { prices } = useTokenPrices(domaTokens);
 
   // Filter tokens based on search
   const filteredTokens = useMemo(() => {
@@ -60,7 +60,7 @@ export function DomaCollateralBrowser({
   };
 
   return (
-    <Dialog open={open} onSetOpen={setOpen}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger || (
           <Button
@@ -164,10 +164,10 @@ export function DomaCollateralBrowser({
                           </p>
                         )}
 
-                        {/* Domain Metadata (if available) */}
-                        {token.domainMetadata?.description && (
+                        {/* Token Description */}
+                        {token.description && (
                           <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                            {token.domainMetadata.description}
+                            {token.description}
                           </p>
                         )}
                       </div>
