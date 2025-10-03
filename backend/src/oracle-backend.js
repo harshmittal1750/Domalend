@@ -6,6 +6,8 @@
 import { GraphQLClient, gql } from "graphql-request";
 import { ethers } from "ethers";
 import dotenv from "dotenv";
+import express from "express";
+import cors from "cors";
 
 dotenv.config();
 
@@ -75,6 +77,66 @@ const PREMIUM_KEYWORDS = new Map([
   ["market", 8],
   ["invest", 8],
 ]);
+
+// ============================================================================
+// HEALTH CHECK SERVER - For Railway/hosting platforms
+// ============================================================================
+
+const app = express();
+const PORT = process.env.PORT || 3001;
+
+// Track oracle statistics
+let stats = {
+  lastUpdateTime: null,
+  totalUpdates: 0,
+  successfulUpdates: 0,
+  failedUpdates: 0,
+  isRunning: false,
+  startTime: new Date().toISOString(),
+};
+
+// Enable CORS
+app.use(cors());
+app.use(express.json());
+
+// Health check endpoint
+app.get("/", (req, res) => {
+  res.json({
+    service: "DomaRank Oracle Backend",
+    status: "running",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    stats: stats,
+  });
+});
+
+app.get("/health", (req, res) => {
+  const isHealthy = stats.lastUpdateTime
+    ? Date.now() - new Date(stats.lastUpdateTime).getTime() < 15 * 60 * 1000 // Updated in last 15 mins
+    : true; // Or just started
+
+  res.status(isHealthy ? 200 : 503).json({
+    status: isHealthy ? "healthy" : "unhealthy",
+    lastUpdate: stats.lastUpdateTime,
+    uptime: process.uptime(),
+    stats: stats,
+  });
+});
+
+app.get("/stats", (req, res) => {
+  res.json(stats);
+});
+
+// Start the health check server
+app.listen(PORT, () => {
+  console.log(`\n${"=".repeat(60)}`);
+  console.log("🏥 Health Check Server Started");
+  console.log(`${"=".repeat(60)}`);
+  console.log(`Port: ${PORT}`);
+  console.log(`Health: http://localhost:${PORT}/health`);
+  console.log(`Stats: http://localhost:${PORT}/stats`);
+  console.log(`${"=".repeat(60)}\n`);
+});
 
 // ============================================================================
 // PART 1: THE COLLECTOR - Data Collection
@@ -587,6 +649,8 @@ async function broadcastPricesOnChain(valuations) {
  */
 async function main() {
   const startTime = Date.now();
+  stats.isRunning = true;
+  stats.totalUpdates++;
 
   console.log("\n" + "=".repeat(60));
   console.log("DOMALEND ORACLE BACKEND - EXECUTION CYCLE");
@@ -637,6 +701,11 @@ async function main() {
     // ========================================
     const duration = ((Date.now() - startTime) / 1000).toFixed(2);
 
+    // Update stats on success
+    stats.successfulUpdates++;
+    stats.lastUpdateTime = new Date().toISOString();
+    stats.isRunning = false;
+
     console.log("=".repeat(60));
     console.log("CYCLE COMPLETE");
     console.log("=".repeat(60));
@@ -644,6 +713,11 @@ async function main() {
     console.log(`Next cycle in 10 minutes`);
     console.log("=".repeat(60) + "\n");
   } catch (error) {
+    // Update stats on failure
+    stats.failedUpdates++;
+    stats.lastUpdateTime = new Date().toISOString();
+    stats.isRunning = false;
+
     console.error("\n❌ Fatal error in main execution:");
     console.error(error);
     console.error("\nRetrying in 10 minutes...\n");
