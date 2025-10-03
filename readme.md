@@ -18,18 +18,101 @@ DomaLend is the **first DeFi lending protocol** that unlocks liquidity from **Do
 
 #### 1. **Fractional Domain Tokens as Collateral** 🎨
 
+**What Are Doma Fractional Tokens?**
+
+Doma Protocol allows users to fractionalize their premium domain NFTs into fungible ERC20 tokens, enabling:
+
+- **Shared Ownership**: Own 0.1% of `software.ai` instead of needing to buy the entire domain
+- **Liquidity**: Trade fractional shares on Mizu DEX like any ERC20 token
+- **Price Discovery**: Market determines value through trading volume and offers
+- **Composability**: Use these tokens in DeFi protocols (like DomaLend!)
+
+**Our Deep Integration:**
+
 - **Direct Integration**: Users can collateralize loans with ANY fractionalized Doma domain token (software.ai, drinkmizu.com, etc.)
 - **Live Trading**: Integrated with [Mizu DEX](https://mizu-testnet.doma.xyz/) for seamless domain token acquisition
-- **Real Examples**: Accept `SOFTWAREAI`, `DRINKMIZU`, and other premium fractional tokens as collateral
+- **Real Examples**: Accept `SOFTWAREAI` (0xf2dDd2022611cCddFC088d87D355bEEC15B30d7D), `DRINKMIZU` (0xF547543382fe62C6Da7bB862a0765b95E0269661), and other premium fractional tokens as collateral
 - **Smart Detection**: Contract automatically identifies Doma tokens via our oracle architecture
+- **Dynamic Discovery**: Frontend fetches ALL available fractional tokens from Doma Subgraph in real-time
+- **Token Metadata**: Display domain images, descriptions, and social links from Doma CDN
+
+**Example Fractional Tokens We Support:**
+
+| Domain Token          | Symbol            | Address                                    | Market Cap (Est.)    |
+| --------------------- | ----------------- | ------------------------------------------ | -------------------- |
+| software.ai           | SOFTWAREAI        | 0xf2dDd2022611cCddFC088d87D355bEEC15B30d7D | High-value AI domain |
+| drinkmizu.com         | DRINKMIZU         | 0xF547543382fe62C6Da7bB862a0765b95E0269661 | Brand-ready domain   |
+| seeyouatkbw.com       | SEEYOUATKBW       | 0xBA1Ac5CF547d1C2bdaE9aAaa588D7f081219Bc62 | Premium .com         |
+| labuburip.com         | LABUBURIP         | 0xAf56AB93BD19a94136a808Ab3CcD8B61BFa99119 | Short .com           |
+| ilovepumpkinspice.com | ILOVEPUMPKINSPICE | 0x2121B21659C60Eadf39a27Fb7B9a8Ec23b215526 | Niche brand          |
+
+**Why This Matters:**
+
+1. **First-Ever Use Case**: We're the FIRST protocol to accept Doma fractional tokens as DeFi collateral
+2. **Unlocks Liquidity**: Domain investors can now borrow against their fractional holdings without selling
+3. **Market Validation**: Lending/borrowing activity provides real price signals for domain values
+4. **Ecosystem Growth**: Creates demand for Mizu DEX trading and domain fractionalization
 
 #### 2. **Doma Subgraph Integration** 📊
 
-- **Two-Phase Data Collection**: Query Doma's GraphQL API for:
-  - Phase 1: Discover all fractional tokens via `fractionalTokens` query
-  - Phase 2: Analyze each domain via `names` query for market data, expiry dates, and offers
+We built a sophisticated **two-phase data collection system** that queries Doma's GraphQL Subgraph to discover and analyze fractional tokens:
+
+**Phase 1: Token Discovery**
+
+```graphql
+query GetFractionalTokenList {
+  fractionalTokens {
+    items {
+      name # Domain name (e.g., "software.ai")
+      address # ERC20 token contract address
+      fractionalizedAt # When domain was fractionalized
+      currentPrice # Market price (8 decimals)
+      params {
+        totalSupply # Number of fractional shares
+        name # Token name
+        symbol # Token symbol
+      }
+    }
+  }
+}
+```
+
+**Phase 2: Domain Analysis**
+
+```graphql
+query GetNameDetails($domainName: String!) {
+  names(name: $domainName) {
+    items {
+      name # Confirm domain name
+      expiresAt # Domain expiry date (for DomaRank calculation)
+      activeOffersCount # Number of active buy offers (demand signal)
+      highestOffer {
+        price # Top offer price
+      }
+      fractionalTokenInfo {
+        address # Token contract
+        currentPrice # Live market price
+      }
+    }
+  }
+}
+```
+
+**What We Extract:**
+
+- ✅ **All Fractional Tokens**: Dynamically discover every fractionalized domain on Doma
+- ✅ **Market Data**: Current prices, total supply, trading volume
+- ✅ **Domain Metadata**: TLD, length, expiry dates, active offers
+- ✅ **Historical Context**: Fractionalization date, years on-chain
+- ✅ **Demand Signals**: Offer counts and highest bids
+
+**Technical Implementation:**
+
 - **API Authentication**: Proper API-KEY header integration with Doma's testnet endpoint
-- **Real-Time Indexing**: Fetch live domain metadata, sales history, and active offers from `https://api-testnet.doma.xyz/graphql`
+- **Rate Limiting**: 100ms delays between requests to respect API limits
+- **Error Handling**: Graceful fallbacks if Subgraph is unavailable
+- **Real-Time Updates**: Backend queries Subgraph every 10 minutes for fresh data
+- **Caching**: Frontend caches token lists for fast user experience
 
 #### 3. **Custom AI Oracle for Domain Valuation** 🧠
 
@@ -213,8 +296,47 @@ indexer.on("loanCreated", async (loanEvent) => {
 - 🎨 **DomaRank Badges**: Visual scores (0-100) on every domain token
 - 💰 **Dual Price Display**: Show both AI oracle price AND CoinGecko market price
 - 📊 **Live Loan Marketplace**: Filter loans by domain tokens with beautiful UI
-- 🔍 **Subgraph Integration**: Lightning-fast loan data via Graph Protocol
+- 🔍 **Subgraph Integration**: Lightning-fast loan data via our custom indexer
 - 🎯 **Smart Token Detection**: Auto-identify domain tokens vs regular ERC20s
+- 🖼️ **Domain Images**: Display fractional token images from Doma CDN
+- 🏷️ **Token Categories**: Separate UI sections for domains vs stablecoins vs crypto
+
+**Fractional Token Integration:**
+
+```typescript
+// Dynamically fetch all fractional tokens from Doma Subgraph
+const { tokens: domainTokens } = useAllDomainTokens();
+
+// Example token object from Subgraph:
+{
+  address: "0xf2dDd2022611cCddFC088d87D355bEEC15B30d7D",
+  name: "software.ai",
+  symbol: "SOFTWAREAI",
+  decimals: 6,
+  isDomainToken: true,
+  domainMetadata: {
+    image: "https://cdn-testnet.doma.xyz/fractionalization/.../image.jpg",
+    website: "https://mizu.xyz",
+    twitterLink: "https://x.com/domaprotocol"
+  }
+}
+
+// Display in loan offer UI with rich metadata
+<TokenCard
+  token={token}
+  price={domaRankPrice}
+  marketPrice={mizuDexPrice}
+  showDomainBadge={true}
+/>
+```
+
+**User Experience Enhancements:**
+
+1. **Domain Token Selector**: Beautiful grid view of all fractional tokens with images
+2. **Price Comparison**: Show DomaRank AI price vs Mizu DEX market price side-by-side
+3. **Collateral Preview**: Before accepting loan, show domain token details and DomaRank score
+4. **Token Discovery**: "Buy on Mizu" CTA buttons that link directly to Mizu DEX for each domain
+5. **Real-time Updates**: Prices refresh automatically as oracle updates on-chain
 
 ### Custom Event Indexer (EventIndexer.js)
 
@@ -315,10 +437,27 @@ indexer.on("loanCreated", (loan) => {
 **Demonstrates:**
 
 1. **Buying Domain Tokens** on Mizu DEX (0:00-1:30)
+   - Browse fractional tokens (software.ai, drinkmizu.com)
+   - Swap USDTEST for SOFTWAREAI tokens
+   - View token balance and metadata
 2. **Creating Loan Offer** with USDTEST (1:30-2:30)
+   - Specify loan amount, interest rate, duration
+   - Select accepted collateral (domain tokens or standard ERC20s)
+   - Set risk parameters (150% collateral ratio, 120% liquidation threshold)
 3. **Accepting Loan** with `software.ai` as collateral (2:30-3:30)
+   - Browse available loan offers
+   - See DomaRank AI valuation for software.ai ($2,325 vs $2,500 market)
+   - Approve fractional token as collateral
+   - Accept loan and receive USDTEST instantly
 4. **DomaRank Oracle** in action - live price updates (3:30-4:30)
+   - Backend queries Doma Subgraph for domain metadata
+   - AI calculates DomaRank score (93/100 for software.ai)
+   - Oracle broadcasts updated price on-chain
+   - Frontend displays new price within seconds
 5. **Repaying Loan** and collateral return (4:30-5:00)
+   - Calculate total owed (principal + interest)
+   - Make full or partial repayment
+   - Fractional domain tokens automatically returned to borrower
 
 ### 🖼️ **Screenshots**
 
@@ -345,7 +484,9 @@ indexer.on("loanCreated", (loan) => {
 2. **Buy Domain Tokens:**
 
    - Visit Mizu DEX: [https://mizu-testnet.doma.xyz/](https://mizu-testnet.doma.xyz/)
-   - Swap for fractional domains like `SOFTWAREAI` or `DRINKMIZU`
+   - Browse fractional domains: `SOFTWAREAI`, `DRINKMIZU`, `SEEYOUATKBW`, etc.
+   - Swap USDTEST or other tokens for fractional domain shares
+   - Each token represents fractional ownership of a premium domain NFT
 
 3. **Use DomaLend:**
    - Create loan offers or borrow with your domain tokens
