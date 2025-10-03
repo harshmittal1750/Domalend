@@ -56,7 +56,7 @@ function updateSolidityConfig() {
 
   // Mapping from frontend names to Solidity constant names
   const solidityMapping = {
-    MUSDT: "USDT_TOKEN",
+    USDTEST: "USDT_TOKEN",
     MUSDC: "USDC_TOKEN",
     MWBTC: "BTC_TOKEN",
     MARB: "ARB_TOKEN",
@@ -88,7 +88,7 @@ function updateMintScript() {
   let content = fs.readFileSync(scriptPath, "utf8");
 
   const scriptMapping = {
-    MUSDT: "MOCK_USDT",
+    USDTEST: "MOCK_USDT",
     MUSDC: "MOCK_USDC",
     MWBTC: "MOCK_WBTC",
     MARB: "MOCK_ARB",

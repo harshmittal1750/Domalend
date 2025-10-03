@@ -47,7 +47,7 @@ export function DualPriceDisplay({
             className="text-xs bg-green-50 text-green-700 border-green-200"
           >
             <TrendingUp className="h-3 w-3 mr-1" />
-            Chainlink
+            Oracle
           </Badge>
         </div>
       </div>
@@ -66,7 +66,7 @@ export function DualPriceDisplay({
                 {showLabel && (
                   <span className="text-xs text-muted-foreground">Market:</span>
                 )}
-                <span className="text-base font-semibold text-foreground">
+                <span className="text-xs  space-y-1 font-semibold text-foreground">
                   ${price.liveMarketPrice}
                 </span>
                 <Info className="h-3 w-3 text-muted-foreground" />

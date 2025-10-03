@@ -20,7 +20,7 @@ export class CoinGeckoPriceFetcher {
       MWBTC: "bitcoin",
       MARB: "arbitrum",
       MSOL: "solana",
-      MUSDT: "tether",
+      USDTEST: "tether", // Official Doma testnet USD token, using USDT price feed
       MUSDC: "usd-coin",
       // Add more mappings as needed
     };

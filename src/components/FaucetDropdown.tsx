@@ -27,9 +27,8 @@ import { useP2PLending } from "@/hooks/useP2PLending";
 import { useAppKitProvider } from "@reown/appkit/react";
 import { toast } from "sonner";
 
-// Quick mint amounts for each token
+// Quick mint amounts for each token (USDTEST not included - get from Mizu faucet)
 const QUICK_MINT_AMOUNTS = {
-  MUSDT: "1000",
   MUSDC: "1000",
   MWBTC: "1",
   MARB: "1000",
@@ -181,6 +180,28 @@ export function FaucetDropdown() {
           <div className="flex items-center gap-2">
             <Globe className="h-3 w-3" />
             <span className="text-sm">Buy Domain Tokens (Mizu DEX)</span>
+          </div>
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        {/* USDTEST Faucet */}
+        <DropdownMenuLabel className="flex items-center gap-2">
+          <Droplets className="h-4 w-4" />
+          Official Doma Testnet Token
+        </DropdownMenuLabel>
+        <DropdownMenuItem
+          onClick={() => {
+            window.open("https://mizu-testnet.doma.xyz/faucet", "_blank");
+            toast.info(
+              "Opening Mizu Faucet - Get 10,000 USDTEST every 6 hours"
+            );
+          }}
+          className="flex items-center justify-between cursor-pointer"
+        >
+          <div className="flex items-center gap-2">
+            <ExternalLink className="h-3 w-3" />
+            <span className="text-sm">Get USDTEST from Faucet</span>
           </div>
         </DropdownMenuItem>
 

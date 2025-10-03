@@ -20,6 +20,7 @@ import {
   Menu,
   X,
   Gift,
+  Sparkles,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -35,6 +36,11 @@ export function Navigation() {
       href: "/",
       label: "Home",
       icon: Home,
+    },
+    {
+      href: "/domarank",
+      label: "DomaRank",
+      icon: Sparkles,
     },
     {
       href: "/create",
@@ -102,7 +108,13 @@ export function Navigation() {
               return (
                 <Link key={item.href} href={item.href}>
                   <Button
-                    variant={isActive ? "default" : "ghost"}
+                    variant={
+                      isActive
+                        ? "default"
+                        : item.label === "DomaRank"
+                          ? "outline"
+                          : "ghost"
+                    }
                     size="sm"
                     className={`
                       relative flex items-center space-x-2 px-4 py-2 rounded-xl font-medium transition-all duration-300
@@ -111,6 +123,7 @@ export function Navigation() {
                           ? "bg-primary text-primary-foreground shadow-lg btn-premium"
                           : "hover:bg-accent hover:text-accent-foreground hover:scale-105"
                       }
+                      ${item.label === "DomaRank" ? "border-b-cyan-400" : ""}
                     `}
                   >
                     <Icon className="h-4 w-4" />

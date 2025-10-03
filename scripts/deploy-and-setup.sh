@@ -47,7 +47,7 @@ DEPLOY_OUTPUT=$(forge script script/DeployMockTokens.s.sol \
 echo "$DEPLOY_OUTPUT"
 
 # Extract addresses from deployment output
-MUSDT_ADDRESS=$(echo "$DEPLOY_OUTPUT" | grep "MockUSDT deployed to:" | awk '{print $4}')
+USDTEST_ADDRESS=$(echo "$DEPLOY_OUTPUT" | grep "MockUSDT deployed to:" | awk '{print $4}')
 MUSDC_ADDRESS=$(echo "$DEPLOY_OUTPUT" | grep "MockUSDC deployed to:" | awk '{print $4}')
 MWBTC_ADDRESS=$(echo "$DEPLOY_OUTPUT" | grep "MockWBTC deployed to:" | awk '{print $4}')
 MARB_ADDRESS=$(echo "$DEPLOY_OUTPUT" | grep "MockARB deployed to:" | awk '{print $4}')
@@ -57,7 +57,7 @@ cd ..
 
 echo ""
 echo "📋 Deployed Addresses:"
-echo "MUSDT: $MUSDT_ADDRESS"
+echo "USDTEST: $USDTEST_ADDRESS"
 echo "MUSDC: $MUSDC_ADDRESS"
 echo "MWBTC: $MWBTC_ADDRESS"
 echo "MARB: $MARB_ADDRESS"
@@ -68,7 +68,7 @@ echo ""
 echo "⚙️  Step 2: Updating configuration files..."
 
 node scripts/update-token-addresses.js \
-    --musdt=$MUSDT_ADDRESS \
+    --usdtest=$USDTEST_ADDRESS \
     --musdc=$MUSDC_ADDRESS \
     --mwbtc=$MWBTC_ADDRESS \
     --marb=$MARB_ADDRESS \
@@ -109,7 +109,7 @@ echo "🎉 Deployment completed successfully!"
 echo ""
 echo "📋 Contract Addresses:"
 echo "DomaLend: $DREAMLEND_ADDRESS"
-echo "MockUSDT:  $MUSDT_ADDRESS"
+echo "USDTEST:   $USDTEST_ADDRESS"
 echo "MockUSDC:  $MUSDC_ADDRESS"
 echo "MockWBTC:  $MWBTC_ADDRESS"
 echo "MockARB:   $MARB_ADDRESS"

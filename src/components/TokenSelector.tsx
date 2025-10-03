@@ -72,7 +72,7 @@ export const TokenSelector = forwardRef<TokenSelectorRef, TokenSelectorProps>(
       error: domainTokensError,
     } = useAllDomainTokens();
 
-    // Get crypto tokens from config (MUSDT, MUSDC, MWBTC, MARB, MSOL)
+    // Get crypto tokens from config (USDTEST, MUSDC, MWBTC, MARB, MSOL)
     const cryptoTokens = getCryptoTokens();
 
     // Merge crypto and domain tokens

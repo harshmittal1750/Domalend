@@ -23,7 +23,7 @@ export class CryptoPriceOracle {
 
     // Token addresses (from your deployed contracts)
     this.tokenAddresses = {
-      MUSDT: "0x75Ae0D4f6c603065D169EC3C4B6Ab43FA8cC6A61",
+      USDTEST: "0x8725f6FDF6E240C303B4e7A60AD13267Fa04d55C",
       MUSDC: "0x87c20443Ba0480677842851CB27a5b1D38C91639",
       MWBTC: "0x02BFF1B39378aCCB20b8870863f30D48b4Dc1DE4",
       MARB: "0x6E1f4b629Ea42Db26E2970aEcE38A61BB50a029f",

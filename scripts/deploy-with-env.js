@@ -107,7 +107,7 @@ function main() {
   };
 
   const addresses = {
-    MUSDT: extractAddress(deployOutput, "MockUSDT"),
+    USDTEST: extractAddress(deployOutput, "MockUSDT"),
     MUSDC: extractAddress(deployOutput, "MockUSDC"),
     MWBTC: extractAddress(deployOutput, "MockWBTC"),
     MARB: extractAddress(deployOutput, "MockARB"),
@@ -140,7 +140,7 @@ function main() {
 
   const updateCommand = [
     "node scripts/update-token-addresses.js",
-    `--musdt=${addresses.MUSDT}`,
+    `--usdtest=${addresses.USDTEST}`,
     `--musdc=${addresses.MUSDC}`,
     `--mwbtc=${addresses.MWBTC}`,
     `--marb=${addresses.MARB}`,

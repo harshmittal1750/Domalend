@@ -284,26 +284,33 @@ export default function OffersPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold">Available Loan Offers</h1>
-          <p className="text-muted-foreground mt-2">
-            Browse and accept loan offers from lenders on DomaLend
-          </p>
-        </div>
-        <div className="flex items-center space-x-3">
-          <Button
-            onClick={handleRefresh}
-            variant="outline"
-            disabled={isLoadingSubgraph || isLoadingPrices}
-          >
-            {isLoadingSubgraph || isLoadingPrices ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <RefreshCw className="mr-2 h-4 w-4" />
-            )}
-            Refresh Offers
-          </Button>
+      {/* Hero Section with Innovation Highlights */}
+      <div className="mb-8 space-y-6">
+        <div className="flex justify-between items-start">
+          <div className="flex-1">
+            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-cyan-400 via-primary to-purple-400 bg-clip-text text-transparent">
+              AI-Powered Loan Marketplace
+            </h1>
+            <p className="text-muted-foreground text-lg">
+              The world's first lending platform with AI-driven domain asset
+              valuation
+            </p>
+          </div>
+          <div className="flex items-center space-x-3">
+            <Button
+              onClick={handleRefresh}
+              variant="outline"
+              disabled={isLoadingSubgraph || isLoadingPrices}
+              className="btn-premium"
+            >
+              {isLoadingSubgraph || isLoadingPrices ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="mr-2 h-4 w-4" />
+              )}
+              Refresh
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -465,82 +472,56 @@ export default function OffersPage() {
           </div>
 
           {/* Premium Offers Table */}
-          <Card className="luxury-shadow-lg glass">
-            <CardHeader className="gradient-bg">
+          <Card className="luxury-shadow-lg glass border-2 border-primary/20">
+            <CardHeader className="gradient-bg border-b-2 border-primary/10">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 rounded-lg bg-gradient-to-r from-primary/10 to-accent/10">
-                    <DollarSign className="h-5 w-5 text-primary" />
+                  <div className="p-2 rounded-lg bg-gradient-to-r from-cyan-500 to-purple-600 shadow-lg">
+                    <DollarSign className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <CardTitle className="text-xl font-semibold">
-                      Available Loan Offers
+                    <CardTitle className="text-2xl font-bold flex items-center gap-2">
+                      Live Loan Offers
+                      <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 animate-pulse">
+                        LIVE
+                      </Badge>
                     </CardTitle>
-                    <CardDescription className="flex items-center gap-2">
-                      {formattedLoans.length} loan offer
-                      {formattedLoans.length !== 1 ? "s" : ""} available
-                      <span className="text-xs text-cyan-500 flex items-center gap-1">
+                    <CardDescription className="flex items-center gap-2 mt-1">
+                      <span className="font-medium text-foreground/70">
+                        {formattedLoans.length} AI-analyzed offer
+                        {formattedLoans.length !== 1 ? "s" : ""} available
+                      </span>
+                      <span className="text-xs text-cyan-400 flex items-center gap-1 ml-2">
                         <Eye className="h-3 w-3" />
-                        Click any row for details
+                        Click for detailed AI insights
                       </span>
                     </CardDescription>
                   </div>
                 </div>
-                {/* {rewardsSystemAvailable && (
-                  <div className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-accent/10 to-primary/10 dark:from-accent/5 dark:to-primary/5 border border-accent/20 dark:border-accent/10">
-                    <Gift className="h-4 w-4 text-accent" />
-                    <span className="text-sm font-medium text-accent-foreground">
-                      +{calculateRewardsAPR()}% Rewards APR
-                    </span>
-                  </div>
-                )} */}
               </div>
             </CardHeader>
-            <CardContent className="p-6">
+            <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-border/50 hover:bg-muted/30">
-                      {/* <TableHead className="font-semibold text-muted-foreground">
-                        Loan ID
-                      </TableHead> */}
-                      <TableHead className="font-semibold text-muted-foreground">
-                        Loan Amount & Value
+                    <TableRow className="border-border/50 bg-muted/30">
+                      <TableHead className="font-bold text-foreground pl-6">
+                        Loan Asset
                       </TableHead>
-                      <TableHead className="font-semibold text-muted-foreground">
-                        Token Price Info
-                      </TableHead>
-                      <TableHead className="font-semibold text-muted-foreground">
-                        Interest APR
-                      </TableHead>
-                      {/* {rewardsSystemAvailable && (
-                        <TableHead className="font-semibold text-muted-foreground">
-                          <div className="flex items-center space-x-1">
-                            <Gift className="h-3 w-3 text-accent" />
-                            <span>Rewards APR</span>
-                          </div>
-                        </TableHead>
-                      )} */}
-                      {/* <TableHead className="font-semibold text-muted-foreground">
-                        <div className="flex items-center space-x-1">
-                          <TrendingUp className="h-3 w-3 text-success" />
-                          <span>Total APR</span>
+                      <TableHead className="font-bold text-foreground">
+                        <div className="flex items-center gap-1">
+                          <TrendingUp className="h-4 w-4 text-cyan-500" />
+                          AI Price
                         </div>
-                      </TableHead> */}
-                      <TableHead className="font-semibold text-muted-foreground">
-                        Duration
                       </TableHead>
-                      <TableHead className="font-semibold text-muted-foreground">
-                        Collateral Required
+                      <TableHead className="font-bold text-foreground">
+                        Terms
                       </TableHead>
-                      <TableHead className="font-semibold text-muted-foreground">
-                        Lender
+                      <TableHead className="font-bold text-foreground">
+                        Collateral
                       </TableHead>
-                      <TableHead className="font-semibold text-muted-foreground">
-                        Status
-                      </TableHead>
-                      <TableHead className="font-semibold text-muted-foreground">
-                        Action
+                      <TableHead className="font-bold text-foreground pr-6">
+                        Actions
                       </TableHead>
                     </TableRow>
                   </TableHeader>
@@ -549,26 +530,21 @@ export default function OffersPage() {
                       <TableRow
                         key={loan.id.toString()}
                         className={`
-                          border-border/30 hover:bg-gradient-to-r hover:from-cyan-500/5 hover:to-primary/5 
-                          transition-all duration-300 group cursor-pointer
-                          ${index % 2 === 0 ? "bg-muted/20" : "bg-background"}
+                          border-border/30 hover:bg-gradient-to-r hover:from-emerald-500/10 hover:via-teal-500/10 hover:to-cyan-500/10 
+                          transition-all duration-500 group cursor-pointer hover:shadow-xl hover:scale-[1.01] hover:border-emerald-400/30
+                          ${index % 2 === 0 ? "bg-muted/10" : "bg-background"}
                         `}
                         onClick={() =>
                           (window.location.href = `/offers/${loan.id.toString()}`)
                         }
                       >
-                        {/* <TableCell className="font-medium font-mono text-sm">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 rounded-full bg-gradient-to-r from-primary to-accent"></div>
-                            <span>#{loan.id.toString()}</span>
-                          </div>
-                        </TableCell> */}
-                        <TableCell>
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-3">
-                              {/* Show token image for domain tokens */}
-                              {loan.tokenInfo?.domainMetadata?.image && (
-                                <div className="w-10 h-10 rounded-lg overflow-hidden border-2 border-cyan-500/30 flex-shrink-0">
+                        {/* Loan Asset Column */}
+                        <TableCell className="pl-6 py-6">
+                          <div className="flex items-center gap-4">
+                            {/* Token Image */}
+                            <div className="relative">
+                              {loan.tokenInfo?.domainMetadata?.image ? (
+                                <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-cyan-500/50 shadow-lg flex-shrink-0 relative group-hover:border-cyan-400 transition-all">
                                   <img
                                     src={loan.tokenInfo.domainMetadata.image}
                                     alt={loan.tokenInfo.name}
@@ -578,78 +554,100 @@ export default function OffersPage() {
                                     }}
                                   />
                                 </div>
+                              ) : (
+                                <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center border-2 border-primary/30">
+                                  <DollarSign className="h-8 w-8 text-primary" />
+                                </div>
                               )}
-                              <div className="flex-1">
-                                <p className="font-semibold text-foreground">
-                                  {parseFloat(loan.formattedAmount).toFixed(4)}{" "}
-                                  <span className="text-primary font-medium">
-                                    {loan.tokenInfo?.symbol || "Tokens"}
-                                  </span>
+                              {/* AI Badge */}
+                              {loan.tokenInfo?.isDomainToken && (
+                                <div className="absolute -top-2 -right-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg border-2 border-background">
+                                  AI
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Token Info */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <p className="text-2xl font-bold text-foreground">
+                                  {parseFloat(loan.formattedAmount).toFixed(2)}
                                 </p>
-                                <p className="text-sm text-green-600 font-medium mt-1">
-                                  ${loan.currentLoanValueUSD}
-                                </p>
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  {loan.tokenInfo?.name ||
-                                    `${loan.tokenAddress.slice(0, 6)}...${loan.tokenAddress.slice(-4)}`}
-                                </p>
+                                <span className="text-lg font-semibold text-primary">
+                                  {loan.tokenInfo?.symbol || "TOKEN"}
+                                </span>
+                              </div>
+                              <p className="text-lg font-bold text-green-600 mb-1">
+                                ${loan.currentLoanValueUSD} USD
+                              </p>
+                              <p className="text-xs text-muted-foreground truncate max-w-[200px]">
+                                {loan.tokenInfo?.name ||
+                                  `Token ${loan.tokenAddress.slice(0, 8)}...`}
+                              </p>
+
+                              {/* DomaRank Badge for domain tokens */}
+                              {loan.tokenInfo?.isDomainToken && (
+                                <div className="mt-2">
+                                  <DomaRankBadge
+                                    score={75 + Math.floor(Math.random() * 20)}
+                                    size="sm"
+                                    showTooltip={true}
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </TableCell>
+
+                        {/* AI Price Column */}
+                        <TableCell className="py-6">
+                          <div className="space-y-2">
+                            <DualPriceDisplay
+                              price={prices.get(
+                                loan.tokenAddress.toLowerCase()
+                              )}
+                              showLabel={false}
+                              className="text-base font-semibold"
+                            />
+                            <div className="flex items-center gap-1 text-xs text-cyan-500">
+                              <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse"></div>
+                              <span className="font-medium">Live Oracle</span>
+                            </div>
+                          </div>
+                        </TableCell>
+
+                        {/* Terms Column */}
+                        <TableCell className="py-6">
+                          <div className="space-y-3">
+                            <div>
+                              <p className="text-xs text-muted-foreground mb-1">
+                                Interest APR
+                              </p>
+                              <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 text-base font-bold px-3 py-1">
+                                {loan.formattedInterestRate.toFixed(2)}%
+                              </Badge>
+                            </div>
+                            <div>
+                              <p className="text-xs text-muted-foreground mb-1">
+                                Duration
+                              </p>
+                              <div className="flex items-center gap-2">
+                                <Calendar className="h-4 w-4 text-orange-500" />
+                                <span className="font-bold text-foreground">
+                                  {Math.round(loan.formattedDuration)} days
+                                </span>
                               </div>
                             </div>
-                            {/* Show DomaRank badge only for domain tokens */}
-                            {loan.tokenInfo?.isDomainToken && (
-                              <DomaRankBadge
-                                score={75 + Math.floor(Math.random() * 20)}
-                                size="sm"
-                                showTooltip={true}
-                              />
-                            )}
                           </div>
                         </TableCell>
-                        <TableCell>
-                          <DualPriceDisplay
-                            price={prices.get(loan.tokenAddress.toLowerCase())}
-                            showLabel={false}
-                            className="text-sm"
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant="secondary"
-                            className="bg-gradient-to-r from-primary/10 to-primary/5 dark:from-primary/5 dark:to-primary/3 text-primary border-primary/20 dark:border-primary/10"
-                          >
-                            {loan.formattedInterestRate.toFixed(2)}%
-                          </Badge>
-                        </TableCell>
-                        {/* {rewardsSystemAvailable && (
-                          <TableCell>
-                            <Badge
-                              variant="outline"
-                              className="bg-gradient-to-r from-accent-foreground/10 to-accent-foreground/5 dark:from-accent-foreground/5 dark:to-accent-foreground/3 text-accent-foreground border-accent-foreground/20 dark:border-accent-foreground/10"
-                            >
-                              <Gift className="h-3 w-3 mr-1" />+
-                              {calculateRewardsAPR()}%
-                            </Badge>
-                          </TableCell>
-                        )} */}
-                        {/* <TableCell>
-                          <Badge className="bg-gradient-to-r from-success to-success/80 text-success-foreground font-semibold shadow-sm">
-                            {calculateTotalAPR(loan.interestRate)}%
-                          </Badge>
-                        </TableCell> */}
-                        <TableCell>
-                          <div className="flex items-center space-x-2">
-                            <Calendar className="h-3 w-3 text-warning" />
-                            <span className="font-medium">
-                              {Math.round(loan.formattedDuration)} days
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-3">
-                              {/* Show collateral image for domain tokens */}
-                              {loan.collateralInfo?.domainMetadata?.image && (
-                                <div className="w-10 h-10 rounded-lg overflow-hidden border-2 border-cyan-500/30 flex-shrink-0">
+
+                        {/* Collateral Column */}
+                        <TableCell className="py-6">
+                          <div className="flex items-center gap-3">
+                            {/* Collateral Image */}
+                            <div className="relative">
+                              {loan.collateralInfo?.domainMetadata?.image ? (
+                                <div className="w-14 h-14 rounded-lg overflow-hidden border-2 border-purple-500/50 shadow-md flex-shrink-0 group-hover:border-purple-400 transition-all">
                                   <img
                                     src={
                                       loan.collateralInfo.domainMetadata.image
@@ -661,82 +659,68 @@ export default function OffersPage() {
                                     }}
                                   />
                                 </div>
+                              ) : (
+                                <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center border-2 border-purple-500/30">
+                                  <Shield className="h-6 w-6 text-purple-500" />
+                                </div>
                               )}
-                              <div className="flex-1">
-                                <p className="font-semibold text-foreground">
-                                  {parseFloat(
-                                    loan.formattedCollateralAmount
-                                  ).toFixed(4)}{" "}
-                                  <span className="text-primary font-medium">
-                                    {loan.collateralInfo?.symbol || "Tokens"}
-                                  </span>
-                                </p>
-                                <p className="text-sm text-blue-600 font-medium mt-1">
-                                  ${loan.currentCollateralValueUSD}
-                                </p>
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  {loan.collateralInfo?.name ||
-                                    `${loan.collateralAddress.slice(0, 6)}...${loan.collateralAddress.slice(-4)}`}
-                                </p>
+                              {/* AI Badge */}
+                              {loan.collateralInfo?.isDomainToken && (
+                                <div className="absolute -top-1 -right-1 bg-gradient-to-r from-purple-500 to-pink-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-lg border border-background">
+                                  AI
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Collateral Info */}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-base font-bold text-foreground mb-1">
+                                {parseFloat(
+                                  loan.formattedCollateralAmount
+                                ).toFixed(2)}{" "}
+                                <span className="text-sm text-primary">
+                                  {loan.collateralInfo?.symbol || "TOKEN"}
+                                </span>
+                              </p>
+                              <p className="text-sm font-bold text-blue-600 mb-1">
+                                ${loan.currentCollateralValueUSD}
+                              </p>
+
+                              {/* DomaRank for collateral */}
+                              {loan.collateralInfo?.isDomainToken && (
+                                <div className="mt-1">
+                                  <DomaRankBadge
+                                    score={75 + Math.floor(Math.random() * 20)}
+                                    size="sm"
+                                    showTooltip={true}
+                                  />
+                                </div>
+                              )}
+
+                              {/* AI Price */}
+                              <div className="mt-1">
+                                <DualPriceDisplay
+                                  price={prices.get(
+                                    loan.collateralAddress.toLowerCase()
+                                  )}
+                                  showLabel={false}
+                                  className="text-xs"
+                                />
                               </div>
                             </div>
-                            {/* Show DomaRank badge only for domain tokens */}
-                            {loan.collateralInfo?.isDomainToken && (
-                              <DomaRankBadge
-                                score={75 + Math.floor(Math.random() * 20)}
-                                size="sm"
-                                showTooltip={true}
-                              />
-                            )}
-                            <DualPriceDisplay
-                              price={prices.get(
-                                loan.collateralAddress.toLowerCase()
-                              )}
-                              showLabel={false}
-                              className="text-xs"
-                            />
                           </div>
                         </TableCell>
-                        <TableCell>
-                          <span className="text-xs font-mono px-2 py-1 rounded-md bg-muted text-muted-foreground">
-                            {loan.lender.slice(0, 6)}...{loan.lender.slice(-4)}
-                          </span>
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={
-                              loan.status === LoanStatus.Pending
-                                ? "default"
-                                : "secondary"
-                            }
-                            className={
-                              loan.status === LoanStatus.Pending
-                                ? "status-dot success"
-                                : ""
-                            }
-                          >
-                            {loan.statusText}
-                          </Badge>
-                        </TableCell>
-                        <TableCell onClick={(e) => e.stopPropagation()}>
-                          <div className="flex items-center gap-2">
-                            <Link href={`/offers/${loan.id.toString()}`}>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="btn-cyan"
-                              >
-                                <Eye className="mr-2 h-3 w-3" />
-                                View Details
-                              </Button>
-                            </Link>
+
+                        {/* Actions Column */}
+                        <TableCell
+                          onClick={(e) => e.stopPropagation()}
+                          className="pr-6 py-6"
+                        >
+                          <div className="flex flex-col gap-2">
                             {loan.lender.toLowerCase() ===
                             address?.toLowerCase() ? (
-                              <div className="flex items-center gap-2">
-                                <Badge
-                                  variant="outline"
-                                  className="text-xs bg-gradient-to-r from-warning/10 to-warning/5 dark:from-warning/5 dark:to-warning/3 text-warning border-warning/20 dark:border-warning/10"
-                                >
+                              <>
+                                <Badge className="bg-gradient-to-r from-orange-500 to-amber-600 text-white border-0 justify-center">
                                   Your Offer
                                 </Badge>
                                 <Button
@@ -752,7 +736,7 @@ export default function OffersPage() {
                                     (selectedLoanId !== null &&
                                       selectedLoanId !== loan.id)
                                   }
-                                  className="btn-premium"
+                                  className="w-full btn-premium"
                                 >
                                   {transactionState.isLoading &&
                                     selectedLoanId === loan.id && (
@@ -761,12 +745,12 @@ export default function OffersPage() {
                                   {transactionState.step === "cancelling" &&
                                   selectedLoanId === loan.id
                                     ? "Cancelling..."
-                                    : "Cancel"}
+                                    : "Cancel Offer"}
                                 </Button>
-                              </div>
+                              </>
                             ) : (
                               <Button
-                                size="sm"
+                                size="lg"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleAcceptOffer(loan);
@@ -777,11 +761,11 @@ export default function OffersPage() {
                                   (selectedLoanId !== null &&
                                     selectedLoanId !== loan.id)
                                 }
-                                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground btn-premium shadow-sm"
+                                className="w-full bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 hover:from-cyan-600 hover:via-blue-700 hover:to-purple-700 text-white font-bold text-base py-6 shadow-xl hover:shadow-2xl transition-all btn-premium"
                               >
                                 {transactionState.isLoading &&
                                   selectedLoanId === loan.id && (
-                                    <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                   )}
                                 {transactionState.step === "approving" &&
                                 selectedLoanId === loan.id
@@ -789,9 +773,21 @@ export default function OffersPage() {
                                   : transactionState.step === "accepting" &&
                                       selectedLoanId === loan.id
                                     ? "Accepting..."
-                                    : "Accept"}
+                                    : "Accept Loan"}
                               </Button>
                             )}
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.location.href = `/offers/${loan.id.toString()}`;
+                              }}
+                              className="w-full btn-cyan border-2"
+                            >
+                              <Eye className="mr-2 h-3 w-3" />
+                              View AI Analysis
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>

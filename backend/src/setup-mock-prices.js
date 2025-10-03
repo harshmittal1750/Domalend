@@ -3,7 +3,7 @@
 /**
  * Setup Mock Token Prices in DomaRankOracle
  *
- * This script sets up test prices for mock tokens (MUSDT, MUSDC, etc.)
+ * This script sets up test prices for mock tokens (USDTEST, MUSDC, etc.)
  * in the DomaRankOracle contract so they can be used for testing.
  *
  * Since Chainlink price feeds don't exist on Doma testnet, we use
@@ -20,7 +20,7 @@ const ORACLE_ADDRESS = process.env.DOMA_RANK_ORACLE_ADDRESS;
 const PRIVATE_KEY = process.env.ORACLE_UPDATER_PRIVATE_KEY;
 
 // === DEPLOYMENT SUMMARY ===
-//   MockUSDT (6 decimals): 0x75Ae0D4f6c603065D169EC3C4B6Ab43FA8cC6A61
+//   USDTEST (6 decimals): 0x8725f6FDF6E240C303B4e7A60AD13267Fa04d55C - Official Doma Testnet Token
 //   MockUSDC (6 decimals): 0x87c20443Ba0480677842851CB27a5b1D38C91639
 //   MockWBTC (8 decimals): 0x02BFF1B39378aCCB20b8870863f30D48b4Dc1DE4
 //   MockARB (18 decimals): 0x6E1f4b629Ea42Db26E2970aEcE38A61BB50a029f
@@ -34,7 +34,7 @@ const PRIVATE_KEY = process.env.ORACLE_UPDATER_PRIVATE_KEY;
 //   SOL Price Feed:  0xD5Ea6C434582F827303423dA21729bEa4F87D519
 // // Mock token addresses (from deployed contracts)
 const MOCK_TOKENS = {
-  MUSDT: "0x75Ae0D4f6c603065D169EC3C4B6Ab43FA8cC6A61",
+  USDTEST: "0x8725f6FDF6E240C303B4e7A60AD13267Fa04d55C",
   MUSDC: "0x87c20443Ba0480677842851CB27a5b1D38C91639",
   MWBTC: "0x02BFF1B39378aCCB20b8870863f30D48b4Dc1DE4",
   MARB: "0x6E1f4b629Ea42Db26E2970aEcE38A61BB50a029f",
@@ -43,7 +43,7 @@ const MOCK_TOKENS = {
 
 // Test prices (in USD with 18 decimals)
 const TEST_PRICES = {
-  MUSDT: "1.00", // $1.00 USD
+  USDTEST: "1.00", // $1.00 USD
   MUSDC: "1.00", // $1.00 USD
   MWBTC: "65000.00", // $65,000 USD
   MARB: "2.50", // $2.50 USD

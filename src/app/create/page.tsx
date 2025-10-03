@@ -30,11 +30,13 @@ import {
   AlertTriangle,
   RefreshCw,
   Wallet,
+  Sparkles,
 } from "lucide-react";
 
 import { TokenSelector, TokenSelectorRef } from "@/components/TokenSelector";
 import { QuickMintTokens } from "@/components/QuickMintTokens";
 import { TransactionModal } from "@/components/TransactionModal";
+import { DomaRankBadge } from "@/components/DomaRankBadge";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { ethers } from "ethers";
 import {
@@ -940,6 +942,44 @@ export default function CreateLoanOfferPage() {
                                 </div>
                               </div>
                             </div>
+
+                            {/* DomaRank Info - Show when collateral is a domain token */}
+                            {selectedCollateralToken.isDomainToken &&
+                              selectedCollateralToken.hasDomaRankOracle && (
+                                <div className="bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-purple-500/10 border border-purple-500/30 rounded-lg p-3 luxury-shadow">
+                                  <div className="flex items-start gap-3">
+                                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
+                                      <Sparkles className="h-4 w-4 text-white" />
+                                    </div>
+                                    <div className="flex-1 space-y-2">
+                                      <div>
+                                        <h4 className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                                          DomaRank™ Powered Valuation
+                                        </h4>
+                                        <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                                          This domain token is valued using our
+                                          proprietary AI algorithm that analyzes
+                                          domain quality, market demand, and
+                                          historical data to provide accurate,
+                                          real-time pricing.
+                                        </p>
+                                      </div>
+                                      <div className="flex items-center gap-2 pt-1">
+                                        <div className="flex-1 h-px bg-gradient-to-r from-purple-500/50 to-pink-500/50" />
+                                        <a
+                                          href="/domarank"
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-[10px] text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium uppercase tracking-wider transition-colors"
+                                        >
+                                          Learn More
+                                        </a>
+                                        <div className="flex-1 h-px bg-gradient-to-r from-pink-500/50 to-purple-500/50" />
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
 
                             {/* Collateral Analysis - Compact */}
                             <div

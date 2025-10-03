@@ -35,38 +35,51 @@ export function DomaRankBadge({
     return "D";
   };
 
-  // Get color class based on score (professional, not flashy)
+  // Get color class based on score (bold and prominent)
   const getColorClass = (score: number): string => {
-    if (score >= 80) return "bg-accent text-accent-foreground"; // Green for high scores
+    if (score >= 90)
+      return "bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 text-white border-0 shadow-lg shadow-emerald-500/50"; // A+ Premium
+    if (score >= 80)
+      return "bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 shadow-lg shadow-green-500/40"; // A Grade
+    if (score >= 70)
+      return "bg-gradient-to-r from-blue-500 to-cyan-500 text-white border-0 shadow-md shadow-blue-500/30"; // B+ Good
     if (score >= 60)
-      return "bg-primary/10 text-primary border border-primary/20"; // Blue for good scores
+      return "bg-gradient-to-r from-yellow-500 to-amber-500 text-white border-0 shadow-md shadow-yellow-500/30"; // B Average
+    if (score >= 50)
+      return "bg-gradient-to-r from-orange-500 to-yellow-600 text-white border-0 shadow-sm"; // C+ Below Average
     if (score >= 40)
-      return "bg-warning/10 text-warning border border-warning/20"; // Yellow for average
-    return "bg-muted text-muted-foreground border border-border"; // Gray for low scores
+      return "bg-gradient-to-r from-red-500 to-orange-600 text-white border-0 shadow-sm"; // C Poor
+    return "bg-gradient-to-r from-gray-500 to-slate-600 text-white border-0"; // D Very Poor
   };
 
   const grade = getGrade(score);
   const colorClass = getColorClass(score);
 
-  // Size classes
+  // Size classes - larger and bolder
   const sizeClasses = {
-    sm: "text-xs px-2 py-0.5",
-    md: "text-sm px-3 py-1",
-    lg: "text-base px-4 py-1.5",
+    sm: "text-sm px-3 py-1.5 font-bold",
+    md: "text-lg px-4 py-2 font-bold",
+    lg: "text-2xl px-6 py-3 font-extrabold",
+  };
+
+  const scoreClasses = {
+    sm: "text-xs font-bold",
+    md: "text-sm font-bold",
+    lg: "text-base font-bold",
   };
 
   const badgeContent = (
     <div className="flex items-center gap-2">
       <Badge
-        className={`${colorClass} ${sizeClasses[size]} font-semibold tracking-tight`}
+        className={`${colorClass} ${sizeClasses[size]} tracking-tight uppercase animate-in fade-in zoom-in duration-300`}
       >
         {grade}
       </Badge>
-      <span className="text-xs text-muted-foreground font-medium">
+      <span className={`${scoreClasses[size]} text-foreground`}>
         {score}/100
       </span>
       {showTooltip && (
-        <Info className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground transition-colors cursor-help" />
+        <Info className="h-4 w-4 text-muted-foreground hover:text-primary transition-colors cursor-help" />
       )}
     </div>
   );

@@ -27,6 +27,9 @@ import {
   CheckCircle,
   HelpCircle,
   BookOpen,
+  Brain,
+  BarChart3,
+  Activity,
 } from "lucide-react";
 
 export default function Home() {
@@ -102,9 +105,11 @@ export default function Home() {
         <section className="relative pt-20 pb-32 overflow-hidden">
           <div className="text-center relative z-10">
             {/* Hero Badge */}
-            <div className="inline-flex items-center space-x-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-8 border border-primary/20">
-              <Sparkles className="h-4 w-4" />
-              <span>Powered by DomaRank Algorithm • Built on Doma Testnet</span>
+            <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-cyan-500/10 to-primary/10 text-cyan-600 dark:text-cyan-400 px-6 py-3 rounded-full text-sm font-semibold mb-8 border border-cyan-500/30 hover:scale-105 transition-transform duration-300 cursor-pointer">
+              <Brain className="h-4 w-4" />
+              <span>Powered by DomaRank AI Oracle</span>
+              <span className="text-primary">•</span>
+              <span className="text-primary">Built on Doma Testnet</span>
             </div>
 
             {/* Main Heading */}
@@ -270,6 +275,126 @@ export default function Home() {
                 );
               })}
             </div>
+          </div>
+        </section>
+
+        {/* DomaRank Showcase Section */}
+        <section className="py-20 bg-gradient-to-br from-cyan-500/5 via-primary/5 to-purple-500/5 relative overflow-hidden">
+          {/* Background decoration */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-20 left-20 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" />
+            <div
+              className="absolute bottom-20 right-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse"
+              style={{ animationDelay: "1s" }}
+            />
+          </div>
+
+          <div className="relative z-10">
+            <div className="text-center mb-12">
+              <Badge className="px-6 py-3 mb-6 bg-gradient-to-r from-cyan-500/20 to-primary/20 border-cyan-500/30 text-lg">
+                <Brain className="h-4 w-4 mr-2" />
+                Revolutionary AI Oracle
+              </Badge>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                Powered by{" "}
+                <span className="bg-gradient-to-r from-cyan-500 to-primary bg-clip-text text-transparent">
+                  DomaRank
+                </span>{" "}
+                AI Oracle
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+                World's first AI-powered oracle for domain token valuation.
+                Intelligent pricing that analyzes multiple factors to ensure
+                fair, accurate valuations in real-time.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+              {[
+                {
+                  icon: Brain,
+                  title: "AI-Powered Analysis",
+                  description:
+                    "Machine learning algorithms evaluate 6 key metrics including domain length, social presence, and market activity",
+                  color: "text-cyan-500",
+                  bgColor: "bg-cyan-500/10",
+                },
+                {
+                  icon: Activity,
+                  title: "Real-Time Updates",
+                  description:
+                    "Prices updated every 10 minutes with live market data from CoinGecko and Doma Protocol",
+                  color: "text-green-500",
+                  bgColor: "bg-green-500/10",
+                },
+                {
+                  icon: BarChart3,
+                  title: "Multi-Factor Scoring",
+                  description:
+                    "DomaRank score (0-100) combines domain quality, liquidity, supply, and launch metrics",
+                  color: "text-purple-500",
+                  bgColor: "bg-purple-500/10",
+                },
+              ].map((feature, index) => (
+                <Card
+                  key={index}
+                  className="glass luxury-shadow border-2 border-border hover:border-cyan-500/30 transition-all duration-300 group"
+                >
+                  <CardContent className="p-6 text-center">
+                    <div
+                      className={`w-16 h-16 rounded-xl ${feature.bgColor} flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}
+                    >
+                      <feature.icon className={`h-8 w-8 ${feature.color}`} />
+                    </div>
+                    <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {feature.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* DomaRank CTA Card */}
+            <Card className="luxury-shadow-lg glass border-2 border-cyan-500/30 max-w-4xl mx-auto overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-primary/10 to-purple-500/10" />
+              <CardContent className="p-12 text-center relative z-10">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-cyan-500/20 to-primary/20 mb-6 animate-pulse">
+                  <Sparkles className="h-10 w-10 text-cyan-500" />
+                </div>
+                <h3 className="text-3xl font-bold mb-4 bg-gradient-to-r from-cyan-500 via-primary to-purple-500 bg-clip-text text-transparent">
+                  Discover the DomaRank Revolution
+                </h3>
+                <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+                  Learn how our groundbreaking AI oracle technology is
+                  transforming DeFi lending. Explore the architecture,
+                  algorithms, and innovation behind intelligent domain token
+                  pricing.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Link href="/domarank">
+                    <Button
+                      size="lg"
+                      className="btn-cyan text-lg px-10 py-6 shadow-2xl"
+                    >
+                      <Brain className="mr-2 h-5 w-5" />
+                      Explore DomaRank Oracle
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                  </Link>
+                  <Link href="/offers">
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="glass text-lg px-10 py-6"
+                    >
+                      <TrendingUp className="mr-2 h-5 w-5" />
+                      See Live Prices
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </section>
 
@@ -553,13 +678,24 @@ export default function Home() {
             <Card className="luxury-shadow-lg overflow-hidden">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="p-8">
-                  <h3 className="text-2xl font-bold mb-6 flex items-center space-x-2">
-                    <Sparkles className="h-6 w-6 text-primary" />
-                    <span>Powered by DomaRank Algorithm</span>
-                  </h3>
-                  <p className="text-muted-foreground mb-6">
-                    Our intelligent pricing algorithm evaluates domains using
-                    multiple factors to ensure fair, risk-adjusted valuations
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-3 rounded-xl bg-gradient-to-br from-cyan-500/20 to-primary/20">
+                      <Brain className="h-8 w-8 text-cyan-500" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-500 to-primary bg-clip-text text-transparent">
+                        DomaRank AI Oracle
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        Revolutionary AI-Powered Valuation
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-muted-foreground mb-6 leading-relaxed">
+                    Our groundbreaking AI oracle technology evaluates domain
+                    tokens using advanced machine learning algorithms and
+                    real-time market data to ensure fair, accurate, and
+                    risk-adjusted valuations.
                   </p>
                   <div className="space-y-3">
                     {benefits.map((benefit, index) => (
@@ -572,21 +708,33 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-                <div className="p-8 bg-gradient-to-br from-primary/5 to-purple-500/5 flex items-center justify-center">
-                  <div className="text-center">
-                    <Globe className="h-16 w-16 text-primary mx-auto mb-4" />
-                    <h4 className="text-xl font-semibold mb-2">
-                      Unlock Your Domain Value
-                    </h4>
-                    <p className="text-muted-foreground mb-6">
-                      Start lending or borrowing with fractionalized Doma domain
-                      tokens today
-                    </p>
-                    {!isConnected && (
-                      <Button className="btn-premium">
-                        Connect Wallet to Start
-                      </Button>
-                    )}
+                <div className="p-8 bg-gradient-to-br from-cyan-500/5 via-primary/5 to-purple-500/5 flex items-center justify-center">
+                  <div className="text-center space-y-6">
+                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-cyan-500/20 to-primary/20 mb-2">
+                      <Sparkles className="h-10 w-10 text-cyan-500" />
+                    </div>
+                    <div>
+                      <h4 className="text-2xl font-bold mb-2 bg-gradient-to-r from-cyan-500 to-primary bg-clip-text text-transparent">
+                        Experience AI-Powered Lending
+                      </h4>
+                      <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
+                        Discover how DomaRank AI Oracle revolutionizes DeFi
+                        lending with intelligent pricing
+                      </p>
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      <Link href="/domarank">
+                        <Button className="btn-cyan w-full">
+                          <Brain className="mr-2 h-4 w-4" />
+                          Learn About DomaRank
+                        </Button>
+                      </Link>
+                      {!isConnected && (
+                        <Button variant="outline" className="glass w-full">
+                          Connect Wallet to Start
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

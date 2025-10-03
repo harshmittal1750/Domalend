@@ -20,7 +20,7 @@ export interface TokenInfo {
 
 export const SUPPORTED_TOKENS: Record<string, TokenInfo> = {
   // === DEPLOYMENT SUMMARY ===
-  //   MockUSDT (6 decimals): 0x75Ae0D4f6c603065D169EC3C4B6Ab43FA8cC6A61
+  //   USDTEST (6 decimals): 0x8725f6FDF6E240C303B4e7A60AD13267Fa04d55C - Official Doma Testnet Token
   //   MockUSDC (6 decimals): 0x87c20443Ba0480677842851CB27a5b1D38C91639
   //   MockWBTC (8 decimals): 0x02BFF1B39378aCCB20b8870863f30D48b4Dc1DE4
   //   MockARB (18 decimals): 0x6E1f4b629Ea42Db26E2970aEcE38A61BB50a029f
@@ -34,18 +34,18 @@ export const SUPPORTED_TOKENS: Record<string, TokenInfo> = {
   //   SOL Price Feed:  0xD5Ea6C434582F827303423dA21729bEa4F87D519
   // // Mock token addresses (from deployed contracts)
   // const MOCK_TOKENS = {
-  //   MUSDT: "0x75Ae0D4f6c603065D169EC3C4B6Ab43FA8cC6A61",
+  //   USDTEST: "0x8725f6FDF6E240C303B4e7A60AD13267Fa04d55C",
   //   MUSDC: "0x87c20443Ba0480677842851CB27a5b1D38C91639",
   //   MWBTC: "0x02BFF1B39378aCCB20b8870863f30D48b4Dc1DE4",
   //   MARB: "0x6E1f4b629Ea42Db26E2970aEcE38A61BB50a029f",
   //   MSOL: "0x457Ebd6E5ad62dF0fde31a1a144a9Ed1f1d2E38B",
   // };
-  MUSDT: {
-    address: "0x75Ae0D4f6c603065D169EC3C4B6Ab43FA8cC6A61",
-    name: "Mock Tether USD",
-    symbol: "MUSDT",
+  USDTEST: {
+    address: "0x8725f6FDF6E240C303B4e7A60AD13267Fa04d55C",
+    name: "USD Test Token",
+    symbol: "USDTEST",
     decimals: 6,
-    description: "Mock stablecoin for testing (pegged to USD)",
+    description: "Official Doma testnet stablecoin (pegged to USD)",
     category: "stablecoin",
     volatilityTier: "stable",
     priceFeedAddress: "0x67d2C2a87A17b7267a6DBb1A59575C0E9A1D1c3e", // Placeholder - not active on Doma

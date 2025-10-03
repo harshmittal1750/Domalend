@@ -324,7 +324,7 @@ export function getTokenDisplayPrecision(symbol: string): number {
     USDT: 2,
     USDC: 2,
     DAI: 2,
-    MUSDT: 2,
+    USDTEST: 2,
     MUSDC: 2,
 
     // Major cryptocurrencies - show 4 decimal places
