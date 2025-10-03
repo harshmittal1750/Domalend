@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -44,6 +45,7 @@ import {
   Gift,
   TrendingUp,
   TrendingDown,
+  Eye,
 } from "lucide-react";
 import { ethers } from "ethers";
 import { getTokenByAddress, getAllSupportedTokens } from "@/config/tokens";
@@ -52,6 +54,12 @@ interface TokenInfo {
   name: string;
   symbol: string;
   decimals: number;
+  isDomainToken?: boolean;
+  domainMetadata?: {
+    image?: string;
+    website?: string;
+    twitterLink?: string;
+  };
 }
 
 interface LoanOfferWithDetails extends ProcessedLoan {
@@ -468,9 +476,13 @@ export default function OffersPage() {
                     <CardTitle className="text-xl font-semibold">
                       Available Loan Offers
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="flex items-center gap-2">
                       {formattedLoans.length} loan offer
                       {formattedLoans.length !== 1 ? "s" : ""} available
+                      <span className="text-xs text-cyan-500 flex items-center gap-1">
+                        <Eye className="h-3 w-3" />
+                        Click any row for details
+                      </span>
                     </CardDescription>
                   </div>
                 </div>
@@ -537,10 +549,13 @@ export default function OffersPage() {
                       <TableRow
                         key={loan.id.toString()}
                         className={`
-                          border-border/30 hover:bg-gradient-to-r hover:from-primary/5 hover:to-accent/5 
-                          transition-all duration-300 group
+                          border-border/30 hover:bg-gradient-to-r hover:from-cyan-500/5 hover:to-primary/5 
+                          transition-all duration-300 group cursor-pointer
                           ${index % 2 === 0 ? "bg-muted/20" : "bg-background"}
                         `}
+                        onClick={() =>
+                          (window.location.href = `/offers/${loan.id.toString()}`)
+                        }
                       >
                         {/* <TableCell className="font-medium font-mono text-sm">
                           <div className="flex items-center space-x-2">
@@ -703,63 +718,81 @@ export default function OffersPage() {
                             {loan.statusText}
                           </Badge>
                         </TableCell>
-                        <TableCell>
-                          {loan.lender.toLowerCase() ===
-                          address?.toLowerCase() ? (
-                            <div className="space-y-2">
-                              <Badge
-                                variant="outline"
-                                className="text-xs bg-gradient-to-r from-warning/10 to-warning/5 dark:from-warning/5 dark:to-warning/3 text-warning border-warning/20 dark:border-warning/10"
-                              >
-                                Your Offer
-                              </Badge>
+                        <TableCell onClick={(e) => e.stopPropagation()}>
+                          <div className="flex items-center gap-2">
+                            <Link href={`/offers/${loan.id.toString()}`}>
                               <Button
                                 size="sm"
-                                variant="destructive"
-                                onClick={() => handleCancelOffer(loan)}
+                                variant="outline"
+                                className="btn-cyan"
+                              >
+                                <Eye className="mr-2 h-3 w-3" />
+                                View Details
+                              </Button>
+                            </Link>
+                            {loan.lender.toLowerCase() ===
+                            address?.toLowerCase() ? (
+                              <div className="flex items-center gap-2">
+                                <Badge
+                                  variant="outline"
+                                  className="text-xs bg-gradient-to-r from-warning/10 to-warning/5 dark:from-warning/5 dark:to-warning/3 text-warning border-warning/20 dark:border-warning/10"
+                                >
+                                  Your Offer
+                                </Badge>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleCancelOffer(loan);
+                                  }}
+                                  disabled={
+                                    transactionState.isLoading ||
+                                    loan.status !== LoanStatus.Pending ||
+                                    (selectedLoanId !== null &&
+                                      selectedLoanId !== loan.id)
+                                  }
+                                  className="btn-premium"
+                                >
+                                  {transactionState.isLoading &&
+                                    selectedLoanId === loan.id && (
+                                      <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                                    )}
+                                  {transactionState.step === "cancelling" &&
+                                  selectedLoanId === loan.id
+                                    ? "Cancelling..."
+                                    : "Cancel"}
+                                </Button>
+                              </div>
+                            ) : (
+                              <Button
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleAcceptOffer(loan);
+                                }}
                                 disabled={
                                   transactionState.isLoading ||
                                   loan.status !== LoanStatus.Pending ||
                                   (selectedLoanId !== null &&
                                     selectedLoanId !== loan.id)
                                 }
-                                className=" ml-6 btn-premium"
+                                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground btn-premium shadow-sm"
                               >
                                 {transactionState.isLoading &&
                                   selectedLoanId === loan.id && (
                                     <Loader2 className="mr-2 h-3 w-3 animate-spin" />
                                   )}
-                                {transactionState.step === "cancelling" &&
+                                {transactionState.step === "approving" &&
                                 selectedLoanId === loan.id
-                                  ? "Cancelling..."
-                                  : "Cancel Offer"}
+                                  ? "Approving..."
+                                  : transactionState.step === "accepting" &&
+                                      selectedLoanId === loan.id
+                                    ? "Accepting..."
+                                    : "Accept"}
                               </Button>
-                            </div>
-                          ) : (
-                            <Button
-                              size="sm"
-                              onClick={() => handleAcceptOffer(loan)}
-                              disabled={
-                                transactionState.isLoading ||
-                                loan.status !== LoanStatus.Pending ||
-                                (selectedLoanId !== null &&
-                                  selectedLoanId !== loan.id)
-                              }
-                              className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground btn-premium shadow-sm"
-                            >
-                              {transactionState.isLoading &&
-                                selectedLoanId === loan.id && (
-                                  <Loader2 className="mr-2 h-3 w-3 animate-spin" />
-                                )}
-                              {transactionState.step === "approving" &&
-                              selectedLoanId === loan.id
-                                ? "Approving..."
-                                : transactionState.step === "accepting" &&
-                                    selectedLoanId === loan.id
-                                  ? "Accepting..."
-                                  : "Accept"}
-                            </Button>
-                          )}
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
