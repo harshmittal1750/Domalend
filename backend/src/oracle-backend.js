@@ -286,8 +286,15 @@ async function getConsolidatedDomainData() {
     // Get active offers count from Phase 2 data
     const activeOffersCount = nameDetails?.activeOffersCount || 0;
 
-    // Parse current price
-    const livePriceUSD = parseFloat(token.currentPrice || "0");
+    // Parse current price - IMPORTANT: currentPrice is in token's smallest unit
+    // Must divide by 10^decimals to get actual USD price
+    const decimals = token.params?.decimals || 6;
+    const currentPriceRaw = parseFloat(token.currentPrice || "0");
+    const livePriceUSD = currentPriceRaw / Math.pow(10, decimals);
+
+    console.log(
+      `  💰 ${domainName}: ${currentPriceRaw} raw → $${livePriceUSD.toFixed(2)} USD (decimals: ${decimals})`
+    );
 
     consolidatedData.push({
       fractionalTokenAddress: token.address,
@@ -400,6 +407,21 @@ function calculateDomaRank(domainData) {
   // ========================================
   const riskAdjustmentFactor = domaRank / 100;
   const finalValuationUSD = domainData.livePriceUSD * riskAdjustmentFactor;
+
+  // Log calculation breakdown
+  console.log(`\n  📊 DomaRank Calculation for ${domainData.domainName}:`);
+  console.log(`    Age Score: ${ageScore.toFixed(2)}/10`);
+  console.log(`    Demand Score: ${demandScore.toFixed(2)}/10`);
+  console.log(`    Keyword Score: ${combinedKeywordScore.toFixed(2)}/10`);
+  console.log(`    → DomaRank: ${domaRank.toFixed(2)}/100`);
+  console.log(
+    `    → Risk Adjustment: ${(riskAdjustmentFactor * 100).toFixed(2)}%`
+  );
+  console.log(`    Live Market Price: $${domainData.livePriceUSD.toFixed(2)}`);
+  console.log(`    AI Oracle Price: $${finalValuationUSD.toFixed(2)}`);
+  console.log(
+    `    Safety Margin: ${((1 - riskAdjustmentFactor) * 100).toFixed(2)}%\n`
+  );
 
   // Convert to 18 decimals for blockchain
   const finalValuationWei = ethers.parseUnits(

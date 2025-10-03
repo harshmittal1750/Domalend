@@ -191,7 +191,7 @@ function main() {
   });
 
   log("\n🔗 Add these to your wallet:", colors.yellow);
-  log("Network: Somnia L1 Testnet", colors.yellow);
+  log("Network: Doma Testnet", colors.yellow);
   log(`RPC URL: ${RPC_URL}`, colors.yellow);
   log("Chain ID: 97476", colors.yellow);
 
