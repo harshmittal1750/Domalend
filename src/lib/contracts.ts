@@ -1,4 +1,4 @@
-// DreamLend Contract Configuration for Somnia L1 Testnet
+// DreamLend Contract Configuration for Doma Testnet
 // Read contract address from environment (preferred for client: NEXT_PUBLIC_*, otherwise server-side)
 
 import { defineChain } from "viem";
@@ -6,7 +6,7 @@ import { defineChain } from "viem";
 // Falls back to the previous hardcoded address if env not provided.
 export const DREAMLEND_CONTRACT_ADDRESS: string =
   process.env.NEXT_PUBLIC_DREAMLEND_CONTRACT_ADDRESS ??
-  "0xddDa4e2B1B8E6f06086F103dA6358E7aCbd020ec";
+  "0x9F1694E8a8aC038d4ab3e2217AC0E79111948FD9";
 
 // Rewards System Contract Addresses
 
@@ -770,9 +770,9 @@ export const DOMA_RANK_ORACLE_ABI = [
   },
 ] as const;
 
-// Somnia L1 Testnet Configuration
+// Doma Testnet Configuration
 export const DOMA_TESTNET_CONFIG = defineChain({
-  id: 50312, // Somnia L1 testnet chain ID (placeholder - check official docs)
+  id: 97476, // Doma testnet chain ID
   name: "Doma Testnet",
   network: "doma-testnet",
   nativeCurrency: {

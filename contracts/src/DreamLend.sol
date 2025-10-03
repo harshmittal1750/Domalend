@@ -27,7 +27,7 @@ interface IDomaOwnershipToken {
 
 /**
  * @title DreamLend
- * @dev A decentralized lending protocol for Somnia L1 testnet
+ * @dev A decentralized lending protocol for Doma testnet
  * @notice This contract enables peer-to-peer lending with collateral backing
  */
 contract DreamLend is ReentrancyGuard, Ownable {

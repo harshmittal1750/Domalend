@@ -18,7 +18,9 @@
         "test-oracle-tx": "node src/test-oracle-tx.js",
         "test-subgraph": "node src/subgraphQueries.js",
         "indexer": "node src/indexer/index.js",
-        "indexer:dev": "nodemon src/indexer/index.js"
+        "indexer:dev": "nodemon src/indexer/index.js",
+        "setup-mock-prices": "node src/setup-mock-prices.js",
+        "check-indexer": "node src/check-indexer.js"
     },
     "keywords": [
         "doma",

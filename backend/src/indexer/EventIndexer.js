@@ -290,8 +290,12 @@ export class EventIndexer extends EventEmitter {
     const block = await event.getBlock();
     const args = event.args;
 
+    // ethers v6: event properties are directly on event object, not event.log
+    const txHash = event.transactionHash || event.log?.transactionHash;
+    const logIndex = event.index !== undefined ? event.index : event.log?.index;
+
     const loanCreated = {
-      id: event.log.transactionHash + "-" + event.log.index,
+      id: txHash + "-" + logIndex,
       loanId: args.loanId.toString(),
       lender: args.lender.toLowerCase(),
       tokenAddress: args.tokenAddress.toLowerCase(),
@@ -305,7 +309,7 @@ export class EventIndexer extends EventEmitter {
       maxPriceStaleness: args.maxPriceStaleness.toString(),
       blockNumber: event.blockNumber.toString(),
       blockTimestamp: block.timestamp.toString(),
-      transactionHash: event.log.transactionHash,
+      transactionHash: txHash,
       // Historical price data (will be fetched from oracle if available)
       priceUSD: "0",
       amountUSD: "0",
@@ -337,8 +341,11 @@ export class EventIndexer extends EventEmitter {
     const block = await event.getBlock();
     const args = event.args;
 
+    const txHash = event.transactionHash || event.log?.transactionHash;
+    const logIndex = event.index !== undefined ? event.index : event.log?.index;
+
     const loanAccepted = {
-      id: event.log.transactionHash + "-" + event.log.index,
+      id: txHash + "-" + logIndex,
       loanId: args.loanId.toString(),
       borrower: args.borrower.toLowerCase(),
       timestamp: block.timestamp.toString(),
@@ -361,8 +368,11 @@ export class EventIndexer extends EventEmitter {
     const block = await event.getBlock();
     const args = event.args;
 
+    const txHash = event.transactionHash || event.log?.transactionHash;
+    const logIndex = event.index !== undefined ? event.index : event.log?.index;
+
     const loanRepaid = {
-      id: event.log.transactionHash + "-" + event.log.index,
+      id: txHash + "-" + logIndex,
       loanId: args.loanId.toString(),
       borrower: args.borrower.toLowerCase(),
       repaymentAmount: args.repaymentAmount.toString(),
@@ -385,8 +395,11 @@ export class EventIndexer extends EventEmitter {
     const block = await event.getBlock();
     const args = event.args;
 
+    const txHash = event.transactionHash || event.log?.transactionHash;
+    const logIndex = event.index !== undefined ? event.index : event.log?.index;
+
     const loanLiquidated = {
-      id: event.log.transactionHash + "-" + event.log.index,
+      id: txHash + "-" + logIndex,
       loanId: args.loanId.toString(),
       liquidator: args.liquidator.toLowerCase(),
       collateralClaimedByLender: args.collateralClaimedByLender.toString(),
@@ -410,8 +423,11 @@ export class EventIndexer extends EventEmitter {
     const block = await event.getBlock();
     const args = event.args;
 
+    const txHash = event.transactionHash || event.log?.transactionHash;
+    const logIndex = event.index !== undefined ? event.index : event.log?.index;
+
     const loanCancelled = {
-      id: event.log.transactionHash + "-" + event.log.index,
+      id: txHash + "-" + logIndex,
       loanId: args.loanId.toString(),
       lender: args.lender.toLowerCase(),
       timestamp: block.timestamp.toString(),
@@ -432,8 +448,11 @@ export class EventIndexer extends EventEmitter {
   async processLoanRemovedEvent(event) {
     const args = event.args;
 
+    const txHash = event.transactionHash || event.log?.transactionHash;
+    const logIndex = event.index !== undefined ? event.index : event.log?.index;
+
     const loanRemoved = {
-      id: event.log.transactionHash + "-" + event.log.index,
+      id: txHash + "-" + logIndex,
       loanId: args.loanId.toString(),
       reason: args.reason,
     };
@@ -453,10 +472,13 @@ export class EventIndexer extends EventEmitter {
   async processDomaOracleSetEvent(event) {
     const args = event.args;
 
+    const txHash = event.transactionHash || event.log?.transactionHash;
+    const logIndex = event.index !== undefined ? event.index : event.log?.index;
+
     const oracleSet = {
-      id: event.log.transactionHash + "-" + event.log.index,
+      id: txHash + "-" + logIndex,
       newOracleAddress: args.newOracleAddress.toLowerCase(),
-      transactionHash: event.log.transactionHash,
+      transactionHash: txHash,
       blockNumber: event.blockNumber.toString(),
     };
 

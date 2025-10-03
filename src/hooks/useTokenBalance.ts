@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { ethers } from "ethers";
-import { SOMNIA_TESTNET_CONFIG } from "@/lib/contracts";
+import { DOMA_TESTNET_CONFIG } from "@/lib/contracts";
 
 interface TokenBalance {
   balance: string;
@@ -59,7 +59,7 @@ export const useTokenBalance = (
 
     try {
       const provider = new ethers.JsonRpcProvider(
-        SOMNIA_TESTNET_CONFIG.rpcUrls.default.http[0]
+        DOMA_TESTNET_CONFIG.rpcUrls.default.http[0]
       );
 
       // Test provider connection
@@ -247,7 +247,7 @@ export const useMultipleTokenBalances = (
 
     try {
       const provider = new ethers.JsonRpcProvider(
-        SOMNIA_TESTNET_CONFIG.rpcUrls.default.http[0]
+        DOMA_TESTNET_CONFIG.rpcUrls.default.http[0]
       );
 
       const balancePromises = tokens.map(async (token) => {

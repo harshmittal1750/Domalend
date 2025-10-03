@@ -72,7 +72,7 @@ export default function Home() {
       icon: Zap,
       title: "Lightning-Fast Execution",
       description:
-        "Built on Somnia L1 for near-instant transactions and minimal fees, making DeFi lending accessible to everyone.",
+        "Built on Doma for near-instant transactions and minimal fees, making DeFi lending accessible to everyone.",
       color: "text-yellow-600",
     },
     {
@@ -104,7 +104,7 @@ export default function Home() {
             {/* Hero Badge */}
             <div className="inline-flex items-center space-x-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-8 border border-primary/20">
               <Sparkles className="h-4 w-4" />
-              <span>Built on Somnia L1 Testnet</span>
+              <span>Built on Doma Testnet</span>
             </div>
 
             {/* Main Heading */}

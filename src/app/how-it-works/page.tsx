@@ -129,7 +129,7 @@ export default function HowItWorks() {
     {
       title: "Instant Settlement",
       description:
-        "Built on Somnia L1 for fast, low-cost transactions with instant finality.",
+        "Built on Doma for fast, low-cost transactions with instant finality.",
       icon: Zap,
     },
   ];

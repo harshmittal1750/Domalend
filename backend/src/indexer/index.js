@@ -20,7 +20,8 @@ const CONFIG = {
   // Blockchain connection
   rpcUrl: process.env.RPC_URL || "https://rpc-testnet.doma.xyz",
   contractAddress:
-    process.env.DREAM_LEND_CONTRACT_ADDRESS || "YOUR_DEPLOYED_CONTRACT_ADDRESS",
+    process.env.DREAM_LEND_CONTRACT_ADDRESS ||
+    "0x9F1694E8a8aC038d4ab3e2217AC0E79111948FD9",
   startBlock: parseInt(process.env.INDEXER_START_BLOCK || "0"),
   pollInterval: parseInt(process.env.INDEXER_POLL_INTERVAL || "5000"),
 

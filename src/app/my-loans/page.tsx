@@ -578,8 +578,7 @@ export default function MyLoansPage() {
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Please connect your wallet to Somnia L1 testnet to view your
-                loans.
+                Please connect your wallet to Doma testnet to view your loans.
               </AlertDescription>
             </Alert>
           </CardContent>

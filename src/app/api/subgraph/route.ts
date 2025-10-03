@@ -1,9 +1,9 @@
 // app/api/subgraph/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
+// Use local indexer instead of remote subgraph
 const SUBGRAPH_URL =
-  process.env.NEXT_PUBLIC_SUBGRAPH_URL ||
-  "https://api.subgraph.somnia.network/api/public/d5671b32-2846-489e-a577-e7d9702dd17b/subgraphs/catalex-graph/v0.0.1/";
+  process.env.NEXT_PUBLIC_SUBGRAPH_URL || "http://localhost:3001/graphql";
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,6 +12,13 @@ export async function POST(req: NextRequest) {
     if (!query) {
       return NextResponse.json({ error: "Query is required" }, { status: 400 });
     }
+
+    console.log(
+      "🔍 Proxying GraphQL query to:",
+      SUBGRAPH_URL,
+      "\nQuery:",
+      query.substring(0, 100) + "..."
+    );
 
     const response = await fetch(SUBGRAPH_URL, {
       method: "POST",
@@ -22,19 +29,27 @@ export async function POST(req: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Subgraph request failed:", errorText);
+      console.error("❌ Indexer request failed:", errorText);
       return NextResponse.json(
-        { error: "Failed to fetch from subgraph", details: errorText },
+        { error: "Failed to fetch from indexer", details: errorText },
         { status: response.status }
       );
     }
 
     const data = await response.json();
+    console.log(
+      "✅ Indexer response:",
+      JSON.stringify(data).substring(0, 200) + "..."
+    );
+
     return NextResponse.json(data);
   } catch (error) {
-    console.error("API route error:", error);
+    console.error("❌ API route error:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      {
+        error: "Internal Server Error",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 }
     );
   }

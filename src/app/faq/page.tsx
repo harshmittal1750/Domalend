@@ -25,7 +25,7 @@ const faqs = [
       {
         question: "What is DreamLend Finance?",
         answer:
-          "DreamLend Finance is a peer-to-peer (P2P) cryptocurrency lending platform built on Somnia L1. It allows users to lend their crypto assets to earn interest or borrow crypto by providing collateral, all through secure smart contracts.",
+          "DreamLend Finance is a peer-to-peer (P2P) cryptocurrency lending platform built on Doma. It allows users to lend their crypto assets to earn interest or borrow crypto by providing collateral, all through secure smart contracts.",
       },
       {
         question: "How do I get started with DreamLend?",
@@ -139,7 +139,7 @@ const faqs = [
       {
         question: "How much are gas fees?",
         answer:
-          "Gas fees depend on network congestion and are paid to the blockchain network, not DreamLend. Built on Somnia L1, our platform offers significantly lower gas fees compared to Ethereum mainnet.",
+          "Gas fees depend on network congestion and are paid to the blockchain network, not DreamLend. Built on Doma, our platform offers significantly lower gas fees compared to Ethereum mainnet.",
       },
       {
         question: "Do I pay fees for cancelled offers?",

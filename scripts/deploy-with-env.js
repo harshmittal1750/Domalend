@@ -193,7 +193,7 @@ function main() {
   log("\n🔗 Add these to your wallet:", colors.yellow);
   log("Network: Somnia L1 Testnet", colors.yellow);
   log(`RPC URL: ${RPC_URL}`, colors.yellow);
-  log("Chain ID: 50312", colors.yellow);
+  log("Chain ID: 97476", colors.yellow);
 
   log("\n💡 Next steps:", colors.cyan);
   log("1. Add the token addresses to your wallet", colors.cyan);

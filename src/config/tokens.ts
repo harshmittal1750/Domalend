@@ -19,55 +19,80 @@ export interface TokenInfo {
 }
 
 export const SUPPORTED_TOKENS: Record<string, TokenInfo> = {
+  // === DEPLOYMENT SUMMARY ===
+  //   MockUSDT (6 decimals): 0x75Ae0D4f6c603065D169EC3C4B6Ab43FA8cC6A61
+  //   MockUSDC (6 decimals): 0x87c20443Ba0480677842851CB27a5b1D38C91639
+  //   MockWBTC (8 decimals): 0x02BFF1B39378aCCB20b8870863f30D48b4Dc1DE4
+  //   MockARB (18 decimals): 0x6E1f4b629Ea42Db26E2970aEcE38A61BB50a029f
+  //   MockSOL (18 decimals): 0x457Ebd6E5ad62dF0fde31a1a144a9Ed1f1d2E38B
+
+  // === ORACLE ADAPTER ADDRESSES (Already Configured) ===
+  //   USDT Price Feed: 0x67d2C2a87A17b7267a6DBb1A59575C0E9A1D1c3e
+  //   USDC Price Feed: 0x235266D5ca6f19F134421C49834C108b32C2124e
+  //   BTC Price Feed:  0x4803db1ca3A1DA49c3DB991e1c390321c20e1f21
+  //   ARB Price Feed:  0x74952812B6a9e4f826b2969C6D189c4425CBc19B
+  //   SOL Price Feed:  0xD5Ea6C434582F827303423dA21729bEa4F87D519
+  // // Mock token addresses (from deployed contracts)
+  // const MOCK_TOKENS = {
+  //   MUSDT: "0x75Ae0D4f6c603065D169EC3C4B6Ab43FA8cC6A61",
+  //   MUSDC: "0x87c20443Ba0480677842851CB27a5b1D38C91639",
+  //   MWBTC: "0x02BFF1B39378aCCB20b8870863f30D48b4Dc1DE4",
+  //   MARB: "0x6E1f4b629Ea42Db26E2970aEcE38A61BB50a029f",
+  //   MSOL: "0x457Ebd6E5ad62dF0fde31a1a144a9Ed1f1d2E38B",
+  // };
   MUSDT: {
-    address: "0x5C99fEb638C1959144696a77CC900c58A4B4EB6F", // UPDATE WITH DEPLOYED MockUSDT ADDRESS
+    address: "0x75Ae0D4f6c603065D169EC3C4B6Ab43FA8cC6A61",
     name: "Mock Tether USD",
     symbol: "MUSDT",
-    decimals: 6, // USDT typically has 6 decimals
+    decimals: 6,
     description: "Mock stablecoin for testing (pegged to USD)",
     category: "stablecoin",
     volatilityTier: "stable",
-    priceFeedAddress: "0x67d2C2a87A17b7267a6DBb1A59575C0E9A1D1c3e", // Real USDT oracle adapter
+    priceFeedAddress: "0x67d2C2a87A17b7267a6DBb1A59575C0E9A1D1c3e", // Placeholder - not active on Doma
+    hasDomaRankOracle: false,
   },
   MUSDC: {
-    address: "0x571D9915eA4D187b7f0b1460fd0432D7Cce74c47", // UPDATE WITH DEPLOYED MockUSDC ADDRESS
+    address: "0x87c20443Ba0480677842851CB27a5b1D38C91639",
     name: "Mock USD Coin",
     symbol: "MUSDC",
-    decimals: 6, // USDC typically has 6 decimals
+    decimals: 6,
     description: "Mock stablecoin for testing (backed by USD reserves)",
     category: "stablecoin",
     volatilityTier: "stable",
-    priceFeedAddress: "0x235266D5ca6f19F134421C49834C108b32C2124e", // Real USDC oracle adapter
+    priceFeedAddress: "0x235266D5ca6f19F134421C49834C108b32C2124e", // Placeholder - not active on Doma
+    hasDomaRankOracle: false,
   },
   MWBTC: {
-    address: "0xE218717fE38D582B8C00a8D6363f5BC7BF32a8B6", // UPDATE WITH DEPLOYED MockWBTC ADDRESS
+    address: "0x02BFF1B39378aCCB20b8870863f30D48b4Dc1DE4",
     name: "Mock Wrapped Bitcoin",
     symbol: "MWBTC",
-    decimals: 8, // WBTC typically has 8 decimals
+    decimals: 8,
     description: "Mock tokenized Bitcoin for testing",
     category: "crypto",
     volatilityTier: "high",
-    priceFeedAddress: "0x4803db1ca3A1DA49c3DB991e1c390321c20e1f21", // Real BTC oracle adapter
+    priceFeedAddress: "0x4803db1ca3A1DA49c3DB991e1c390321c20e1f21", // Placeholder - not active on Doma
+    hasDomaRankOracle: false,
   },
   MARB: {
-    address: "0x9c15F281BFC66D2FA26686aE2E297eD5d7f61ee1", // UPDATE WITH DEPLOYED MockARB ADDRESS
+    address: "0x6E1f4b629Ea42Db26E2970aEcE38A61BB50a029f",
     name: "Mock Arbitrum",
     symbol: "MARB",
-    decimals: 18, // ARB has 18 decimals
+    decimals: 18,
     description: "Mock Arbitrum ecosystem token for testing",
     category: "defi",
     volatilityTier: "moderate",
-    priceFeedAddress: "0x74952812B6a9e4f826b2969C6D189c4425CBc19B", // Real ARB oracle adapter
+    priceFeedAddress: "0x74952812B6a9e4f826b2969C6D189c4425CBc19B", // Placeholder - not active on Doma
+    hasDomaRankOracle: false,
   },
   MSOL: {
-    address: "0x71264e1321E1980b32002EAF6b24759DfBA5E281", // UPDATE WITH DEPLOYED MockSOL ADDRESS
+    address: "0x457Ebd6E5ad62dF0fde31a1a144a9Ed1f1d2E38B",
     name: "Mock Solana",
     symbol: "MSOL",
-    decimals: 18, // For EVM compatibility, using 18 decimals
+    decimals: 18,
     description: "Mock Solana blockchain native token for testing",
     category: "crypto",
     volatilityTier: "high",
-    priceFeedAddress: "0xD5Ea6C434582F827303423dA21729bEa4F87D519", // Real SOL oracle adapter
+    priceFeedAddress: "0xD5Ea6C434582F827303423dA21729bEa4F87D519", // Placeholder - not active on Doma
     hasDomaRankOracle: false,
   },
   // ==================== DOMA FRACTIONAL DOMAIN TOKENS ====================

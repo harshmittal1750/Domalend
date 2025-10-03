@@ -1,11 +1,11 @@
 /**
  * @file multicall.ts
- * @description Efficient price fetching utility for Somnia L1 (no multicall contract needed)
+ * @description Efficient price fetching utility for Doma (no multicall contract needed)
  * @author DreamLend Team
  */
 
 import { ethers } from "ethers";
-import { SOMNIA_TESTNET_CONFIG } from "./contracts";
+import { DOMA_TESTNET_CONFIG } from "./contracts";
 
 // Chainlink Aggregator ABI - only the functions we need
 export const AGGREGATOR_ABI = [
@@ -50,7 +50,7 @@ export interface PriceData {
 }
 
 /**
- * Price fetching utility class for Somnia L1 (uses Promise.all instead of multicall)
+ * Price fetching utility class for Doma (uses Promise.all instead of multicall)
  */
 export class MulticallUtil {
   private provider: ethers.JsonRpcProvider;
@@ -63,7 +63,7 @@ export class MulticallUtil {
       this.provider = providerOrRpc;
     } else {
       this.provider = new ethers.JsonRpcProvider(
-        SOMNIA_TESTNET_CONFIG.rpcUrls.default.http[0]
+        DOMA_TESTNET_CONFIG.rpcUrls.default.http[0]
       );
     }
   }
