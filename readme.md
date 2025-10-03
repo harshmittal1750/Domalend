@@ -46,8 +46,8 @@ Built **DomaRankOracle.sol** - a specialized oracle that prices domain tokens us
 - **Chain**: Doma Testnet (Chain ID: 97476)
 - **RPC**: `https://rpc-testnet.doma.xyz`
 - **Bridge**: Integrated guide for users to bridge Sepolia ETH to Doma
-- **DomaLend Contract**: `0xYourContractAddress` (deployed on Doma)
-- **DomaRankOracle**: `0xYourOracleAddress` (deployed on Doma)
+- **DomaLend Contract**: `0x9F1694E8a8aC038d4ab3e2217AC0E79111948FD9` (deployed on Doma)
+- **DomaRankOracle**: `0xccC7F3bD5aB3E0A3f1e54D29a4F3D3430Cde06De` (deployed on Doma)
 
 ---
 
@@ -216,22 +216,6 @@ indexer.on("loanCreated", async (loanEvent) => {
 - 🔍 **Subgraph Integration**: Lightning-fast loan data via Graph Protocol
 - 🎯 **Smart Token Detection**: Auto-identify domain tokens vs regular ERC20s
 
-**Key Components:**
-
-```typescript
-// Fetch domain tokens dynamically
-const { tokens } = useAllDomainTokens(); // From Doma Subgraph
-
-// Display AI-powered prices
-<DualPriceDisplay
-  price={prices.get(tokenAddress)}
-  showAIBadge={isDomainToken}
-/>
-
-// DomaRank scoring visualization
-<DomaRankBadge score={93} size="lg" />
-```
-
 ### Custom Event Indexer (EventIndexer.js)
 
 **Why We Built Our Own Instead of Using The Graph:**
@@ -371,7 +355,7 @@ indexer.on("loanCreated", (loan) => {
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/catalex.git
+git clone https://github.com/harshmittal1750/Domalend.git
 cd catalex
 
 # Install dependencies
@@ -454,7 +438,7 @@ ORACLE_UPDATER_PRIVATE_KEY=0x...
 | **Blockchain**       | Doma Testnet (97476)     | Main deployment network             |
 | **Oracle Backend**   | Node.js + ethers.js      | Price calculation & broadcasting    |
 | **Data Source**      | Doma Subgraph GraphQL    | Domain metadata, fractional tokens  |
-| **Frontend**         | Next.js 14 + TypeScript  | React-based modern UI               |
+| **Frontend**         | Next.js 15 + TypeScript  | React-based modern UI               |
 | **Styling**          | Tailwind CSS + shadcn/ui | Beautiful, responsive design        |
 | **State Management** | React Hooks + Wagmi      | Web3 wallet integration             |
 | **Indexing**         | Custom EventIndexer.js   | Real-time blockchain event indexing |
@@ -523,7 +507,7 @@ All contracts verified on Doma Testnet Explorer for transparency.
 
 - Twitter DM: [@DomaLendFi](https://twitter.com/DomaLendFi)
 - GitHub Issues: For technical questions
-- Doma Discord: @yourusername
+- Discord: @essentialpcspy
 
 ---
 
@@ -539,7 +523,7 @@ Special thanks to:
 
 - **Doma Protocol Team** for building incredible infrastructure (Subgraph, Mizu DEX, Bridge)
 - **OpenZeppelin** for battle-tested smart contract libraries
-- **The Graph Protocol** for enabling fast indexing
+
 - **Hackathon Organizers** for this opportunity to innovate
 
 ---
