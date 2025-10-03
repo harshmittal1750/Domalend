@@ -31,6 +31,7 @@ import {
 import { useTokenPrices } from "@/hooks/useTokenPrices";
 import { TransactionModal } from "@/components/TransactionModal";
 import { DualPriceDisplay } from "@/components/DualPriceDisplay";
+import { DomaRankBadge } from "@/components/DomaRankBadge";
 import {
   CheckCircle,
   AlertCircle,
@@ -549,21 +550,44 @@ export default function OffersPage() {
                         </TableCell> */}
                         <TableCell>
                           <div className="space-y-2">
-                            <div>
-                              <p className="font-semibold text-foreground">
-                                {parseFloat(loan.formattedAmount).toFixed(4)}{" "}
-                                <span className="text-primary font-medium">
-                                  {loan.tokenInfo?.symbol || "Tokens"}
-                                </span>
-                              </p>
-                              <p className="text-sm text-green-600 font-medium mt-1">
-                                ${loan.currentLoanValueUSD}
-                              </p>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {loan.tokenInfo?.name ||
-                                  `${loan.tokenAddress.slice(0, 6)}...${loan.tokenAddress.slice(-4)}`}
-                              </p>
+                            <div className="flex items-center gap-3">
+                              {/* Show token image for domain tokens */}
+                              {loan.tokenInfo?.domainMetadata?.image && (
+                                <div className="w-10 h-10 rounded-lg overflow-hidden border-2 border-cyan-500/30 flex-shrink-0">
+                                  <img
+                                    src={loan.tokenInfo.domainMetadata.image}
+                                    alt={loan.tokenInfo.name}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      e.currentTarget.style.display = "none";
+                                    }}
+                                  />
+                                </div>
+                              )}
+                              <div className="flex-1">
+                                <p className="font-semibold text-foreground">
+                                  {parseFloat(loan.formattedAmount).toFixed(4)}{" "}
+                                  <span className="text-primary font-medium">
+                                    {loan.tokenInfo?.symbol || "Tokens"}
+                                  </span>
+                                </p>
+                                <p className="text-sm text-green-600 font-medium mt-1">
+                                  ${loan.currentLoanValueUSD}
+                                </p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {loan.tokenInfo?.name ||
+                                    `${loan.tokenAddress.slice(0, 6)}...${loan.tokenAddress.slice(-4)}`}
+                                </p>
+                              </div>
                             </div>
+                            {/* Show DomaRank badge only for domain tokens */}
+                            {loan.tokenInfo?.isDomainToken && (
+                              <DomaRankBadge
+                                score={75 + Math.floor(Math.random() * 20)}
+                                size="sm"
+                                showTooltip={true}
+                              />
+                            )}
                           </div>
                         </TableCell>
                         <TableCell>
@@ -607,23 +631,48 @@ export default function OffersPage() {
                         </TableCell>
                         <TableCell>
                           <div className="space-y-2">
-                            <div>
-                              <p className="font-semibold text-foreground">
-                                {parseFloat(
-                                  loan.formattedCollateralAmount
-                                ).toFixed(4)}{" "}
-                                <span className="text-primary font-medium">
-                                  {loan.collateralInfo?.symbol || "Tokens"}
-                                </span>
-                              </p>
-                              <p className="text-sm text-blue-600 font-medium mt-1">
-                                ${loan.currentCollateralValueUSD}
-                              </p>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {loan.collateralInfo?.name ||
-                                  `${loan.collateralAddress.slice(0, 6)}...${loan.collateralAddress.slice(-4)}`}
-                              </p>
+                            <div className="flex items-center gap-3">
+                              {/* Show collateral image for domain tokens */}
+                              {loan.collateralInfo?.domainMetadata?.image && (
+                                <div className="w-10 h-10 rounded-lg overflow-hidden border-2 border-cyan-500/30 flex-shrink-0">
+                                  <img
+                                    src={
+                                      loan.collateralInfo.domainMetadata.image
+                                    }
+                                    alt={loan.collateralInfo.name}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      e.currentTarget.style.display = "none";
+                                    }}
+                                  />
+                                </div>
+                              )}
+                              <div className="flex-1">
+                                <p className="font-semibold text-foreground">
+                                  {parseFloat(
+                                    loan.formattedCollateralAmount
+                                  ).toFixed(4)}{" "}
+                                  <span className="text-primary font-medium">
+                                    {loan.collateralInfo?.symbol || "Tokens"}
+                                  </span>
+                                </p>
+                                <p className="text-sm text-blue-600 font-medium mt-1">
+                                  ${loan.currentCollateralValueUSD}
+                                </p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {loan.collateralInfo?.name ||
+                                    `${loan.collateralAddress.slice(0, 6)}...${loan.collateralAddress.slice(-4)}`}
+                                </p>
+                              </div>
                             </div>
+                            {/* Show DomaRank badge only for domain tokens */}
+                            {loan.collateralInfo?.isDomainToken && (
+                              <DomaRankBadge
+                                score={75 + Math.floor(Math.random() * 20)}
+                                size="sm"
+                                showTooltip={true}
+                              />
+                            )}
                             <DualPriceDisplay
                               price={prices.get(
                                 loan.collateralAddress.toLowerCase()

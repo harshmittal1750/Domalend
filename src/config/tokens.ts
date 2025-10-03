@@ -285,10 +285,19 @@ export const TOKEN_CATEGORIES = {
   },
 } as const;
 
-// Get tokens with DomaRank oracle support
+// Get tokens with DomaRank oracle support (domain tokens)
+// Note: This now returns only hardcoded domain tokens
+// For dynamic domain tokens, use useFractionalTokens hook
 export function getDomaRankTokens(): TokenInfo[] {
   return Object.values(SUPPORTED_TOKENS).filter(
-    (token) => token.hasDomaRankOracle === true
+    (token) => token.hasDomaRankOracle === true && token.isDomainToken === true
+  );
+}
+
+// Get crypto tokens with oracle support (non-domain tokens)
+export function getCryptoTokens(): TokenInfo[] {
+  return Object.values(SUPPORTED_TOKENS).filter(
+    (token) => token.hasDomaRankOracle === true && token.isDomainToken !== true
   );
 }
 

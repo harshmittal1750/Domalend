@@ -22,16 +22,18 @@ import {
   X,
   Sparkles,
   TrendingUp,
+  Clock,
 } from "lucide-react";
 import {
   TokenInfo,
-  getAllSupportedTokens,
-  TOKEN_CATEGORIES,
+  getCryptoTokens,
   RISK_COLORS,
   formatBasisPoints,
   DEFAULT_PARAMETERS,
 } from "@/config/tokens";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
+import { useAllDomainTokens } from "@/hooks/useFractionalTokens";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface TokenSelectorProps {
   selectedToken?: TokenInfo;
@@ -62,7 +64,21 @@ export const TokenSelector = forwardRef<TokenSelectorRef, TokenSelectorProps>(
   ) => {
     const [open, setOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-    const allTokens = getAllSupportedTokens();
+
+    // Fetch domain tokens from GraphQL
+    const {
+      tokens: domainTokens,
+      loading: domainTokensLoading,
+      error: domainTokensError,
+    } = useAllDomainTokens();
+
+    // Get crypto tokens from config (MUSDT, MUSDC, MWBTC, MARB, MSOL)
+    const cryptoTokens = getCryptoTokens();
+
+    // Merge crypto and domain tokens
+    const allTokens = useMemo(() => {
+      return [...cryptoTokens, ...domainTokens];
+    }, [cryptoTokens, domainTokens]);
 
     // // Fetch balance for selected token
     // const {
@@ -113,11 +129,40 @@ export const TokenSelector = forwardRef<TokenSelectorRef, TokenSelectorProps>(
       );
     }, [availableTokens, searchQuery]);
 
-    // Get popular tokens (domain tokens)
+    // Get popular tokens (domain tokens with oracle support)
     const popularTokens = useMemo(
-      () => availableTokens.filter((t) => t.category === "domain").slice(0, 4),
+      () =>
+        availableTokens
+          .filter((t) => t.category === "domain" && t.hasDomaRankOracle)
+          .slice(0, 4),
       [availableTokens]
     );
+
+    // Create dynamic token categories
+    const tokenCategories = useMemo(() => {
+      return {
+        stablecoin: {
+          name: "Stablecoins",
+          description: "Low volatility, USD-pegged assets",
+          tokens: allTokens.filter((t) => t.category === "stablecoin"),
+        },
+        crypto: {
+          name: "Cryptocurrencies",
+          description: "Major blockchain native tokens",
+          tokens: allTokens.filter((t) => t.category === "crypto"),
+        },
+        defi: {
+          name: "DeFi Tokens",
+          description: "Decentralized finance protocol tokens",
+          tokens: allTokens.filter((t) => t.category === "defi"),
+        },
+        domain: {
+          name: "Domain Tokens",
+          description: "Fractional ownership of premium domains (AI-priced)",
+          tokens: allTokens.filter((t) => t.category === "domain"),
+        },
+      };
+    }, [allTokens]);
 
     // Expose refresh function to parent component
     // useImperativeHandle(
@@ -144,23 +189,45 @@ export const TokenSelector = forwardRef<TokenSelectorRef, TokenSelectorProps>(
             >
               {selectedToken ? (
                 <div className="flex items-center justify-between w-full">
-                  <div className="flex flex-col items-start">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">
-                        {selectedToken.symbol}
-                      </span>
-                      <Badge
-                        variant="secondary"
-                        className={`text-xs ${
-                          RISK_COLORS[selectedToken.volatilityTier]
-                        }`}
-                      >
-                        {selectedToken.volatilityTier}
-                      </Badge>
+                  <div className="flex items-center gap-3">
+                    {/* Selected Token Image */}
+                    <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/30 flex-shrink-0">
+                      {selectedToken.domainMetadata?.image ? (
+                        <img
+                          src={selectedToken.domainMetadata.image}
+                          alt={selectedToken.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                            e.currentTarget.parentElement!.innerHTML = `<div class="w-full h-full bg-gradient-to-br from-cyan-500/20 to-primary/20 flex items-center justify-center"><span class="text-sm font-bold">${selectedToken.symbol[0]}</span></div>`;
+                          }}
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-cyan-500/20 to-primary/20 flex items-center justify-center">
+                          <span className="text-sm font-bold">
+                            {selectedToken.symbol[0]}
+                          </span>
+                        </div>
+                      )}
                     </div>
-                    <span className="text-sm text-muted-foreground">
-                      {selectedToken.name}
-                    </span>
+                    <div className="flex flex-col items-start">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">
+                          {selectedToken.symbol}
+                        </span>
+                        <Badge
+                          variant="secondary"
+                          className={`text-xs ${
+                            RISK_COLORS[selectedToken.volatilityTier]
+                          }`}
+                        >
+                          {selectedToken.volatilityTier}
+                        </Badge>
+                      </div>
+                      <span className="text-sm text-muted-foreground">
+                        {selectedToken.name}
+                      </span>
+                    </div>
                   </div>
                   {/* {showBalance && userAddress && (
                     <div className="flex flex-col items-end">
@@ -248,10 +315,20 @@ export const TokenSelector = forwardRef<TokenSelectorRef, TokenSelectorProps>(
                       size="sm"
                       onClick={() => handleSelect(token)}
                       className={`
-                        transition-all duration-300 hover:scale-105
-                        ${selectedToken?.address === token.address ? "border-primary bg-primary/10" : ""}
+                        transition-all duration-300 hover:scale-105 flex items-center gap-2
+                        ${selectedToken?.address === token.address ? "border-cyan-500 bg-cyan-500/10" : ""}
                       `}
                     >
+                      {token.domainMetadata?.image && (
+                        <img
+                          src={token.domainMetadata.image}
+                          alt={token.name}
+                          className="w-5 h-5 rounded-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                          }}
+                        />
+                      )}
                       {token.symbol}
                     </Button>
                   ))}
@@ -261,7 +338,22 @@ export const TokenSelector = forwardRef<TokenSelectorRef, TokenSelectorProps>(
 
             {/* Token List */}
             <div className="px-6 py-4 overflow-y-auto max-h-[50vh]">
-              {searchQuery && filteredTokens.length === 0 ? (
+              {domainTokensLoading ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-4 p-4 rounded-xl border border-border"
+                    >
+                      <Skeleton className="h-12 w-12 rounded-full" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-5 w-32" />
+                        <Skeleton className="h-4 w-48" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : searchQuery && filteredTokens.length === 0 ? (
                 <div className="py-12 text-center">
                   <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
                   <p className="text-muted-foreground">
@@ -278,7 +370,7 @@ export const TokenSelector = forwardRef<TokenSelectorRef, TokenSelectorProps>(
                 </div>
               ) : (
                 <div className="space-y-6">
-                  {Object.entries(TOKEN_CATEGORIES).map(
+                  {Object.entries(tokenCategories).map(
                     ([categoryKey, category]) => {
                       const categoryTokens = category.tokens.filter((token) => {
                         // Exclude tokens with zero address (unassigned placeholders)
@@ -323,36 +415,62 @@ export const TokenSelector = forwardRef<TokenSelectorRef, TokenSelectorProps>(
                             {categoryTokens.map((token) => {
                               const isSelected =
                                 selectedToken?.address === token.address;
+                              const hasOracle =
+                                token.hasDomaRankOracle === true;
+                              const isComingSoon =
+                                token.category === "domain" && !hasOracle;
+
                               return (
                                 <button
                                   key={token.address}
+                                  disabled={isComingSoon}
                                   className={`
                                     w-full flex items-center justify-between p-4 rounded-xl
                                     transition-all duration-300 group
-                                    hover:bg-gradient-to-r hover:from-primary/5 hover:to-accent/5
-                                    hover:luxury-shadow-sm hover:scale-[1.01]
-                                    ${isSelected ? "bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary/30" : "border-2 border-transparent"}
+                                    ${
+                                      isComingSoon
+                                        ? "opacity-60 cursor-not-allowed"
+                                        : "hover:bg-gradient-to-r hover:from-cyan-500/5 hover:to-primary/5 hover:luxury-shadow-sm hover:scale-[1.01]"
+                                    }
+                                    ${isSelected ? "bg-gradient-to-r from-cyan-500/10 to-primary/10 border-2 border-cyan-500/30" : "border-2 border-transparent"}
                                   `}
-                                  onClick={() => handleSelect(token)}
+                                  onClick={() =>
+                                    !isComingSoon && handleSelect(token)
+                                  }
                                 >
                                   <div className="flex items-start gap-4 flex-1">
-                                    {/* Token Icon Placeholder */}
+                                    {/* Token Icon/Image */}
                                     <div
                                       className={`
                                       w-12 h-12 rounded-full flex items-center justify-center
-                                      bg-gradient-to-br from-primary/20 to-accent/20
+                                      overflow-hidden
                                       border-2 border-primary/30
                                       group-hover:scale-110 transition-transform duration-300
+                                      ${!token.domainMetadata?.image ? "bg-gradient-to-br from-cyan-500/20 to-primary/20" : ""}
                                     `}
                                     >
-                                      <span className="text-xl font-bold text-foreground">
-                                        {token.symbol[0]}
-                                      </span>
+                                      {token.domainMetadata?.image ? (
+                                        <img
+                                          src={token.domainMetadata.image}
+                                          alt={token.name}
+                                          className="w-full h-full object-cover"
+                                          onError={(e) => {
+                                            // Fallback to letter if image fails to load
+                                            e.currentTarget.style.display =
+                                              "none";
+                                            e.currentTarget.parentElement!.innerHTML = `<span class="text-xl font-bold text-foreground">${token.symbol[0]}</span>`;
+                                          }}
+                                        />
+                                      ) : (
+                                        <span className="text-xl font-bold text-foreground">
+                                          {token.symbol[0]}
+                                        </span>
+                                      )}
                                     </div>
 
                                     {/* Token Info */}
                                     <div className="flex flex-col items-start flex-1">
-                                      <div className="flex items-center gap-2 mb-1">
+                                      <div className="flex items-center gap-2 mb-1 flex-wrap">
                                         <span className="font-semibold text-lg text-foreground">
                                           {token.symbol}
                                         </span>
@@ -364,6 +482,12 @@ export const TokenSelector = forwardRef<TokenSelectorRef, TokenSelectorProps>(
                                         >
                                           {token.volatilityTier}
                                         </Badge>
+                                        {isComingSoon && (
+                                          <Badge className="text-xs bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20">
+                                            <Clock className="h-3 w-3 mr-1" />
+                                            Coming Soon
+                                          </Badge>
+                                        )}
                                       </div>
                                       <span className="text-sm text-muted-foreground mb-2">
                                         {token.name}
