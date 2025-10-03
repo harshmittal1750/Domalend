@@ -432,7 +432,7 @@ indexer.on("loanCreated", (loan) => {
 
 ### 📹 **Video Demo** (5-minute walkthrough)
 
-[Watch on YouTube](https://youtu.be/YOUR_DEMO_VIDEO)
+[Watch on YouTube](https://youtu.be/viIFgxnhWlo)
 
 **Demonstrates:**
 
@@ -497,7 +497,7 @@ indexer.on("loanCreated", (loan) => {
 ```bash
 # Clone repository
 git clone https://github.com/harshmittal1750/Domalend.git
-cd catalex
+cd domalend
 
 # Install dependencies
 npm install
@@ -590,8 +590,8 @@ ORACLE_UPDATER_PRIVATE_KEY=0x...
 
 - **Live App:** [https://domalend.vercel.app/](https://domalend.vercel.app/)
 - **Twitter:** [@DomaLendFi](https://twitter.com/DomaLendFi) (active updates during hackathon)
-- **GitHub:** [https://github.com/yourusername/catalex](https://github.com/yourusername/catalex)
-- **Demo Video:** [YouTube Link](https://youtu.be/YOUR_VIDEO)
+- **GitHub:** [https://github.com/harshmital1750/domalend](https://github.com/harshmital1750/domalend)
+- **Demo Video:** [YouTube Link](https://youtu.be/viIFgxnhWlo)
 - **Documentation:** [Full Docs](./backend/README.md)
 - **DomaRank Page:** [https://domalend.vercel.app//domarank](https://domalend.vercel.app//domarank)
 
