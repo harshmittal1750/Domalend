@@ -165,7 +165,7 @@ const faqs = [
       {
         question: "How do I contact support?",
         answer:
-          "For support, you can reach us through our Discord community, send an email to harsh@catalex.finance, or use the help chat feature on our website.",
+          "For support, you can reach us through our Discord community, send an email to harshmittal.dev@gmail.com, or use the help chat feature on our website.",
       },
       {
         question: "Can I use DomaLend on mobile?",
@@ -246,7 +246,7 @@ export default function FAQ() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="mailto:harsh@catalex.finance"
+              href="mailto:harshmittal.dev@gmail.com"
               className="inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
             >
               Contact Support

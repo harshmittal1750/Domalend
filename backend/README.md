@@ -1,4 +1,4 @@
-# CataLex Backend Service
+# DomaLend Backend Service
 
 Backend service for collecting Doma fractional token data and updating the DomaRank oracle on-chain with AI-powered valuations.
 

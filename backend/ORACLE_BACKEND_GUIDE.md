@@ -514,7 +514,7 @@ After=network.target
 [Service]
 Type=simple
 User=ubuntu
-WorkingDirectory=/home/ubuntu/catalex/backend
+WorkingDirectory=/home/ubuntu/DomaLend/backend
 ExecStart=/usr/bin/node src/oracle-backend.js
 Restart=always
 RestartSec=10

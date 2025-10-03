@@ -9,11 +9,11 @@ if (!projectId) {
 
 // Set up metadata
 const metadata = {
-  name: "Catalex Finance",
+  name: "DomaLend Finance",
   description:
-    "Catalex Finance a secure , smart and permission less  way to lend/borrow",
-  url: "https://www.catalex.finance", // origin must match your domain & subdomain
-  icons: ["https://www.catalex.finance/logo.png"],
+    "DomaLend Finance a secure , smart and permission less  way to lend/borrow",
+  url: "https://domalend.vercel.app/",
+  icons: ["https://domalend.vercel.app/logo.png"],
 };
 
 // Create the modal

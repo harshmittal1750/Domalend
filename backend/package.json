@@ -1,5 +1,5 @@
 {
-    "name": "catalex-backend",
+    "name": "DomaLend-backend",
     "version": "1.0.0",
     "description": "Backend service for DomaRank oracle data collection and price updates",
     "main": "src/index.js",
