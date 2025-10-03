@@ -23,24 +23,24 @@ const faqs = [
     icon: HelpCircle,
     questions: [
       {
-        question: "What is DomaLend Finance?",
+        question: "What is DomaLend?",
         answer:
-          "DomaLend Finance is a peer-to-peer (P2P) cryptocurrency lending platform built on Doma. It allows users to lend their crypto assets to earn interest or borrow crypto by providing collateral, all through secure smart contracts.",
+          "DomaLend is the world's first lending protocol that accepts fractionalized Doma domain tokens as collateral. Built on Doma Testnet, it uses an AI-powered DomaRank Oracle to intelligently value domain tokens, enabling users to unlock liquidity from their premium domain holdings.",
       },
       {
         question: "How do I get started with DomaLend?",
         answer:
-          "To get started, simply connect your Web3 wallet (like MetaMask) to our platform. Once connected, you can browse loan offers to borrow crypto or create your own loan offers to start lending and earning interest.",
+          "First, bridge Sepolia ETH to Doma Testnet using the Doma Bridge. Then, buy fractionalized domain tokens on Mizu DEX (like software.ai or crypto.ai tokens). Finally, connect your wallet to DomaLend to create loan offers or use your domain tokens as collateral to borrow stablecoins.",
+      },
+      {
+        question: "What are fractionalized domain tokens?",
+        answer:
+          "Fractionalized domain tokens are ERC20 tokens representing fractional ownership of premium Doma domains. For example, if 'software.ai' is fractionalized into 1 million tokens, owning 10,000 tokens means you own 1% of that domain. These tokens can be traded on Mizu DEX and used as collateral on DomaLend.",
       },
       {
         question: "What wallets are supported?",
         answer:
-          "DomaLend supports all major Web3 wallets including MetaMask, WalletConnect, Coinbase Wallet, and any wallet compatible with WalletConnect protocol.",
-      },
-      {
-        question: "Do I need to create an account?",
-        answer:
-          "No, you don't need to create a traditional account. DomaLend is fully decentralized - you just need to connect your Web3 wallet to start using the platform.",
+          "DomaLend supports all major Web3 wallets including MetaMask, WalletConnect, Coinbase Wallet, and any wallet compatible with the WalletConnect protocol. Make sure to connect to Doma Testnet (Chain ID: 97476).",
       },
     ],
   },
@@ -51,126 +51,126 @@ const faqs = [
       {
         question: "How much interest can I earn by lending?",
         answer:
-          "Interest rates on DomaLend are market-driven and can vary based on supply and demand. Lenders typically earn between 5-15% APY, depending on the loan terms, duration, and market conditions.",
+          "Interest rates on DomaLend are set by lenders when creating loan offers, typically ranging from 5-25% APY. You have full control over your loan terms including interest rate, duration, and accepted collateral types. Higher rates may attract borrowers with premium domain tokens.",
       },
       {
         question: "What tokens can I lend?",
         answer:
-          "DomaLend supports a variety of popular cryptocurrencies including stablecoins (USDC, USDT), major tokens (WETH, WBTC), and other selected ERC-20 tokens. The supported token list is regularly updated based on market demand and security assessments.",
+          "You can lend stablecoins (USDC, USDT, DAI) and other ERC-20 tokens on Doma Testnet. Borrowers can use fractionalized domain tokens (like software.ai, crypto.ai) or standard crypto assets as collateral. Our DomaRank Oracle ensures fair valuations for domain tokens.",
       },
       {
         question: "How do I create a loan offer?",
         answer:
-          "To create a loan offer, go to the 'Create' page, specify your loan terms (amount, interest rate, duration), choose accepted collateral types, and submit your offer. Your offer will appear in the marketplace for borrowers to accept.",
+          "Go to the 'Create Loan Offer' page, specify your lending token and amount, set your interest rate and duration, choose which collateral tokens you'll accept (domain tokens and/or standard tokens), and submit. Your offer appears in the marketplace immediately.",
       },
       {
-        question: "Can I cancel my loan offer?",
+        question: "What is DomaRank and how does it protect me?",
         answer:
-          "Yes, you can cancel your loan offer anytime before it's accepted by a borrower. Once a borrower accepts your offer and provides collateral, the loan becomes active and cannot be cancelled.",
+          "DomaRank is our AI-powered oracle that values domain tokens using 6+ metrics: domain age, TLD quality (.ai, .com score higher), keyword value (crypto, defi, nft), length, social presence, and market liquidity. This ensures you're protected by accurately valued collateral.",
       },
     ],
   },
   {
-    category: "Borrowing",
+    category: "Borrowing with Domain Tokens",
     icon: Zap,
     questions: [
       {
-        question: "How do crypto loans work on DomaLend?",
+        question: "How can I borrow using my domain tokens?",
         answer:
-          "Crypto loans on DomaLend are collateralized, meaning you must deposit crypto assets as collateral to secure your loan. The collateral value must exceed the loan value by a certain ratio to protect lenders.",
+          "If you own fractionalized domain tokens (purchased from Mizu DEX), browse loan offers on DomaLend, select one that accepts your domain token as collateral, lock your tokens, and receive stablecoins instantly. Your domain tokens are valued using our DomaRank AI Oracle.",
       },
       {
-        question: "What can I use as collateral?",
+        question: "What domain tokens are accepted as collateral?",
         answer:
-          "You can use various cryptocurrencies as collateral, including WETH, WBTC, and other approved tokens. The platform uses real-time oracle pricing to determine fair collateral values.",
+          "Any fractionalized domain token from Doma Protocol can be used as collateral. Premium domains with high-value TLDs (.ai, .com, .io), short names, and strong keywords (crypto, nft, defi, web3) receive higher DomaRank scores and better loan-to-value ratios.",
       },
       {
-        question: "What happens if I can't repay my loan?",
+        question: "How is my domain token valued?",
         answer:
-          "If you fail to repay your loan by the deadline, your collateral will be liquidated to repay the lender. The liquidation process is automated and handled by smart contracts to ensure fairness.",
+          "Our DomaRank Oracle analyzes your domain token using AI: TLD premium scoring (.ai/.com get 100 points), keyword analysis (crypto terms valued higher), domain age (older = better), length (shorter = better), social links, and market liquidity on Mizu DEX. Prices update every 10 minutes.",
       },
       {
-        question: "Can I repay my loan early?",
+        question: "Can I add more collateral or repay partially?",
         answer:
-          "Yes, you can repay your loan at any time before the deadline. Early repayment will save you interest costs, and you'll immediately regain access to your collateral.",
+          "Yes! You can add more domain tokens or other approved collateral to improve your loan health ratio. You can also make partial repayments at any time to reduce your debt and improve your collateral position, preventing liquidation.",
       },
     ],
   },
   {
-    category: "Security & Safety",
+    category: "DomaRank Oracle & Pricing",
     icon: Shield,
     questions: [
       {
-        question: "How secure is DomaLend Finance?",
+        question: "What makes DomaRank Oracle special?",
         answer:
-          "DomaLend prioritizes security with multi-signature wallets, audited smart contracts, and institutional-grade security protocols. All funds are secured by smart contracts, and we never have custody of your assets.",
+          "DomaRank is the world's first AI-powered oracle specifically designed for domain token valuation. Unlike generic price feeds, it analyzes domain-specific metrics like TLD quality, keyword relevance, domain age, and social presence to provide accurate, risk-adjusted valuations for fractionalized domain tokens.",
       },
       {
-        question: "Are smart contracts audited?",
+        question: "How often are domain token prices updated?",
         answer:
-          "Yes, all DomaLend smart contracts undergo rigorous security audits by reputable firms. We also implement additional security measures like time-locks and multi-signature requirements for critical functions.",
+          "Our backend oracle updates DomaRank prices every 10 minutes by fetching real-time market data from Mizu DEX and Doma's GraphQL subgraph. The system also triggers instant updates when new loans are created with domain token collateral, ensuring you always have fresh pricing.",
       },
       {
-        question: "What happens if there's a smart contract bug?",
+        question: "Can I trust the DomaRank valuations?",
         answer:
-          "While our contracts are thoroughly audited, we maintain insurance funds and emergency procedures to protect users in the unlikely event of a critical bug. We also have a bug bounty program to incentivize security researchers.",
+          "Yes! DomaRank uses conservative, risk-adjusted scoring to protect lenders. We apply safety margins (80-90% LTV ratios) and multi-factor analysis. For standard tokens, we use battle-tested Chainlink/DIA oracles. Domain token valuations combine AI analysis with real Mizu DEX market prices.",
       },
       {
-        question: "How are prices determined for liquidations?",
+        question: "What is the Custom Event Indexer?",
         answer:
-          "DomaLend uses Chainlink price oracles to get real-time, accurate market prices for all supported tokens. This ensures fair and transparent pricing for collateral valuations and liquidations.",
+          "DomaLend built a custom high-performance indexer that tracks blockchain events in real-time (5-second polling), providing 95% faster updates than The Graph Protocol. This powers our real-time loan dashboard and instant oracle price updates when loans are created.",
       },
     ],
   },
   {
-    category: "Fees & Costs",
+    category: "Doma Ecosystem Integration",
     icon: Clock,
     questions: [
       {
-        question: "What fees does DomaLend charge?",
+        question: "How do I get testnet ETH for gas fees?",
         answer:
-          "DomaLend charges a small platform fee (typically 0.5-1%) on successful loans to maintain and improve the platform. All fees are clearly displayed before you confirm any transaction.",
+          "Get Sepolia ETH from any faucet (like Alchemy or Infura), then use the Doma Bridge (bridge-testnet.doma.xyz) to bridge it to Doma Testnet. Gas fees on Doma are extremely low - a few cents per transaction - so 0.1 ETH will last you hundreds of transactions.",
       },
       {
-        question: "Are there any hidden fees?",
+        question: "Where can I buy domain tokens?",
         answer:
-          "No, DomaLend believes in complete transparency. All fees, including platform fees and network gas costs, are clearly displayed before you confirm any transaction.",
+          "Visit Mizu DEX (mizu-testnet.doma.xyz) - Doma's official DeFi marketplace for fractionalized domain tokens. You can browse premium domains like software.ai, crypto.ai, nft.io and buy fractional shares using your Doma testnet ETH.",
       },
       {
-        question: "How much are gas fees?",
+        question: "Can I see my domain token metadata?",
         answer:
-          "Gas fees depend on network congestion and are paid to the blockchain network, not DomaLend. Built on Doma, our platform offers significantly lower gas fees compared to Ethereum mainnet.",
+          "Yes! DomaLend integrates deeply with Doma's Subgraph to display rich metadata for domain tokens: domain images, Twitter links, website URLs, fractionalization date, total supply, and current Mizu DEX prices. All visible in our loan offer interface.",
       },
       {
-        question: "Do I pay fees for cancelled offers?",
+        question: "What happens when my loan is liquidated?",
         answer:
-          "You only pay the network gas fee for creating an offer. If you cancel an offer that hasn't been accepted, you won't pay any platform fees - only the gas cost for the cancellation transaction.",
+          "If your collateral value drops below the liquidation threshold and you don't add more collateral or make a partial repayment, the smart contract automatically transfers your locked domain tokens to the lender. This protects lenders from losses while ensuring fairness.",
       },
     ],
   },
   {
-    category: "Troubleshooting",
+    category: "Technical & Troubleshooting",
     icon: AlertTriangle,
     questions: [
       {
-        question: "My transaction is stuck or pending. What should I do?",
+        question: "What blockchain network does DomaLend use?",
         answer:
-          "If your transaction is pending for a long time, it might be due to network congestion or low gas fees. You can try speeding up the transaction in your wallet or wait for network conditions to improve.",
+          "DomaLend is deployed on Doma Testnet (Chain ID: 97476, RPC: https://rpc-testnet.doma.xyz). Make sure your wallet is connected to this network. You can add it manually or DomaLend will prompt you to switch networks when you connect your wallet.",
       },
       {
-        question: "I can't see my loan or transaction. Where is it?",
+        question: "Where can I verify the smart contracts?",
         answer:
-          "Check the 'My Loans' page to see all your active loans and transaction history. If you still can't find it, verify that you're connected with the correct wallet address.",
+          "Our smart contracts are deployed and verified on Doma Testnet Explorer (explorer-testnet.doma.xyz). DomaLend contract: 0x55c351F83F9Ad1bCE69a4A2A655BB55E48E67a40, DomaRankOracle: 0x4EB31C15D33FaC33A1C68aE3b7f8Ce40e2e65F1C. All code is open-source on GitHub.",
+      },
+      {
+        question: "I can't see my loan or transaction. What should I do?",
+        answer:
+          "Check the 'My Loans' page to see all your active loans. Verify you're connected to Doma Testnet (Chain ID: 97476) with the correct wallet address. You can also check transactions on Doma Testnet Explorer using your wallet address or transaction hash.",
       },
       {
         question: "How do I contact support?",
         answer:
-          "For support, you can reach us through our Discord community, send an email to harshmittal.dev@gmail.com, or use the help chat feature on our website.",
-      },
-      {
-        question: "Can I use DomaLend on mobile?",
-        answer:
-          "Yes, DomaLend is fully responsive and works on mobile devices. You can use it through mobile Web3 browsers or wallet apps like MetaMask mobile.",
+          "For support, email harshmittal.dev@gmail.com or reach out on Twitter @DomaLendFi. You can also open an issue on our GitHub repository. We typically respond within 24 hours.",
       },
     ],
   },
@@ -196,9 +196,10 @@ export default function FAQ() {
             Frequently Asked Questions
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Find answers to common questions about DomaLend &apos; s P2P crypto
-            lending platform. Learn about lending, borrowing, security, fees,
-            and more.
+            Everything you need to know about DomaLend - the world&apos;s first
+            lending protocol for fractionalized domain tokens. Learn about
+            DomaRank AI Oracle, domain token collateral, Doma ecosystem, and
+            more.
           </p>
         </section>
 
@@ -241,8 +242,8 @@ export default function FAQ() {
             Still have questions?
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Can &apos;t find the answer you &apos;re looking for? Our support
-            team is here to help you get the most out of DomaLend Finance.
+            Can&apos;t find the answer you&apos;re looking for? Our support team
+            is here to help you unlock liquidity from your domain tokens.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
@@ -252,12 +253,12 @@ export default function FAQ() {
               Contact Support
             </a>
             <a
-              href="https://x.com/dreamlendfi"
+              href="https://twitter.com/DomaLendFi"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center px-6 py-3 border border-border rounded-lg hover:bg-accent transition-colors"
             >
-              Contact on X (Twitter)
+              Follow on X (Twitter)
             </a>
           </div>
         </section>

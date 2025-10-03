@@ -22,15 +22,18 @@ import {
   Wallet,
   FileText,
   Clock,
+  Brain,
+  Globe,
+  Sparkles,
 } from "lucide-react";
 
 export default function HowItWorks() {
   const lendingSteps = [
     {
       step: 1,
-      title: "Connect Your Wallet",
+      title: "Get Testnet ETH",
       description:
-        "Connect your Web3 wallet to DomaLend Finance. We support MetaMask, WalletConnect, and other popular wallets.",
+        "Bridge Sepolia ETH to Doma Testnet using the Doma Bridge for ultra-low gas fees.",
       icon: Wallet,
       color: "text-blue-500",
     },
@@ -38,7 +41,7 @@ export default function HowItWorks() {
       step: 2,
       title: "Create Loan Offer",
       description:
-        "Set your lending terms: loan amount, interest rate, duration, and accepted collateral tokens.",
+        "Set your terms: lending amount, interest rate (5-25% APY), duration, and which collateral tokens you'll accept (domain tokens or standard tokens).",
       icon: FileText,
       color: "text-green-500",
     },
@@ -46,7 +49,7 @@ export default function HowItWorks() {
       step: 3,
       title: "Wait for Borrowers",
       description:
-        "Your loan offer appears in the marketplace. Borrowers can accept your terms and provide collateral.",
+        "Your offer appears in the marketplace. Borrowers with domain tokens can accept your terms, and DomaRank Oracle automatically values their collateral.",
       icon: Users,
       color: "text-purple-500",
     },
@@ -54,7 +57,7 @@ export default function HowItWorks() {
       step: 4,
       title: "Earn Interest",
       description:
-        "Once accepted, your loan starts earning interest automatically. Track your earnings in real-time.",
+        "Earn competitive interest as borrowers repay. If liquidated, you receive valuable domain tokens worth more than your loan.",
       icon: TrendingUp,
       color: "text-primary",
     },
@@ -63,25 +66,25 @@ export default function HowItWorks() {
   const borrowingSteps = [
     {
       step: 1,
-      title: "Browse Loan Offers",
+      title: "Buy Domain Tokens",
       description:
-        "Explore available loan offers with competitive rates and terms that match your needs.",
-      icon: Users,
+        "Visit Mizu DEX to purchase fractionalized tokens of premium domains like software.ai, crypto.ai, or nft.io.",
+      icon: Globe,
       color: "text-blue-500",
     },
     {
       step: 2,
-      title: "Provide Collateral",
+      title: "Browse Loan Offers",
       description:
-        "Deposit collateral tokens to secure your loan. Our system ensures fair collateral ratios.",
-      icon: Shield,
+        "Find loan offers that accept your domain tokens as collateral. Our DomaRank AI Oracle values your tokens in real-time.",
+      icon: Brain,
       color: "text-green-500",
     },
     {
       step: 3,
-      title: "Receive Loan",
+      title: "Lock Collateral & Borrow",
       description:
-        "Get your loan tokens instantly after collateral confirmation. Funds are available immediately.",
+        "Lock your domain tokens as collateral and receive stablecoins instantly. Your tokens are secured by smart contracts.",
       icon: Zap,
       color: "text-purple-500",
     },
@@ -89,7 +92,7 @@ export default function HowItWorks() {
       step: 4,
       title: "Repay & Reclaim",
       description:
-        "Repay your loan plus interest before the deadline to reclaim your collateral tokens.",
+        "Repay your loan to unlock your domain tokens. You can also add collateral or make partial repayments anytime.",
       icon: CheckCircle,
       color: "text-primary",
     },
@@ -97,39 +100,39 @@ export default function HowItWorks() {
 
   const features = [
     {
-      title: "Institutional-Grade Security",
+      title: "DomaRank AI Oracle",
       description:
-        "Multi-signature wallets, smart contract audits, and advanced security protocols protect your assets.",
-      icon: Shield,
+        "World's first AI-powered oracle designed specifically for domain token valuation. Analyzes TLD quality, keywords, age, social presence, and market liquidity.",
+      icon: Brain,
     },
     {
-      title: "Automated Liquidation Protection",
+      title: "Fractionalized Domain Collateral",
       description:
-        "Smart contracts automatically manage liquidations to protect both lenders and borrowers.",
-      icon: AlertTriangle,
+        "Use premium domain tokens from Doma Protocol as collateral. Trade domains like software.ai on Mizu DEX, then borrow against your position.",
+      icon: Globe,
     },
     {
-      title: "Real-Time Oracle Pricing",
+      title: "Real-Time Price Updates",
       description:
-        "Fair market pricing powered by Chainlink oracles ensures accurate collateral valuations.",
+        "Oracle prices update every 10 minutes from live Mizu DEX data and Doma's GraphQL Subgraph. Custom event indexer triggers instant updates on new loans.",
       icon: TrendingUp,
     },
     {
-      title: "Flexible Terms",
+      title: "Dual Oracle System",
       description:
-        "Choose from various loan durations, interest rates, and collateral options to suit your needs.",
-      icon: Clock,
+        "DomaRank Oracle for domain tokens + Chainlink/DIA oracles for standard tokens. Best-in-class pricing for all collateral types.",
+      icon: Sparkles,
     },
     {
-      title: "Transparent Fees",
+      title: "Rich Domain Metadata",
       description:
-        "No hidden fees. All costs are clearly displayed before you commit to any transaction.",
+        "Deep Doma Subgraph integration displays domain images, Twitter links, websites, fractionalization dates, and total supply for every token.",
       icon: FileText,
     },
     {
-      title: "Instant Settlement",
+      title: "Lightning Fast Indexing",
       description:
-        "Built on Doma for fast, low-cost transactions with instant finality.",
+        "Custom event indexer with 5-second polling delivers 95% faster updates than The Graph Protocol. Real-time loan dashboard and instant notifications.",
       icon: Zap,
     },
   ];
@@ -146,9 +149,10 @@ export default function HowItWorks() {
             How DomaLend Works
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Learn how to lend, borrow, and earn with DomaLend Finance - the most
-            secure P2P crypto lending platform. Follow our step-by-step guide to
-            start earning up to 15% APY on your digital assets.
+            The world&apos;s first lending protocol for fractionalized domain
+            tokens. Learn how to unlock liquidity from premium Doma domains
+            using our revolutionary DomaRank AI Oracle for intelligent, fair
+            valuations.
           </p>
         </section>
 
@@ -156,11 +160,11 @@ export default function HowItWorks() {
         <section className="space-y-8">
           <div className="text-center space-y-4">
             <h2 className="text-3xl md:text-4xl font-bold">
-              How to Lend & Earn Interest
+              For Lenders: Earn Interest on Your Crypto
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Start earning passive income on your crypto assets in just 4
-              simple steps
+              Lend stablecoins secured by fractionalized domain tokens and earn
+              competitive interest rates
             </p>
           </div>
 
@@ -202,11 +206,11 @@ export default function HowItWorks() {
         <section className="space-y-8">
           <div className="text-center space-y-4">
             <h2 className="text-3xl md:text-4xl font-bold">
-              How to Borrow Crypto
+              For Borrowers: Unlock Liquidity from Domain Tokens
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Get instant access to crypto loans using your digital assets as
-              collateral
+              Use your fractionalized Doma domain tokens as collateral to borrow
+              stablecoins instantly
             </p>
           </div>
 
@@ -248,11 +252,11 @@ export default function HowItWorks() {
         <section className="space-y-8">
           <div className="text-center space-y-4">
             <h2 className="text-3xl md:text-4xl font-bold">
-              Why Choose DomaLend Finance
+              Revolutionary Features Powered by Doma
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Advanced features and security measures that make DomaLend the
-              premier P2P crypto lending platform
+              First-of-its-kind technology combining AI-powered domain valuation
+              with deep Doma Protocol integration
             </p>
           </div>
 
@@ -281,21 +285,25 @@ export default function HowItWorks() {
         {/* CTA Section */}
         <section className="text-center space-y-6 py-12 bg-gradient-to-r from-primary/5 to-primary/10 rounded-2xl">
           <h2 className="text-3xl md:text-4xl font-bold">
-            Ready to Get Started?
+            Ready to Unlock Your Domain&apos;s Value?
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Join thousands of users who are already earning and borrowing on
-            DomaLend Finance
+            Join the revolution in domain-backed DeFi. Start lending or borrow
+            against your premium domain tokens today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="px-8">
-              <Link href="/create">
-                Start Lending
+              <Link href="/domarank">
+                <Brain className="mr-2 h-4 w-4" />
+                Explore DomaRank AI
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="px-8">
-              <Link href="/offers">Browse Loans</Link>
+              <Link href="/offers">
+                <Globe className="mr-2 h-4 w-4" />
+                Browse Loans
+              </Link>
             </Button>
           </div>
         </section>
