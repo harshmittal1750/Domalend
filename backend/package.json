@@ -12,7 +12,12 @@
         "oracle": "node src/oracle-backend.js",
         "oracle:dev": "nodemon src/oracle-backend.js",
         "setup-mock-prices": "node src/setup-mock-prices.js",
-        "verify-deployment": "node verify-deployment.js"
+        "verify-deployment": "node verify-deployment.js",
+        "crypto-oracle:test": "node test-crypto-oracle.js",
+        "crypto-oracle:start": "node src/cryptoPriceOracle.js",
+        "crypto-oracle:pm2": "pm2 start src/cryptoPriceOracle.js --name crypto-oracle",
+        "crypto-oracle:stop": "pm2 stop crypto-oracle",
+        "crypto-oracle:logs": "pm2 logs crypto-oracle"
     },
     "keywords": [
         "doma",

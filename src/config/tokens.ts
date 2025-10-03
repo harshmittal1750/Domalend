@@ -49,7 +49,7 @@ export const SUPPORTED_TOKENS: Record<string, TokenInfo> = {
     category: "stablecoin",
     volatilityTier: "stable",
     priceFeedAddress: "0x67d2C2a87A17b7267a6DBb1A59575C0E9A1D1c3e", // Placeholder - not active on Doma
-    hasDomaRankOracle: false,
+    hasDomaRankOracle: true, // Uses DomaRank Oracle with CoinGecko prices
   },
   MUSDC: {
     address: "0x87c20443Ba0480677842851CB27a5b1D38C91639",
@@ -60,40 +60,40 @@ export const SUPPORTED_TOKENS: Record<string, TokenInfo> = {
     category: "stablecoin",
     volatilityTier: "stable",
     priceFeedAddress: "0x235266D5ca6f19F134421C49834C108b32C2124e", // Placeholder - not active on Doma
-    hasDomaRankOracle: false,
+    hasDomaRankOracle: true, // Uses DomaRank Oracle with CoinGecko prices
   },
   MWBTC: {
     address: "0x02BFF1B39378aCCB20b8870863f30D48b4Dc1DE4",
     name: "Mock Wrapped Bitcoin",
     symbol: "MWBTC",
     decimals: 8,
-    description: "Mock tokenized Bitcoin for testing",
+    description: "Mock tokenized Bitcoin for testing (CoinGecko price feed)",
     category: "crypto",
     volatilityTier: "high",
     priceFeedAddress: "0x4803db1ca3A1DA49c3DB991e1c390321c20e1f21", // Placeholder - not active on Doma
-    hasDomaRankOracle: false,
+    hasDomaRankOracle: true, // Uses DomaRank Oracle with CoinGecko prices
   },
   MARB: {
     address: "0x6E1f4b629Ea42Db26E2970aEcE38A61BB50a029f",
     name: "Mock Arbitrum",
     symbol: "MARB",
     decimals: 18,
-    description: "Mock Arbitrum ecosystem token for testing",
+    description: "Mock Arbitrum ecosystem token (CoinGecko price feed)",
     category: "defi",
     volatilityTier: "moderate",
     priceFeedAddress: "0x74952812B6a9e4f826b2969C6D189c4425CBc19B", // Placeholder - not active on Doma
-    hasDomaRankOracle: false,
+    hasDomaRankOracle: true, // Uses DomaRank Oracle with CoinGecko prices
   },
   MSOL: {
     address: "0x457Ebd6E5ad62dF0fde31a1a144a9Ed1f1d2E38B",
     name: "Mock Solana",
     symbol: "MSOL",
     decimals: 18,
-    description: "Mock Solana blockchain native token for testing",
+    description: "Mock Solana blockchain native token (CoinGecko price feed)",
     category: "crypto",
     volatilityTier: "high",
     priceFeedAddress: "0xD5Ea6C434582F827303423dA21729bEa4F87D519", // Placeholder - not active on Doma
-    hasDomaRankOracle: false,
+    hasDomaRankOracle: true, // Uses DomaRank Oracle with CoinGecko prices
   },
   // ==================== DOMA FRACTIONAL DOMAIN TOKENS ====================
   // These are real fractional domain tokens from Doma protocol

@@ -822,271 +822,300 @@ export default function CreateLoanOfferPage() {
                   </Card>
 
                   {/* Real-time Collateral Calculator */}
-                  {collateralCalc &&
-                    selectedLoanToken &&
-                    selectedCollateralToken &&
-                    formData.amount && (
-                      <Card className="glass luxury-shadow-lg border-primary/20 gradient-bg">
-                        <CardHeader className="pb-3">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <CardTitle className="text-lg flex items-center">
-                                <div className="w-6 h-6 bg-primary/10 rounded-lg flex items-center justify-center mr-2">
-                                  <Info className="h-4 w-4 text-primary" />
-                                </div>
-                                Collateral Calculator
-                              </CardTitle>
-                              <CardDescription className="text-sm">
-                                Live oracle pricing • Auto-refreshes every 30s
-                              </CardDescription>
-                            </div>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={refreshPrices}
-                              disabled={calcLoading}
-                              className="flex items-center gap-1 btn-premium h-8 px-2"
-                            >
-                              <RefreshCw
-                                className={`h-3 w-3 ${
-                                  calcLoading ? "animate-spin" : ""
-                                }`}
-                              />
-                              <span className="text-xs">Refresh</span>
-                            </Button>
+                  {selectedLoanToken && selectedCollateralToken && (
+                    <Card className="glass luxury-shadow-lg border-primary/20 gradient-bg">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <CardTitle className="text-lg flex items-center">
+                              <div className="w-6 h-6 bg-primary/10 rounded-lg flex items-center justify-center mr-2">
+                                <Info className="h-4 w-4 text-primary" />
+                              </div>
+                              Collateral Calculator
+                            </CardTitle>
+                            <CardDescription className="text-sm">
+                              Live oracle pricing • Auto-refreshes every 30s
+                            </CardDescription>
                           </div>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          {/* Current Market Prices - Compact */}
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="bg-card/80 backdrop-blur-sm rounded-lg p-3 border border-border luxury-shadow">
-                              <div className="flex items-center gap-1 mb-1">
-                                <span className="text-xs font-medium text-foreground">
-                                  {selectedLoanToken.symbol}
-                                </span>
-                                <div
-                                  className={`w-1.5 h-1.5 rounded-full status-dot ${
-                                    prices.get(selectedLoanToken.address)
-                                      ?.isStale
-                                      ? "error"
-                                      : "success"
-                                  }`}
-                                />
-                              </div>
-                              <div className="text-lg font-bold text-primary">
-                                ${collateralCalc.priceImpact.loanTokenPriceUSD}
-                              </div>
-                            </div>
-
-                            <div className="bg-card/80 backdrop-blur-sm rounded-lg p-3 border border-border luxury-shadow">
-                              <div className="flex items-center gap-1 mb-1">
-                                <span className="text-xs font-medium text-foreground">
-                                  {selectedCollateralToken.symbol}
-                                </span>
-                                <div
-                                  className={`w-1.5 h-1.5 rounded-full status-dot ${
-                                    prices.get(selectedCollateralToken.address)
-                                      ?.isStale
-                                      ? "error"
-                                      : "success"
-                                  }`}
-                                />
-                              </div>
-                              <div className="text-lg font-bold text-primary">
-                                $
-                                {
-                                  collateralCalc.priceImpact
-                                    .collateralTokenPriceUSD
-                                }
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Exchange Rate - Compact */}
-                          <div className="bg-secondary/50 border border-secondary rounded-lg p-3 luxury-shadow">
-                            <div className="text-center">
-                              <div className="text-xs font-medium text-secondary-foreground mb-1">
-                                Exchange Rate
-                              </div>
-                              <div className="text-sm font-bold text-primary">
-                                1 {selectedLoanToken.symbol} ={" "}
-                                {collateralCalc.priceImpact.exchangeRate}{" "}
-                                {selectedCollateralToken.symbol}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Collateral Analysis - Compact */}
-                          <div
-                            className={`rounded-lg p-3 luxury-shadow transition-all duration-300 ${
-                              formData.collateralAmount &&
-                              parseFloat(formData.collateralAmount) > 0
-                                ? collateralCalc.isHealthy
-                                  ? "bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/30"
-                                  : "bg-gradient-to-r from-accent/30 to-destructive/20 border border-destructive/30"
-                                : "bg-gradient-to-r from-accent/20 to-muted/30 border border-muted-foreground/30"
-                            }`}
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={refreshPrices}
+                            disabled={calcLoading}
+                            className="flex items-center gap-1 btn-premium h-8 px-2"
                           >
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center gap-2">
-                                {formData.collateralAmount &&
-                                parseFloat(formData.collateralAmount) > 0 ? (
-                                  collateralCalc.isHealthy ? (
-                                    <>
-                                      <CheckCircle className="h-4 w-4 text-primary" />
-                                      <span className="text-sm font-semibold text-primary">
-                                        Well Secured
-                                      </span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <AlertTriangle className="h-4 w-4 text-destructive" />
-                                      <span className="text-sm font-semibold text-destructive-foreground">
-                                        Needs More
-                                      </span>
-                                    </>
-                                  )
-                                ) : (
-                                  <>
-                                    <Info className="h-4 w-4 text-muted-foreground" />
-                                    <span className="text-sm font-semibold text-foreground">
-                                      Requirements
-                                    </span>
-                                  </>
-                                )}
+                            <RefreshCw
+                              className={`h-3 w-3 ${
+                                calcLoading ? "animate-spin" : ""
+                              }`}
+                            />
+                            <span className="text-xs">Refresh</span>
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        {/* Show prompt if no loan amount yet */}
+                        {!formData.amount ? (
+                          <div className="py-8 text-center">
+                            <Info className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+                            <p className="text-muted-foreground font-medium mb-2">
+                              Enter a loan amount above
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              The collateral calculator will show requirements
+                              once you specify the loan amount
+                            </p>
+                          </div>
+                        ) : !collateralCalc ? (
+                          <div className="py-8 text-center">
+                            <Loader2 className="h-12 w-12 text-primary mx-auto mb-4 animate-spin" />
+                            <p className="text-muted-foreground font-medium mb-2">
+                              Loading pricing data...
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              Fetching real-time oracle prices and calculating
+                              collateral requirements
+                            </p>
+                          </div>
+                        ) : (
+                          <>
+                            {/* Current Market Prices - Compact */}
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="bg-card/80 backdrop-blur-sm rounded-lg p-3 border border-border luxury-shadow">
+                                <div className="flex items-center gap-1 mb-1">
+                                  <span className="text-xs font-medium text-foreground">
+                                    {selectedLoanToken.symbol}
+                                  </span>
+                                  <div
+                                    className={`w-1.5 h-1.5 rounded-full status-dot ${
+                                      prices.get(selectedLoanToken.address)
+                                        ?.isStale
+                                        ? "error"
+                                        : "success"
+                                    }`}
+                                  />
+                                </div>
+                                <div className="text-lg font-bold text-primary">
+                                  $
+                                  {collateralCalc.priceImpact.loanTokenPriceUSD}
+                                </div>
                               </div>
-                              <span
-                                className={`text-xs font-medium ${
-                                  formData.collateralAmount &&
-                                  parseFloat(formData.collateralAmount) > 0
-                                    ? collateralCalc.isHealthy
-                                      ? "text-primary"
-                                      : "text-destructive"
-                                    : "text-muted-foreground"
-                                }`}
-                              >
-                                {collateralCalc.minRatio}% Min
-                              </span>
-                            </div>
 
-                            <div className="space-y-2">
-                              <div>
-                                <div className="text-xs text-muted-foreground mb-1">
-                                  Minimum Required for {formData.amount}{" "}
-                                  {selectedLoanToken.symbol}
+                              <div className="bg-card/80 backdrop-blur-sm rounded-lg p-3 border border-border luxury-shadow">
+                                <div className="flex items-center gap-1 mb-1">
+                                  <span className="text-xs font-medium text-foreground">
+                                    {selectedCollateralToken.symbol}
+                                  </span>
+                                  <div
+                                    className={`w-1.5 h-1.5 rounded-full status-dot ${
+                                      prices.get(
+                                        selectedCollateralToken.address
+                                      )?.isStale
+                                        ? "error"
+                                        : "success"
+                                    }`}
+                                  />
                                 </div>
-                                <div
-                                  className={`text-lg font-bold ${
-                                    formData.collateralAmount &&
-                                    parseFloat(formData.collateralAmount) > 0 &&
-                                    collateralCalc.isHealthy
-                                      ? "text-primary"
-                                      : "text-destructive"
-                                  }`}
-                                >
-                                  {collateralCalc.minCollateralAmount}{" "}
-                                  {selectedCollateralToken.symbol}
-                                </div>
-                                <div className="text-xs text-muted-foreground">
-                                  ≈{" "}
+                                <div className="text-lg font-bold text-primary">
+                                  $
                                   {
                                     collateralCalc.priceImpact
-                                      .minCollateralValueUSD
+                                      .collateralTokenPriceUSD
                                   }
                                 </div>
                               </div>
+                            </div>
 
-                              {formData.collateralAmount &&
-                                parseFloat(formData.collateralAmount) > 0 && (
-                                  <div className="pt-2 border-t border-border/50">
-                                    <div className="flex items-center justify-between">
-                                      <span className="text-xs text-muted-foreground">
-                                        Your Amount:
-                                      </span>
-                                      <div className="flex items-center gap-2">
-                                        <div
-                                          className={`w-1.5 h-1.5 rounded-full status-dot ${
-                                            collateralCalc.isHealthy
-                                              ? "success"
-                                              : "error"
-                                          }`}
-                                        />
-                                        <span
-                                          className={`text-sm font-medium ${
-                                            collateralCalc.isHealthy
-                                              ? "text-primary"
-                                              : "text-destructive"
-                                          }`}
-                                        >
-                                          {collateralCalc.currentRatio}%
+                            {/* Exchange Rate - Compact */}
+                            <div className="bg-secondary/50 border border-secondary rounded-lg p-3 luxury-shadow">
+                              <div className="text-center">
+                                <div className="text-xs font-medium text-secondary-foreground mb-1">
+                                  Exchange Rate
+                                </div>
+                                <div className="text-sm font-bold text-primary">
+                                  1 {selectedLoanToken.symbol} ={" "}
+                                  {collateralCalc.priceImpact.exchangeRate}{" "}
+                                  {selectedCollateralToken.symbol}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Collateral Analysis - Compact */}
+                            <div
+                              className={`rounded-lg p-3 luxury-shadow transition-all duration-300 ${
+                                formData.collateralAmount &&
+                                parseFloat(formData.collateralAmount) > 0
+                                  ? collateralCalc.isHealthy
+                                    ? "bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/30"
+                                    : "bg-gradient-to-r from-accent/30 to-destructive/20 border border-destructive/30"
+                                  : "bg-gradient-to-r from-accent/20 to-muted/30 border border-muted-foreground/30"
+                              }`}
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                  {formData.collateralAmount &&
+                                  parseFloat(formData.collateralAmount) > 0 ? (
+                                    collateralCalc.isHealthy ? (
+                                      <>
+                                        <CheckCircle className="h-4 w-4 text-primary" />
+                                        <span className="text-sm font-semibold text-primary">
+                                          Well Secured
                                         </span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <AlertTriangle className="h-4 w-4 text-destructive" />
+                                        <span className="text-sm font-semibold text-destructive-foreground">
+                                          Needs More
+                                        </span>
+                                      </>
+                                    )
+                                  ) : (
+                                    <>
+                                      <Info className="h-4 w-4 text-muted-foreground" />
+                                      <span className="text-sm font-semibold text-foreground">
+                                        Requirements
+                                      </span>
+                                    </>
+                                  )}
+                                </div>
+                                <span
+                                  className={`text-xs font-medium ${
+                                    formData.collateralAmount &&
+                                    parseFloat(formData.collateralAmount) > 0
+                                      ? collateralCalc.isHealthy
+                                        ? "text-primary"
+                                        : "text-destructive"
+                                      : "text-muted-foreground"
+                                  }`}
+                                >
+                                  {collateralCalc.minRatio}% Min
+                                </span>
+                              </div>
+
+                              <div className="space-y-2">
+                                <div>
+                                  <div className="text-xs text-muted-foreground mb-1">
+                                    Minimum Required for {formData.amount}{" "}
+                                    {selectedLoanToken.symbol}
+                                  </div>
+                                  <div
+                                    className={`text-lg font-bold ${
+                                      formData.collateralAmount &&
+                                      parseFloat(formData.collateralAmount) >
+                                        0 &&
+                                      collateralCalc.isHealthy
+                                        ? "text-primary"
+                                        : "text-destructive"
+                                    }`}
+                                  >
+                                    {collateralCalc.minCollateralAmount}{" "}
+                                    {selectedCollateralToken.symbol}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    ≈{" "}
+                                    {
+                                      collateralCalc.priceImpact
+                                        .minCollateralValueUSD
+                                    }
+                                  </div>
+                                </div>
+
+                                {formData.collateralAmount &&
+                                  parseFloat(formData.collateralAmount) > 0 && (
+                                    <div className="pt-2 border-t border-border/50">
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-xs text-muted-foreground">
+                                          Your Amount:
+                                        </span>
+                                        <div className="flex items-center gap-2">
+                                          <div
+                                            className={`w-1.5 h-1.5 rounded-full status-dot ${
+                                              collateralCalc.isHealthy
+                                                ? "success"
+                                                : "error"
+                                            }`}
+                                          />
+                                          <span
+                                            className={`text-sm font-medium ${
+                                              collateralCalc.isHealthy
+                                                ? "text-primary"
+                                                : "text-destructive"
+                                            }`}
+                                          >
+                                            {collateralCalc.currentRatio}%
+                                          </span>
+                                        </div>
                                       </div>
+                                    </div>
+                                  )}
+                              </div>
+
+                              {/* Auto-fill button - Compact */}
+                              {(!formData.collateralAmount ||
+                                parseFloat(formData.collateralAmount) === 0 ||
+                                !collateralCalc.isHealthy) && (
+                                <div className="mt-3 pt-3 border-t border-border">
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      handleAutoFillMinCollateral(
+                                        collateralCalc.minCollateralAmount,
+                                        collateralCalc.minCollateralAmountRaw
+                                      );
+                                    }}
+                                    className={`w-full btn-premium border-border text-foreground transition-all duration-300 h-8 ${
+                                      formData.collateralAmount &&
+                                      parseFloat(formData.collateralAmount) >
+                                        0 &&
+                                      !collateralCalc.isHealthy
+                                        ? "bg-destructive/10 hover:bg-destructive/20 border-destructive/30"
+                                        : "bg-card hover:bg-accent"
+                                    }`}
+                                  >
+                                    <span className="text-xs font-medium">
+                                      {formData.collateralAmount &&
+                                      parseFloat(formData.collateralAmount) >
+                                        0 &&
+                                      !collateralCalc.isHealthy
+                                        ? "Fix Collateral (+0.1% buffer)"
+                                        : "Auto-fill Safe Amount (+0.1% buffer)"}
+                                    </span>
+                                  </Button>
+                                </div>
+                              )}
+
+                              {/* Success message when collateral is healthy */}
+                              {formData.collateralAmount &&
+                                parseFloat(formData.collateralAmount) > 0 &&
+                                collateralCalc.isHealthy && (
+                                  <div className="mt-3 pt-3 border-t border-primary/20">
+                                    <div className="flex items-center justify-center gap-2 text-primary">
+                                      <CheckCircle className="h-3 w-3" />
+                                      <span className="text-xs font-medium">
+                                        Perfect! Well-secured and ready
+                                      </span>
                                     </div>
                                   </div>
                                 )}
                             </div>
 
-                            {/* Auto-fill button - Compact */}
-                            {(!formData.collateralAmount ||
-                              parseFloat(formData.collateralAmount) === 0 ||
-                              !collateralCalc.isHealthy) && (
-                              <div className="mt-3 pt-3 border-t border-border">
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => {
-                                    handleAutoFillMinCollateral(
-                                      collateralCalc.minCollateralAmount,
-                                      collateralCalc.minCollateralAmountRaw
-                                    );
-                                  }}
-                                  className={`w-full btn-premium border-border text-foreground transition-all duration-300 h-8 ${
-                                    formData.collateralAmount &&
-                                    parseFloat(formData.collateralAmount) > 0 &&
-                                    !collateralCalc.isHealthy
-                                      ? "bg-destructive/10 hover:bg-destructive/20 border-destructive/30"
-                                      : "bg-card hover:bg-accent"
-                                  }`}
-                                >
-                                  <span className="text-xs font-medium">
-                                    {formData.collateralAmount &&
-                                    parseFloat(formData.collateralAmount) > 0 &&
-                                    !collateralCalc.isHealthy
-                                      ? "Fix Collateral (+0.1% buffer)"
-                                      : "Auto-fill Safe Amount (+0.1% buffer)"}
-                                  </span>
-                                </Button>
+                            {calcLoading && (
+                              <div className="flex items-center justify-center py-4">
+                                <Loader2 className="h-5 w-5 animate-spin mr-2 text-primary" />
+                                <span className="text-sm text-muted-foreground">
+                                  Calculating collateral requirements...
+                                </span>
                               </div>
                             )}
-
-                            {/* Success message when collateral is healthy */}
-                            {formData.collateralAmount &&
-                              parseFloat(formData.collateralAmount) > 0 &&
-                              collateralCalc.isHealthy && (
-                                <div className="mt-3 pt-3 border-t border-primary/20">
-                                  <div className="flex items-center justify-center gap-2 text-primary">
-                                    <CheckCircle className="h-3 w-3" />
-                                    <span className="text-xs font-medium">
-                                      Perfect! Well-secured and ready
-                                    </span>
-                                  </div>
-                                </div>
-                              )}
-                          </div>
-
-                          {calcLoading && (
-                            <div className="flex items-center justify-center py-4">
-                              <Loader2 className="h-5 w-5 animate-spin mr-2 text-primary" />
-                              <span className="text-sm text-muted-foreground">
-                                Calculating collateral requirements...
-                              </span>
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                    )}
+                          </>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
 
                   {/* Risk Management Parameters - Compact */}
                   {recommendedParams &&

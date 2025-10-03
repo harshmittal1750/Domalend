@@ -10,6 +10,7 @@ import {
   calculateDomaRank,
   broadcastPricesOnChain,
 } from "./oracle-backend.js";
+import { CryptoPriceOracle } from "./cryptoPriceOracle.js";
 import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
@@ -37,12 +38,21 @@ const CONFIG = {
   startBlock: parseInt(process.env.INDEXER_START_BLOCK || "11472883"),
   pollInterval: parseInt(process.env.INDEXER_POLL_INTERVAL || "5000"),
 
-  // Oracle Configuration
+  // AI Oracle Configuration (Domain Tokens)
   enableOracle:
     process.env.ENABLE_ORACLE !== "false" &&
     process.env.DOMA_RANK_ORACLE_ADDRESS &&
     process.env.ORACLE_UPDATER_PRIVATE_KEY,
   oracleUpdateInterval: parseInt(process.env.UPDATE_INTERVAL_MS || "600000"), // 10 minutes
+
+  // Crypto Oracle Configuration (CoinGecko)
+  enableCryptoOracle:
+    process.env.ENABLE_CRYPTO_ORACLE !== "false" &&
+    process.env.DOMA_RANK_ORACLE_ADDRESS &&
+    process.env.ORACLE_UPDATER_PRIVATE_KEY,
+  cryptoOracleUpdateInterval: parseInt(
+    process.env.PRICE_UPDATE_INTERVAL_MS || "1800000"
+  ), // 30 minutes
 };
 
 console.log("\n" + "=".repeat(60));
@@ -54,10 +64,18 @@ console.log(`  Port: ${CONFIG.port}`);
 console.log(`  RPC URL: ${CONFIG.rpcUrl}`);
 console.log(`  Contract: ${CONFIG.contractAddress}`);
 console.log(`  Indexer Start Block: ${CONFIG.startBlock}`);
-console.log(`  AI Oracle Enabled: ${CONFIG.enableOracle}`);
+console.log(`  AI Oracle (Domains) Enabled: ${CONFIG.enableOracle}`);
 if (CONFIG.enableOracle) {
   console.log(
-    `  Oracle Update Interval: ${CONFIG.oracleUpdateInterval / 1000}s`
+    `  AI Oracle Update Interval: ${CONFIG.oracleUpdateInterval / 1000}s`
+  );
+}
+console.log(
+  `  Crypto Oracle (CoinGecko) Enabled: ${CONFIG.enableCryptoOracle}`
+);
+if (CONFIG.enableCryptoOracle) {
+  console.log(
+    `  Crypto Oracle Update Interval: ${CONFIG.cryptoOracleUpdateInterval / 1000}s`
   );
 }
 console.log("=".repeat(60) + "\n");
@@ -149,7 +167,7 @@ const server = new IndexerServer({
 });
 
 // ============================================================================
-// AI ORACLE PRICE UPDATER
+// AI ORACLE PRICE UPDATER (Domain Tokens)
 // ============================================================================
 
 let oracleInterval = null;
@@ -228,6 +246,47 @@ function stopOracleScheduler() {
 }
 
 // ============================================================================
+// CRYPTO ORACLE PRICE UPDATER (CoinGecko)
+// ============================================================================
+
+let cryptoOracle = null;
+
+function startCryptoOracleScheduler() {
+  if (!CONFIG.enableCryptoOracle) {
+    console.log("⊘ Crypto Oracle disabled (missing required env variables)\n");
+    return;
+  }
+
+  console.log("💰 Starting Crypto Oracle Scheduler (CoinGecko)...");
+  console.log(
+    `   Update interval: ${CONFIG.cryptoOracleUpdateInterval / 1000} seconds\n`
+  );
+
+  try {
+    // Initialize crypto oracle
+    cryptoOracle = new CryptoPriceOracle({
+      updateIntervalMs: CONFIG.cryptoOracleUpdateInterval,
+    });
+
+    // Start the scheduler
+    cryptoOracle.start();
+
+    console.log("✓ Crypto Oracle scheduler started\n");
+  } catch (error) {
+    console.error("❌ Failed to start Crypto Oracle:", error.message);
+    cryptoOracle = null;
+  }
+}
+
+function stopCryptoOracleScheduler() {
+  if (cryptoOracle) {
+    cryptoOracle.stop();
+    cryptoOracle = null;
+    console.log("✓ Crypto Oracle scheduler stopped");
+  }
+}
+
+// ============================================================================
 // EVENT LISTENERS
 // ============================================================================
 
@@ -275,8 +334,11 @@ const shutdown = async () => {
   // Stop indexer
   indexer.stopIndexing();
 
-  // Stop oracle
+  // Stop AI oracle
   stopOracleScheduler();
+
+  // Stop crypto oracle
+  stopCryptoOracleScheduler();
 
   // Stop server
   await server.stop();
@@ -320,9 +382,16 @@ async function main() {
 
     // Step 3: Start AI Oracle (if enabled)
     if (CONFIG.enableOracle) {
-      console.log("Step 3: Starting AI Oracle...");
+      console.log("Step 3: Starting AI Oracle (Domain Tokens)...");
       startOracleScheduler();
       console.log("✓ AI Oracle running\n");
+    }
+
+    // Step 4: Start Crypto Oracle (if enabled)
+    if (CONFIG.enableCryptoOracle) {
+      console.log("Step 4: Starting Crypto Oracle (CoinGecko)...");
+      startCryptoOracleScheduler();
+      console.log("✓ Crypto Oracle running\n");
     }
 
     // Success!
@@ -335,7 +404,12 @@ async function main() {
     console.log(`📡 Indexer: Active (polling every ${CONFIG.pollInterval}ms)`);
     if (CONFIG.enableOracle) {
       console.log(
-        `🤖 AI Oracle: Active (updating every ${CONFIG.oracleUpdateInterval / 1000}s)`
+        `🤖 AI Oracle (Domains): Active (updating every ${CONFIG.oracleUpdateInterval / 1000}s)`
+      );
+    }
+    if (CONFIG.enableCryptoOracle) {
+      console.log(
+        `💰 Crypto Oracle (CoinGecko): Active (updating every ${CONFIG.cryptoOracleUpdateInterval / 1000}s)`
       );
     }
     console.log("=".repeat(60));
@@ -356,4 +430,4 @@ main().catch((error) => {
 });
 
 // Export for testing
-export { indexer, server, CONFIG };
+export { indexer, server, cryptoOracle, CONFIG };

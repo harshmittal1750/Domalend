@@ -1,6 +1,10 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { ethers } from "ethers";
-import { TokenInfo, getTokenByAddress } from "@/config/tokens";
+import {
+  TokenInfo,
+  getTokenByAddress,
+  DEFAULT_PARAMETERS,
+} from "@/config/tokens";
 import {
   toBaseUnit,
   fromBaseUnit,
@@ -230,14 +234,16 @@ export function useTokenPrices(tokens: TokenInfo[]) {
           let domaRankPriceRaw: bigint | undefined;
           let hasDomaRankOracle = false;
 
+          // Query DomaRank Oracle for all tokens that have oracle support enabled
           if (
+            token.hasDomaRankOracle &&
             DOMA_RANK_ORACLE_ADDRESS &&
             DOMA_RANK_ORACLE_ADDRESS !==
               "0x0000000000000000000000000000000000000000"
           ) {
             try {
               console.log(
-                `🔮 Fetching DomaRank price for ${token.symbol} from oracle at ${DOMA_RANK_ORACLE_ADDRESS}`
+                `🔮 Fetching price for ${token.symbol} from DomaRank Oracle at ${DOMA_RANK_ORACLE_ADDRESS}`
               );
               const domaOracle = new ethers.Contract(
                 DOMA_RANK_ORACLE_ADDRESS,
@@ -254,22 +260,31 @@ export function useTokenPrices(tokens: TokenInfo[]) {
                 domaRankPriceRaw = oraclePrice;
                 domaRankPrice = fromBaseUnit(oraclePrice, 18, 4);
                 hasDomaRankOracle = true;
+
+                // For crypto tokens, use oracle as primary price (overrides defaults)
+                if (!token.isDomainToken) {
+                  priceUSD = domaRankPrice;
+                  priceRaw = oraclePrice;
+                }
+
                 console.log(
-                  `✅ DomaRank price for ${token.symbol}: $${domaRankPrice}`
+                  `✅ Oracle price for ${token.symbol}: $${domaRankPrice}`
                 );
               } else {
-                console.log(`⊘ DomaRank price is 0 for ${token.symbol}`);
+                console.log(
+                  `⊘ Oracle price is 0 for ${token.symbol}, using fallback`
+                );
               }
             } catch (domaErr: any) {
-              // DomaRank oracle might not have this token, that's okay
+              // Oracle might not have this token yet, use fallback
               console.log(
-                `❌ No DomaRank price for ${token.symbol}:`,
+                `⚠️ No oracle price for ${token.symbol}, using fallback:`,
                 domaErr.message
               );
             }
-          } else {
+          } else if (token.hasDomaRankOracle) {
             console.log(
-              `⚠️ DomaRank oracle address not configured (got: ${DOMA_RANK_ORACLE_ADDRESS})`
+              `⚠️ Token ${token.symbol} has oracle support but oracle not configured`
             );
           }
 
@@ -387,45 +402,52 @@ export function useCollateralCalculation(
     return `${loanToken.address}-${collateralToken.address}`;
   }, [loanToken?.address, collateralToken?.address]);
 
-  // Fetch recommended parameters from DomaLend contract
+  // Calculate recommended parameters locally using token config
   useEffect(() => {
-    const fetchRecommendedParams = async () => {
-      if (!loanToken || !collateralToken) {
-        setRecommendedParams(null);
-        return;
-      }
-
-      try {
-        // console.log('Fetching recommended parameters for:', loanToken.symbol, '->', collateralToken.symbol);
-        const provider = new ethers.JsonRpcProvider(
-          "https://rpc-testnet.doma.xyz"
-        );
-        const dreamLend = new ethers.Contract(
-          DREAMLEND_ADDRESS,
-          DREAMLEND_ABI,
-          provider
-        );
-
-        const params = await dreamLend.getRecommendedParameters(
-          loanToken.address,
-          collateralToken.address
-        );
-
-        setRecommendedParams(params);
-      } catch (error) {
-        console.error("Failed to fetch recommended parameters:", error);
-        setRecommendedParams(null);
-      }
-    };
-
-    if (tokenPairKey) {
-      const timeoutId = setTimeout(() => {
-        fetchRecommendedParams();
-      }, 100); // 100ms debounce
-
-      return () => clearTimeout(timeoutId);
+    if (!loanToken || !collateralToken) {
+      setRecommendedParams(null);
+      return;
     }
-  }, [tokenPairKey]);
+
+    try {
+      const loanParams = DEFAULT_PARAMETERS[loanToken.volatilityTier];
+      const collateralParams =
+        DEFAULT_PARAMETERS[collateralToken.volatilityTier];
+
+      // Use more conservative parameters (higher ratio = safer)
+      const minRatio = Math.max(
+        loanParams.minCollateralRatio,
+        collateralParams.minCollateralRatio
+      );
+      const liquidationThreshold = Math.max(
+        loanParams.liquidationThreshold,
+        collateralParams.liquidationThreshold
+      );
+      const maxStaleness = Math.min(
+        loanParams.maxPriceStaleness,
+        collateralParams.maxPriceStaleness
+      );
+
+      // Convert to BigInt format expected by the component
+      setRecommendedParams([
+        BigInt(minRatio),
+        BigInt(liquidationThreshold),
+        BigInt(maxStaleness),
+      ]);
+
+      console.log(
+        `✓ Calculated params for ${loanToken.symbol} -> ${collateralToken.symbol}:`,
+        {
+          minRatio: `${minRatio / 100}%`,
+          liquidationThreshold: `${liquidationThreshold / 100}%`,
+          maxStaleness: `${maxStaleness}s`,
+        }
+      );
+    } catch (error) {
+      console.error("Failed to calculate recommended parameters:", error);
+      setRecommendedParams(null);
+    }
+  }, [loanToken, collateralToken, tokenPairKey]);
 
   useEffect(() => {
     if (!loanToken || !collateralToken || !loanAmount || pricesLoading) {
@@ -433,10 +455,29 @@ export function useCollateralCalculation(
       return;
     }
 
-    const loanPrice = prices.get(loanToken.address);
-    const collateralPrice = prices.get(collateralToken.address);
+    const loanPrice = prices.get(loanToken.address.toLowerCase());
+    const collateralPrice = prices.get(collateralToken.address.toLowerCase());
+
+    console.log(
+      `[useCollateralCalculation] Checking calculation dependencies:`,
+      {
+        loanToken: loanToken.symbol,
+        collateralToken: collateralToken.symbol,
+        loanAmount,
+        loanPrice: loanPrice ? `$${loanPrice.priceUSD}` : "NOT FOUND",
+        collateralPrice: collateralPrice
+          ? `$${collateralPrice.priceUSD}`
+          : "NOT FOUND",
+        recommendedParams: recommendedParams ? "SET" : "NULL",
+        pricesSize: prices.size,
+        pricesLoading,
+      }
+    );
 
     if (!loanPrice || !collateralPrice || !recommendedParams) {
+      console.log(
+        `[useCollateralCalculation] Missing data, skipping calculation`
+      );
       return;
     }
 
