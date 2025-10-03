@@ -63,8 +63,12 @@ export class EventIndexer extends EventEmitter {
     console.log(`Current blockchain height: ${latestBlock}`);
 
     if (this.currentBlock === 0) {
-      // Start from recent blocks if no start block specified
-      this.currentBlock = Math.max(0, latestBlock - 1000);
+      // Start from the beginning to index all historical events
+      // For production, set INDEXER_START_BLOCK env variable to your contract deployment block
+      console.log("⚠️  No start block specified, starting from block 0");
+      console.log("   This will index ALL historical events (may take time)");
+      console.log("   Set INDEXER_START_BLOCK to skip old blocks");
+      this.currentBlock = 11472883; // DreamLend deployment block on Doma Testnet
     }
 
     console.log(

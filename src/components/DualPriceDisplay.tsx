@@ -15,10 +15,10 @@ interface DualPriceDisplayProps {
 }
 
 /**
- * DualPriceDisplay - Shows both market price and AI oracle price for tokens
+ * DualPriceDisplay - Shows both market price and algorithmic valuation for tokens
  *
  * For standard tokens (USDC, USDT): Shows single Chainlink price
- * For Doma fractional tokens: Shows market price AND DomaRank AI price
+ * For Doma fractional tokens: Shows market price AND DomaRank algorithmic price
  */
 export function DualPriceDisplay({
   price,
@@ -85,7 +85,7 @@ export function DualPriceDisplay({
         </TooltipProvider>
       </div>
 
-      {/* DomaRank AI Oracle Price */}
+      {/* DomaRank Algorithmic Price */}
       <div className="flex items-center gap-2">
         <TooltipProvider>
           <Tooltip>
@@ -104,7 +104,7 @@ export function DualPriceDisplay({
                   className="text-xs bg-blue-50 text-blue-700 border-blue-200"
                 >
                   <Sparkles className="h-3 w-3 mr-1" />
-                  AI Oracle
+                  DomaRank
                 </Badge>
               </div>
             </TooltipTrigger>
@@ -112,8 +112,8 @@ export function DualPriceDisplay({
               <div className="space-y-1">
                 <p className="font-medium">DomaRank Collateral Value</p>
                 <p className="text-xs text-muted-foreground">
-                  Risk-adjusted valuation from our AI Oracle. Based on domain
-                  age, keywords, TLD, and market demand. Used for lending
+                  Risk-adjusted algorithmic valuation. Based on domain age,
+                  keywords, TLD, and market demand. Used for lending
                   calculations to protect lenders.
                 </p>
               </div>
@@ -144,8 +144,8 @@ export function DualPriceDisplay({
                     </TooltipTrigger>
                     <TooltipContent>
                       <p className="text-xs max-w-xs">
-                        Our AI Oracle provides a more conservative valuation to
-                        protect lenders from market volatility and
+                        Our pricing algorithm provides a more conservative
+                        valuation to protect lenders from market volatility and
                         overvaluation.
                       </p>
                     </TooltipContent>
@@ -195,7 +195,7 @@ export function CompactPriceDisplay({ price }: { price: TokenPrice }) {
             </div>
             <div>
               <strong>Collateral:</strong> ${price.domaRankPrice}
-              <div className="text-muted-foreground">AI Oracle value</div>
+              <div className="text-muted-foreground">DomaRank value</div>
             </div>
           </div>
         </TooltipContent>

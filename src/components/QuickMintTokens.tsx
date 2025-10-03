@@ -88,7 +88,8 @@ export function QuickMintTokens({ className }: QuickMintTokensProps) {
           Quick Mint Test Tokens
         </CardTitle>
         <CardDescription className="text-sm">
-          Need test tokens? Mint them instantly for testing loans.
+          Mint stablecoins to lend or test borrowing with fractionalized domain
+          tokens.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -126,8 +127,8 @@ export function QuickMintTokens({ className }: QuickMintTokensProps) {
               })}
             </div>
 
-            <div className="text-xs text-gray-600">
-              <p>💡 Click any token to mint testing amounts instantly</p>
+            <div className="text-xs text-muted-foreground">
+              <p>💡 Click to mint testnet tokens for lending on DomaLend</p>
             </div>
           </>
         )}

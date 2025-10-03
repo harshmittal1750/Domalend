@@ -75,20 +75,20 @@ export function Navigation() {
             <div className="relative">
               <img
                 src="/logo.png"
-                alt="DreamLend Logo"
+                alt="DomaLend Logo"
                 className=" w-20 h-20 text-primary transition-colors duration-300 group-hover:text-primary/80"
               />
               <div className="absolute -inset-1 bg-primary/20 rounded-full blur opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
             <div className="flex items-center space-x-2">
               <span className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                DreamLend
+                DomaLend
               </span>
               <Badge
                 variant="secondary"
                 className="text-xs px-2 py-0.5 bg-primary/10 text-primary border-primary/20 font-medium"
               >
-                Doma
+                Testnet
               </Badge>
             </div>
           </Link>

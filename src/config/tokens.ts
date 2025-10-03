@@ -9,7 +9,7 @@ export interface TokenInfo {
   category: "stablecoin" | "crypto" | "defi" | "domain";
   volatilityTier: "stable" | "moderate" | "high";
   priceFeedAddress: string;
-  hasDomaRankOracle?: boolean; // True if token is indexed by DomaRank AI Oracle
+  hasDomaRankOracle?: boolean; // True if token is valued by DomaRank algorithm
   isDomainToken?: boolean; // True if this is a Doma fractional domain token
   domainMetadata?: {
     image?: string;
@@ -97,7 +97,7 @@ export const SUPPORTED_TOKENS: Record<string, TokenInfo> = {
   },
   // ==================== DOMA FRACTIONAL DOMAIN TOKENS ====================
   // These are real fractional domain tokens from Doma protocol
-  // Priced by DomaRank AI Oracle
+  // Valued by DomaRank pricing algorithm
   SOFTWAREAI: {
     address: "0xf2dDd2022611cCddFC088d87D355bEEC15B30d7D",
     name: "software.ai",

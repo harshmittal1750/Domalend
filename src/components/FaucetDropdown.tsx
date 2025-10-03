@@ -19,6 +19,7 @@ import {
   Droplets,
   ExternalLink,
   Fuel,
+  Globe,
 } from "lucide-react";
 import { getAllSupportedTokens } from "@/config/tokens";
 import { useMintTokens } from "@/hooks/useMintTokens";
@@ -124,12 +125,17 @@ export function FaucetDropdown() {
   };
 
   const handleGetGasTokens = () => {
-    // Open the Google Cloud Web3 faucet in a new tab
-    window.open(
-      "https://cloud.google.com/application/web3/faucet/somnia/shannon",
-      "_blank"
+    // Open the Doma Bridge to get testnet ETH
+    window.open("https://bridge-testnet.doma.xyz/", "_blank");
+    toast.info("Opening Doma Bridge - Bridge ETH from Sepolia to Doma testnet");
+  };
+
+  const handleGetDomainTokens = () => {
+    // Open Mizu DEX to buy fractionalized domain tokens
+    window.open("https://mizu-testnet.doma.xyz/", "_blank");
+    toast.info(
+      "Opening Mizu DEX - Buy fractionalized domain tokens as collateral"
     );
-    toast.info("Opening Somnia gas token faucet...");
   };
 
   if (!isConnected) {
@@ -153,11 +159,11 @@ export function FaucetDropdown() {
           <span className="hidden sm:inline">Faucet</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-64">
+      <DropdownMenuContent align="end" className="w-72">
         {/* Gas Token Section */}
         <DropdownMenuLabel className="flex items-center gap-2">
           <Fuel className="h-4 w-4" />
-          Gas Tokens (STT)
+          Get Started with DomaLend
         </DropdownMenuLabel>
         <DropdownMenuItem
           onClick={handleGetGasTokens}
@@ -165,14 +171,23 @@ export function FaucetDropdown() {
         >
           <div className="flex items-center gap-2">
             <ExternalLink className="h-3 w-3" />
-            <span className="text-sm">Get STT from Faucet</span>
+            <span className="text-sm">Bridge ETH (Doma Testnet)</span>
+          </div>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={handleGetDomainTokens}
+          className="flex items-center justify-between cursor-pointer"
+        >
+          <div className="flex items-center gap-2">
+            <Globe className="h-3 w-3" />
+            <span className="text-sm">Buy Domain Tokens (Mizu DEX)</span>
           </div>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
         <DropdownMenuLabel className="flex items-center gap-2">
           <Coins className="h-4 w-4" />
-          Mock Test Tokens
+          Mint Test Tokens (For Lending)
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 

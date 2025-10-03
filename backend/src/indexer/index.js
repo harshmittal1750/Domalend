@@ -33,10 +33,7 @@ const CONFIG = {
 // Load DreamLend ABI
 let dreamLendABI;
 try {
-  const abiPath = path.join(
-    __dirname,
-    "../../../contracts/out/DreamLend.sol/DreamLend.json"
-  );
+  const abiPath = path.join(__dirname, "./Dreamlend.json");
   const abiFile = fs.readFileSync(abiPath, "utf8");
   const abiJson = JSON.parse(abiFile);
   dreamLendABI = abiJson.abi;

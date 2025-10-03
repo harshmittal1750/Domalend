@@ -5,11 +5,14 @@
     "main": "src/index.js",
     "type": "module",
     "scripts": {
-        "start": "node src/oracle-backend.js",
-        "dev": "nodemon src/oracle-backend.js",
+        "start": "node src/unified-server.js",
+        "dev": "nodemon src/unified-server.js",
         "indexer": "node src/indexer/index.js",
         "indexer:dev": "nodemon src/indexer/index.js",
-        "setup-mock-prices": "node src/setup-mock-prices.js"
+        "oracle": "node src/oracle-backend.js",
+        "oracle:dev": "nodemon src/oracle-backend.js",
+        "setup-mock-prices": "node src/setup-mock-prices.js",
+        "verify-deployment": "node verify-deployment.js"
     },
     "keywords": [
         "doma",
