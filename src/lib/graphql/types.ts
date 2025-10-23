@@ -1,7 +1,13 @@
 export interface FractionalTokensResponse {
   data: {
     fractionalTokens: FractionalTokens;
-  };
+  } | null;
+  errors?: Array<{
+    message: string;
+    path?: string[];
+    locations?: Array<{ line: number; column: number }>;
+    extensions?: any;
+  }>;
 }
 
 export interface FractionalTokens {
@@ -33,7 +39,6 @@ export interface FractionalToken {
   boughtOutTxHash: string | null;
   metadataURI: string;
   metadata: Metadata;
-  currentPrice: number;
   name: string;
 }
 
@@ -49,15 +54,13 @@ export interface Params {
   symbol: string;
   decimals: number;
   totalSupply: number;
-  launchpadType: number;
   launchpadSupply: number;
   launchpadFeeBps: number;
   poolSupply: number;
   poolFeeBps: number;
-  initialLaunchpadPrice: number;
-  finalLaunchpadPrice: number;
-  launchStartDate: number;
-  launchEndDate: number;
+  initialPrice: number;
+  launchStartTime: number;
+  launchEndTime: number;
   launchpadData: string;
   vestingCliffSeconds: number;
   vestingDurationSeconds: number;

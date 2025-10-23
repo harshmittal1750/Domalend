@@ -25,15 +25,13 @@ export const FRACTIONAL_TOKENS_QUERY = `
           symbol
           decimals
           totalSupply
-          launchpadType
           launchpadSupply
           launchpadFeeBps
           poolSupply
           poolFeeBps
-          initialLaunchpadPrice
-          finalLaunchpadPrice
-          launchStartDate
-          launchEndDate
+          initialPrice
+          launchStartTime
+          launchEndTime
           launchpadData
           vestingCliffSeconds
           vestingDurationSeconds
@@ -54,7 +52,6 @@ export const FRACTIONAL_TOKENS_QUERY = `
             url
           }
         }
-        currentPrice
         name
       }
       totalCount
