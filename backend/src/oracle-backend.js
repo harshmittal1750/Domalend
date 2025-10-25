@@ -319,12 +319,12 @@ async function getConsolidatedDomainData() {
     }
 
     // Skip inactive/bought out domains (from old contract versions)
-    if (token.status && token.status !== "active") {
-      console.log(
-        `⊘ Skipping ${domainName}: Status is "${token.status}" (not active)`
-      );
-      continue;
-    }
+    // if (token.status && token.status !== "active") {
+    //   console.log(
+    //     `⊘ Skipping ${domainName}: Status is "${token.status}" (not active)`
+    //   );
+    //   continue;
+    // }
 
     // Skip domains that have been bought out
     if (token.boughtOutAt) {

@@ -119,9 +119,13 @@ export default function OffersPage() {
     address,
   } = useP2PLending();
 
+  const [supportedTokens, setSupportedTokens] = useState<any[]>([]);
+  const [isLoadingTokens, setIsLoadingTokens] = useState(true);
+
   // Initialize token cache on mount (BEFORE other effects that need token data)
   useEffect(() => {
     console.log("[OffersPage] Initializing token cache...");
+    setIsLoadingTokens(true);
     getAllSupportedTokensAsync()
       .then((tokens) => {
         console.log(
@@ -129,9 +133,13 @@ export default function OffersPage() {
           tokens.length,
           "tokens"
         );
+        setSupportedTokens(tokens);
       })
       .catch((error) => {
         console.error("[OffersPage] Failed to initialize token cache:", error);
+      })
+      .finally(() => {
+        setIsLoadingTokens(false);
       });
   }, []);
 
@@ -144,7 +152,8 @@ export default function OffersPage() {
 
   // Filter for pending loans only AND exclude loans with unavailable domain tokens
   const pendingLoans = React.useMemo(() => {
-    const supportedTokens = getAllSupportedTokens();
+    if (supportedTokens.length === 0) return []; // Wait for tokens to be loaded
+
     const validTokenAddresses = new Set(
       supportedTokens.map((t) => t.address.toLowerCase())
     );
@@ -176,7 +185,7 @@ export default function OffersPage() {
 
       return loanTokenValid && collateralTokenValid;
     });
-  }, [allLoans]);
+  }, [allLoans, supportedTokens]);
 
   // Get token prices (handles both standard and Doma oracle prices)
   const {
@@ -184,7 +193,7 @@ export default function OffersPage() {
     isLoading: isLoadingPrices,
     error: pricesError,
     refreshPrices,
-  } = useTokenPrices([]);
+  } = useTokenPrices(supportedTokens);
 
   const [selectedLoanId, setSelectedLoanId] = useState<bigint | null>(null);
   const [showStuckMessage, setShowStuckMessage] = useState(false);
@@ -452,7 +461,7 @@ export default function OffersPage() {
         </div>
       )}
 
-      {isLoadingSubgraph || isLoadingPrices ? (
+      {isLoadingSubgraph || isLoadingPrices || isLoadingTokens ? (
         <Card>
           <CardContent className="pt-6">
             <div className="space-y-4">
