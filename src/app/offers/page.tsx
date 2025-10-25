@@ -48,7 +48,11 @@ import {
   Eye,
 } from "lucide-react";
 import { ethers } from "ethers";
-import { getTokenByAddress, getAllSupportedTokens } from "@/config/tokens";
+import {
+  getTokenByAddress,
+  getAllSupportedTokens,
+  getAllSupportedTokensAsync,
+} from "@/config/tokens";
 
 interface TokenInfo {
   name: string;
@@ -115,6 +119,22 @@ export default function OffersPage() {
     address,
   } = useP2PLending();
 
+  // Initialize token cache on mount (BEFORE other effects that need token data)
+  useEffect(() => {
+    console.log("[OffersPage] Initializing token cache...");
+    getAllSupportedTokensAsync()
+      .then((tokens) => {
+        console.log(
+          "[OffersPage] Token cache initialized with",
+          tokens.length,
+          "tokens"
+        );
+      })
+      .catch((error) => {
+        console.error("[OffersPage] Failed to initialize token cache:", error);
+      });
+  }, []);
+
   // Use subgraph data instead of RPC calls
   const {
     loans: allLoans,
@@ -122,9 +142,40 @@ export default function OffersPage() {
     error: subgraphError,
   } = useAllLoansWithStatus();
 
-  // Filter for pending loans only
+  // Filter for pending loans only AND exclude loans with unavailable domain tokens
   const pendingLoans = React.useMemo(() => {
-    return allLoans.filter((loan) => loan.status === 0); // Pending status
+    const supportedTokens = getAllSupportedTokens();
+    const validTokenAddresses = new Set(
+      supportedTokens.map((t) => t.address.toLowerCase())
+    );
+
+    return allLoans.filter((loan) => {
+      // Must be pending
+      if (loan.status !== 0) return false;
+
+      // Check if both loan token and collateral token are still available
+      const loanTokenValid = validTokenAddresses.has(
+        loan.tokenAddress.toLowerCase()
+      );
+      const collateralTokenValid = validTokenAddresses.has(
+        loan.collateralAddress.toLowerCase()
+      );
+
+      // Log if filtering out due to unavailable tokens
+      if (!loanTokenValid || !collateralTokenValid) {
+        console.log(
+          `[OffersPage] Filtering out loan ${loan.id}: Token not available`,
+          {
+            loanToken: loan.tokenAddress,
+            loanTokenValid,
+            collateralToken: loan.collateralAddress,
+            collateralTokenValid,
+          }
+        );
+      }
+
+      return loanTokenValid && collateralTokenValid;
+    });
   }, [allLoans]);
 
   // Get token prices (handles both standard and Doma oracle prices)
@@ -133,12 +184,50 @@ export default function OffersPage() {
     isLoading: isLoadingPrices,
     error: pricesError,
     refreshPrices,
-  } = useTokenPrices(getAllSupportedTokens());
+  } = useTokenPrices([]);
 
   const [selectedLoanId, setSelectedLoanId] = useState<bigint | null>(null);
   const [showStuckMessage, setShowStuckMessage] = useState(false);
   const { data: protocolStats, loading: isLoadingProtocolStats } =
     useProtocolStatsCollection();
+  const [backendStats, setBackendStats] = useState<{
+    totalLoanVolumeUSD: string;
+    totalLoansCreated: string;
+  } | null>(null);
+
+  // Fetch backend health stats for total volume
+  React.useEffect(() => {
+    const fetchBackendStats = async () => {
+      try {
+        const backendUrl =
+          process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3001";
+        const response = await fetch(`${backendUrl}/health`);
+        if (response.ok) {
+          const data = await response.json();
+          const totalLoansCreated =
+            data.indexer?.stats?.totalLoansCreated || "0";
+          const totalLoanVolumeUSD =
+            data.indexer?.stats?.totalLoanVolumeUSD || "0";
+
+          setBackendStats({
+            totalLoanVolumeUSD,
+            totalLoansCreated,
+          });
+          console.log("✅ Fetched backend stats:", {
+            totalLoanVolumeUSD,
+            totalLoansCreated,
+          });
+        }
+      } catch (error) {
+        console.warn("Failed to fetch backend stats:", error);
+      }
+    };
+
+    fetchBackendStats();
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchBackendStats, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Show stuck loading message after 10 seconds
   React.useEffect(() => {
@@ -405,17 +494,20 @@ export default function OffersPage() {
                   <span className="text-sm font-medium">Total Volume</span>
                 </div>
                 <p className="text-2xl font-bold">
-                  {/* {loanOffers
-                    .reduce(
-                      (sum, loan) => sum + parseFloat(loan.formattedAmount),
-                      0
-                    )
-                    .toFixed(2)}{" "} */}
+                  $
                   {Number(
                     protocolStats?.protocolStats_collection?.[0]
-                      ?.totalLoanVolumeUSD
-                  ).toFixed(2)}{" "}
-                  $
+                      ?.totalLoanVolumeUSD ||
+                      backendStats?.totalLoanVolumeUSD ||
+                      "0"
+                  ).toFixed(2)}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {backendStats?.totalLoansCreated ||
+                    protocolStats?.protocolStats_collection?.[0]
+                      ?.totalLoansCreated ||
+                    "0"}{" "}
+                  loans • Real-time indexer
                 </p>
               </CardContent>
             </Card>
@@ -444,13 +536,16 @@ export default function OffersPage() {
               <CardContent className="pt-6">
                 <div className="flex items-center space-x-2">
                   <Shield className="h-4 w-4 text-accent" />
-                  <span className="text-sm font-medium">Active Offers</span>
+                  <span className="text-sm font-medium">Total Loans</span>
                 </div>
                 <p className="text-2xl font-bold">
-                  {
+                  {backendStats?.totalLoansCreated ||
                     protocolStats?.protocolStats_collection?.[0]
-                      ?.totalLoansCreated
-                  }
+                      ?.totalLoansCreated ||
+                    "0"}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  All-time created
                 </p>
               </CardContent>
             </Card>
@@ -589,7 +684,11 @@ export default function OffersPage() {
                               {loan.tokenInfo?.isDomainToken && (
                                 <div className="mt-2">
                                   <DomaRankBadge
-                                    score={75 + Math.floor(Math.random() * 20)}
+                                    score={
+                                      prices.get(
+                                        loan.tokenAddress.toLowerCase()
+                                      )?.domaRankScore || 0
+                                    }
                                     size="sm"
                                     showTooltip={true}
                                   />
@@ -690,7 +789,11 @@ export default function OffersPage() {
                               {loan.collateralInfo?.isDomainToken && (
                                 <div className="mt-1">
                                   <DomaRankBadge
-                                    score={75 + Math.floor(Math.random() * 20)}
+                                    score={
+                                      prices.get(
+                                        loan.collateralAddress.toLowerCase()
+                                      )?.domaRankScore || 0
+                                    }
                                     size="sm"
                                     showTooltip={true}
                                   />

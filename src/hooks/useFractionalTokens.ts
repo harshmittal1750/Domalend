@@ -1,20 +1,56 @@
 import { useState, useEffect } from "react";
+import { ethers } from "ethers";
 import { FractionalTokensResponse, FractionalToken } from "@/lib/graphql/types";
 import { FRACTIONAL_TOKENS_QUERY } from "@/lib/graphql/queries";
 import { TokenInfo } from "@/config/tokens";
+import {
+  DOMA_RANK_ORACLE_ABI,
+  DOMA_RANK_ORACLE_ADDRESS,
+} from "@/lib/contracts";
 
 const GRAPHQL_ENDPOINT = "https://api-testnet.doma.xyz/graphql";
 
-// Tokens that have oracle support (addresses that are already configured)
-const ORACLE_SUPPORTED_ADDRESSES = [
-  "0x46540A006c5a4339DDda114814BA18bDB00243Dc".toLowerCase(), // SOFTWAREAI
-  "0xf0EDc7c1Ef6165D7Ec0B663D6d423B244AD21c14".toLowerCase(), // SEEYOUATKBW
-  "0x81Cad3b1Bab1C89F3a32a8E41bF1C569bC0B6b3C".toLowerCase(), // LABUBURIP
-  "0x2121B21659C60Eadf39a27Fb7B9a8Ec23b215526".toLowerCase(), // ILOVEPUMPKINSPICE
-  "0xb21c8F6A02665c4EE3e9a89afdB62529Cc7cdc57".toLowerCase(), // DRINKMIZU
-  "0xDcA22072a8a2470A55076857f13212e635a4b41b".toLowerCase(), // FRACTIONALIZED DOMAIN
-  "0xCF06f051a7E2877a5A0A098B67511075d0a1a98B".toLowerCase(), // ARTHURSFERRARI.com
-];
+/**
+ * Check if a token has oracle price support by querying the oracle contract
+ */
+async function checkOracleSupport(tokenAddress: string): Promise<boolean> {
+  // If oracle is not configured, return false
+  if (
+    !DOMA_RANK_ORACLE_ADDRESS ||
+    DOMA_RANK_ORACLE_ADDRESS === "0x0000000000000000000000000000000000000000"
+  ) {
+    return false;
+  }
+
+  try {
+    const provider = new ethers.JsonRpcProvider("https://rpc-testnet.doma.xyz");
+    const oracleContract = new ethers.Contract(
+      DOMA_RANK_ORACLE_ADDRESS,
+      DOMA_RANK_ORACLE_ABI,
+      provider
+    );
+
+    // Try to get the token price
+    const price = await oracleContract.getTokenValue(tokenAddress);
+
+    // Oracle has price support if price is greater than 0
+    const hasSupport = price > 0n;
+
+    if (hasSupport) {
+      console.log(
+        `✅ Oracle support confirmed for ${tokenAddress}: $${ethers.formatUnits(price, 18)}`
+      );
+    } else {
+      console.log(`⚠️ Oracle returns 0 for ${tokenAddress}`);
+    }
+
+    return hasSupport;
+  } catch (error: any) {
+    // If the contract call fails (e.g., "Token price not set"), no oracle support
+    console.log(`⚠️ No oracle support for ${tokenAddress}:`, error.message);
+    return false;
+  }
+}
 
 export function useFractionalTokens() {
   const [tokens, setTokens] = useState<TokenInfo[]>([]);
@@ -69,18 +105,29 @@ export function useFractionalTokens() {
         const fractionalTokens = result.data.fractionalTokens.items;
         console.log("✅ Found fractional tokens:", fractionalTokens.length);
 
-        // Convert GraphQL tokens to TokenInfo format
-        const convertedTokens: TokenInfo[] = fractionalTokens.map((token) =>
-          convertToTokenInfo(token)
+        // Convert GraphQL tokens to TokenInfo format (without oracle check yet)
+        const convertedTokens: TokenInfo[] = fractionalTokens.map(
+          (token) => convertToTokenInfo(token, false) // Don't set oracle support yet
         );
 
         console.log("✅ Converted tokens:", convertedTokens.length);
+
+        // Check oracle support for all tokens in parallel
+        console.log("🔮 Checking oracle support for all tokens...");
+        const oracleSupportPromises = convertedTokens.map(async (token) => {
+          const hasSupport = await checkOracleSupport(token.address);
+          return { ...token, hasDomaRankOracle: hasSupport };
+        });
+
+        const tokensWithOracleStatus = await Promise.all(oracleSupportPromises);
+
+        console.log("✅ Oracle support check complete!");
         console.log(
           "🎯 Tokens with oracle support:",
-          convertedTokens.filter((t) => t.hasDomaRankOracle).length
+          tokensWithOracleStatus.filter((t) => t.hasDomaRankOracle).length
         );
 
-        setTokens(convertedTokens);
+        setTokens(tokensWithOracleStatus);
       } catch (err) {
         console.error("❌ Error fetching fractional tokens:", err);
         setError(err instanceof Error ? err.message : "Unknown error");
@@ -96,11 +143,10 @@ export function useFractionalTokens() {
 }
 
 // Convert GraphQL FractionalToken to TokenInfo
-function convertToTokenInfo(token: FractionalToken): TokenInfo {
-  const hasOracleSupport = ORACLE_SUPPORTED_ADDRESSES.includes(
-    token.address.toLowerCase()
-  );
-
+function convertToTokenInfo(
+  token: FractionalToken,
+  hasOracleSupport: boolean = false
+): TokenInfo {
   return {
     address: token.address,
     name: token.params.name || token.name,

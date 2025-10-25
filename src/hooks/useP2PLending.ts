@@ -11,7 +11,10 @@ import {
   LoanStatus,
   DOMA_TESTNET_CONFIG,
 } from "@/lib/contracts";
-import { SUPPORTED_TOKENS } from "@/config/tokens";
+import {
+  getAllSupportedTokensSync,
+  getAllSupportedTokensAsync,
+} from "@/config/tokens";
 
 export interface TransactionState {
   isLoading: boolean;
@@ -294,15 +297,49 @@ export const useP2PLending = () => {
 
       try {
         // Get token information for proper decimal handling
-        const loanToken = Object.values(SUPPORTED_TOKENS).find(
+        // First, try to get from cache (sync)
+        let supportedTokens = getAllSupportedTokensSync();
+
+        // If we only have static tokens (no domain tokens cached), fetch them
+        const staticTokenCount = 3; // USDC, USDT, WETH
+        if (supportedTokens.length <= staticTokenCount) {
+          console.log("[useP2PLending] Domain tokens not cached, fetching...");
+          supportedTokens = await getAllSupportedTokensAsync();
+        }
+
+        console.log("[useP2PLending] Supported tokens loaded:", {
+          totalTokens: supportedTokens.length,
+          tokenAddresses: supportedTokens.map((t) => ({
+            symbol: t.symbol,
+            address: t.address,
+          })),
+          lookingFor: {
+            loanToken: formData.tokenAddress,
+            collateralToken: formData.collateralAddress,
+          },
+        });
+
+        const loanToken = supportedTokens.find(
           (token) =>
             token.address.toLowerCase() === formData.tokenAddress.toLowerCase()
         );
-        const collateralToken = Object.values(SUPPORTED_TOKENS).find(
+        const collateralToken = supportedTokens.find(
           (token) =>
             token.address.toLowerCase() ===
             formData.collateralAddress.toLowerCase()
         );
+
+        console.log("[useP2PLending] Token lookup result:", {
+          loanToken: loanToken
+            ? { symbol: loanToken.symbol, address: loanToken.address }
+            : "NOT FOUND",
+          collateralToken: collateralToken
+            ? {
+                symbol: collateralToken.symbol,
+                address: collateralToken.address,
+              }
+            : "NOT FOUND",
+        });
 
         if (!loanToken)
           throw new Error("Loan token not found in supported tokens");
@@ -712,11 +749,12 @@ export const useP2PLending = () => {
       const isDefaulted = isLoanDefaulted(loan);
 
       // Get token information for proper decimal formatting
-      const loanToken = Object.values(SUPPORTED_TOKENS).find(
+      const supportedTokens = getAllSupportedTokensSync();
+      const loanToken = supportedTokens.find(
         (token) =>
           token.address.toLowerCase() === loan.tokenAddress.toLowerCase()
       );
-      const collateralToken = Object.values(SUPPORTED_TOKENS).find(
+      const collateralToken = supportedTokens.find(
         (token) =>
           token.address.toLowerCase() === loan.collateralAddress.toLowerCase()
       );

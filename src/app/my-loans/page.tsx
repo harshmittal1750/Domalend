@@ -44,7 +44,12 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { ethers } from "ethers";
-import { getTokenByAddress } from "@/config/tokens";
+import {
+  getTokenByAddress,
+  getAllSupportedTokensAsync,
+  getAllSupportedTokens,
+} from "@/config/tokens";
+import { useTokenPrices } from "@/hooks/useTokenPrices";
 
 interface TokenInfo {
   name: string;
@@ -85,6 +90,34 @@ export default function MyLoansPage() {
     isLoanDefaulted,
   } = useP2PLending();
 
+  // Initialize token cache on mount (CRITICAL for domain token data)
+  React.useEffect(() => {
+    console.log("[MyLoansPage] Initializing token cache...");
+    getAllSupportedTokensAsync()
+      .then((tokens) => {
+        console.log(
+          "[MyLoansPage] Token cache initialized with",
+          tokens.length,
+          "tokens"
+        );
+      })
+      .catch((error) => {
+        console.error("[MyLoansPage] Failed to initialize token cache:", error);
+      });
+  }, []);
+
+  // Get token prices for all tokens
+  const { prices: tokenPricesMap } = useTokenPrices([]);
+
+  // Convert Map to object for easier access
+  const tokenPrices = React.useMemo(() => {
+    const obj: Record<string, any> = {};
+    tokenPricesMap.forEach((value, key) => {
+      obj[key] = value;
+    });
+    return obj;
+  }, [tokenPricesMap]);
+
   // Use subgraph data instead of RPC calls
   const {
     loans: allLoans,
@@ -92,19 +125,65 @@ export default function MyLoansPage() {
     error: subgraphError,
   } = useAllLoansWithStatus();
 
-  // Filter loans by user role
+  // Filter loans by user role AND exclude loans with unavailable domain tokens
   const lenderLoans = React.useMemo(() => {
     if (!address) return [];
-    return allLoans.filter(
-      (loan) => loan.lender.toLowerCase() === address.toLowerCase()
+
+    const supportedTokens = getAllSupportedTokens();
+    const validTokenAddresses = new Set(
+      supportedTokens.map((t) => t.address.toLowerCase())
     );
+
+    return allLoans.filter((loan) => {
+      const isLender = loan.lender.toLowerCase() === address.toLowerCase();
+      if (!isLender) return false;
+
+      // Check if both tokens are still available
+      const loanTokenValid = validTokenAddresses.has(
+        loan.tokenAddress.toLowerCase()
+      );
+      const collateralTokenValid = validTokenAddresses.has(
+        loan.collateralAddress.toLowerCase()
+      );
+
+      if (!loanTokenValid || !collateralTokenValid) {
+        console.log(
+          `[MyLoans] Filtering out lender loan ${loan.id}: Token not available`
+        );
+      }
+
+      return loanTokenValid && collateralTokenValid;
+    });
   }, [allLoans, address]);
 
   const borrowerLoans = React.useMemo(() => {
     if (!address) return [];
-    return allLoans.filter(
-      (loan) => loan.borrower.toLowerCase() === address.toLowerCase()
+
+    const supportedTokens = getAllSupportedTokens();
+    const validTokenAddresses = new Set(
+      supportedTokens.map((t) => t.address.toLowerCase())
     );
+
+    return allLoans.filter((loan) => {
+      const isBorrower = loan.borrower.toLowerCase() === address.toLowerCase();
+      if (!isBorrower) return false;
+
+      // Check if both tokens are still available
+      const loanTokenValid = validTokenAddresses.has(
+        loan.tokenAddress.toLowerCase()
+      );
+      const collateralTokenValid = validTokenAddresses.has(
+        loan.collateralAddress.toLowerCase()
+      );
+
+      if (!loanTokenValid || !collateralTokenValid) {
+        console.log(
+          `[MyLoans] Filtering out borrower loan ${loan.id}: Token not available`
+        );
+      }
+
+      return loanTokenValid && collateralTokenValid;
+    });
   }, [allLoans, address]);
 
   // Get live price comparison data
@@ -158,7 +237,7 @@ export default function MyLoansPage() {
       const totalRepayment = calculateTotalRepayment(loan, currentTime);
       const isOverdue = isLoanDefaulted(loan, currentTime);
 
-      // Get token info from config
+      // Get token info from config (includes dynamic domain tokens)
       const tokenInfo = getTokenByAddress(loan.tokenAddress);
       const collateralInfo = getTokenByAddress(loan.collateralAddress);
 
@@ -455,6 +534,19 @@ export default function MyLoansPage() {
                     {parseFloat(loan.formattedAmount).toFixed(4)}{" "}
                     {loan.tokenInfo?.symbol || "Tokens"}
                   </p>
+                  {tokenPrices[loan.tokenAddress.toLowerCase()] && (
+                    <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
+                      $
+                      {(
+                        parseFloat(loan.formattedAmount) *
+                        parseFloat(
+                          tokenPrices[loan.tokenAddress.toLowerCase()]
+                            .liveMarketPrice
+                        )
+                      ).toFixed(2)}{" "}
+                      USD
+                    </p>
+                  )}
                   <p className="text-xs text-muted-foreground group-hover:text-muted-foreground/80 transition-colors">
                     {loan.tokenAddress.slice(0, 6)}...
                     {loan.tokenAddress.slice(-4)}
@@ -478,6 +570,19 @@ export default function MyLoansPage() {
                     {parseFloat(loan.formattedCollateralAmount).toFixed(4)}{" "}
                     {loan.collateralInfo?.symbol || "Tokens"}
                   </p>
+                  {tokenPrices[loan.collateralAddress.toLowerCase()] && (
+                    <p className="text-xs text-violet-600 dark:text-violet-400 font-semibold">
+                      $
+                      {(
+                        parseFloat(loan.formattedCollateralAmount) *
+                        parseFloat(
+                          tokenPrices[loan.collateralAddress.toLowerCase()]
+                            .liveMarketPrice
+                        )
+                      ).toFixed(2)}{" "}
+                      USD
+                    </p>
+                  )}
                   <p className="text-xs text-muted-foreground group-hover:text-muted-foreground/80 transition-colors">
                     {loan.collateralAddress.slice(0, 6)}...
                     {loan.collateralAddress.slice(-4)}

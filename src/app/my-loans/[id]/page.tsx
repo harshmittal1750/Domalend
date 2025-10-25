@@ -52,7 +52,9 @@ import {
   Zap,
 } from "lucide-react";
 import { ethers } from "ethers";
-import { getTokenByAddress } from "@/config/tokens";
+import { getTokenByAddress, getAllSupportedTokensAsync } from "@/config/tokens";
+import { useTokenPrices } from "@/hooks/useTokenPrices";
+import { DualPriceDisplay } from "@/components/DualPriceDisplay";
 
 interface TokenInfo {
   name: string;
@@ -90,6 +92,25 @@ export default function LoanDetailsPage({ params }: LoanDetailsPageProps) {
   const resolvedParams = React.use(params);
   const loanId = BigInt(resolvedParams.id);
 
+  // Initialize token cache on mount (CRITICAL for domain token data)
+  React.useEffect(() => {
+    console.log("[LoanDetailsPage] Initializing token cache...");
+    getAllSupportedTokensAsync()
+      .then((tokens) => {
+        console.log(
+          "[LoanDetailsPage] Token cache initialized with",
+          tokens.length,
+          "tokens"
+        );
+      })
+      .catch((error) => {
+        console.error(
+          "[LoanDetailsPage] Failed to initialize token cache:",
+          error
+        );
+      });
+  }, []);
+
   const {
     repayLoan,
     liquidateLoan,
@@ -103,6 +124,18 @@ export default function LoanDetailsPage({ params }: LoanDetailsPageProps) {
     getLoanHealthFactor,
     getLoanRepaymentInfo,
   } = useP2PLending();
+
+  // Get token prices
+  const { prices: tokenPricesMap } = useTokenPrices([]);
+
+  // Convert Map to object for easier access
+  const tokenPrices = React.useMemo(() => {
+    const obj: Record<string, any> = {};
+    tokenPricesMap.forEach((value, key) => {
+      obj[key] = value;
+    });
+    return obj;
+  }, [tokenPricesMap]);
 
   // Use subgraph data to get all loans
   const {
@@ -555,6 +588,21 @@ export default function LoanDetailsPage({ params }: LoanDetailsPageProps) {
                   <div className="text-sm font-medium text-primary/80">
                     {loanDetails.tokenInfo?.symbol || "Tokens"}
                   </div>
+                  {tokenPrices[loanDetails.tokenAddress.toLowerCase()] && (
+                    <div className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mt-1">
+                      ≈ $
+                      {(
+                        parseFloat(loanDetails.formattedAmount) *
+                        parseFloat(
+                          tokenPrices[loanDetails.tokenAddress.toLowerCase()]
+                            .liveMarketPrice
+                        )
+                      ).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </div>
+                  )}
                   <div className="text-xs text-muted-foreground mt-1">
                     Principal Amount
                   </div>
@@ -593,6 +641,22 @@ export default function LoanDetailsPage({ params }: LoanDetailsPageProps) {
                   <div className="text-sm font-medium text-violet-700 dark:text-violet-300">
                     {loanDetails.collateralInfo?.symbol || "Tokens"}
                   </div>
+                  {tokenPrices[loanDetails.collateralAddress.toLowerCase()] && (
+                    <div className="text-xs text-violet-600 dark:text-violet-400 font-semibold mt-1">
+                      ≈ $
+                      {(
+                        parseFloat(loanDetails.formattedCollateralAmount) *
+                        parseFloat(
+                          tokenPrices[
+                            loanDetails.collateralAddress.toLowerCase()
+                          ].liveMarketPrice
+                        )
+                      ).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </div>
+                  )}
                   <div className="text-xs text-muted-foreground mt-1">
                     Collateral Locked
                   </div>
@@ -824,6 +888,15 @@ export default function LoanDetailsPage({ params }: LoanDetailsPageProps) {
                         {loanDetails.tokenInfo?.decimals || "N/A"}
                       </span>
                     </div>
+                    {tokenPrices[loanDetails.tokenAddress.toLowerCase()] && (
+                      <div className="pt-3 border-t border-primary/20">
+                        <DualPriceDisplay
+                          price={
+                            tokenPrices[loanDetails.tokenAddress.toLowerCase()]
+                          }
+                        />
+                      </div>
+                    )}
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">
                         Contract
@@ -881,6 +954,19 @@ export default function LoanDetailsPage({ params }: LoanDetailsPageProps) {
                         {loanDetails.collateralInfo?.decimals || "N/A"}
                       </span>
                     </div>
+                    {tokenPrices[
+                      loanDetails.collateralAddress.toLowerCase()
+                    ] && (
+                      <div className="pt-3 border-t border-violet-200/60 dark:border-violet-800/40">
+                        <DualPriceDisplay
+                          price={
+                            tokenPrices[
+                              loanDetails.collateralAddress.toLowerCase()
+                            ]
+                          }
+                        />
+                      </div>
+                    )}
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">
                         Contract
