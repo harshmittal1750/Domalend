@@ -1,4 +1,7 @@
 // Doma Testnet - Supported Tokens Configuration
+import { FRACTIONAL_TOKENS_QUERY } from "@/lib/graphql/queries";
+import { FractionalTokensResponse } from "@/lib/graphql/types";
+
 export interface TokenInfo {
   address: string;
   name: string;
@@ -11,6 +14,7 @@ export interface TokenInfo {
   priceFeedAddress: string;
   hasDomaRankOracle?: boolean; // True if token is valued by DomaRank algorithm
   isDomainToken?: boolean; // True if this is a Doma fractional domain token
+  poolAddress?: string; // Uniswap pool address for the token
   domainMetadata?: {
     image?: string;
     website?: string;
@@ -96,105 +100,14 @@ export const SUPPORTED_TOKENS: Record<string, TokenInfo> = {
     hasDomaRankOracle: true, // Uses DomaRank Oracle with CoinGecko prices
   },
   // ==================== DOMA FRACTIONAL DOMAIN TOKENS ====================
-  // These are real fractional domain tokens from Doma protocol
-  // Valued by DomaRank pricing algorithm
-  SOFTWAREAI: {
-    address: "0xf2dDd2022611cCddFC088d87D355bEEC15B30d7D",
-    name: "software.ai",
-    symbol: "SOFTWAREAI",
-    decimals: 6,
-    description:
-      "The Ultimate Digital Address for AI Innovation. Own and trade an ultra-premium domain in the hottest tech category.",
-    category: "domain",
-    volatilityTier: "high",
-    priceFeedAddress: "0x0000000000000000000000000000000000000000", // Uses DomaRank Oracle
-    hasDomaRankOracle: true,
-    isDomainToken: true,
-    domainMetadata: {
-      image:
-        "https://cdn-testnet.doma.xyz/fractionalization/a3190985-5ad1-4d1b-b28d-aa8bcc6c58a6/image_1758354799873_buoi20?timestamp=1758354799873",
-      website: "https://mizu.xyz",
-      twitterLink: "https://x.com/domaprotocol",
-    },
-  },
-  SEEYOUATKBW: {
-    address: "0xBA1Ac5CF547d1C2bdaE9aAaa588D7f081219Bc62",
-    name: "seeyouatkbw.com",
-    symbol: "SEEYOUATKBW",
-    decimals: 6,
-    description: "Fractional ownership of seeyouatkbw.com domain",
-    category: "domain",
-    volatilityTier: "high",
-    priceFeedAddress: "0x0000000000000000000000000000000000000000", // Uses DomaRank Oracle
-    hasDomaRankOracle: true,
-    isDomainToken: true,
-    domainMetadata: {
-      image:
-        "https://cdn-testnet.doma.xyz/fractionalization/24f39752-f916-4565-b45d-8a7bf71fa378/image_1758391682295_tanqsa?timestamp=1758391682295",
-      website: "https://mizu.xyz",
-      twitterLink: "https://x.com/domaprotocol",
-    },
-  },
-  LABUBURIP: {
-    address: "0xAf56AB93BD19a94136a808Ab3CcD8B61BFa99119",
-    name: "labuburip.com",
-    symbol: "LABUBURIP",
-    decimals: 6,
-    description: "Fractional ownership of labuburip.com domain",
-    category: "domain",
-    volatilityTier: "high",
-    priceFeedAddress: "0x0000000000000000000000000000000000000000", // Uses DomaRank Oracle
-    hasDomaRankOracle: true,
-    isDomainToken: true,
-    domainMetadata: {
-      image:
-        "https://cdn-testnet.doma.xyz/fractionalization/cce0371a-20bf-474f-8fce-e986bd2dca2d/image_1758431243173_2r1j6l?timestamp=1758431243173",
-      website: "https://mizu.xyz",
-      twitterLink: "https://x.com/domaprotocol",
-    },
-  },
-  ILOVEPUMPKINSPICE: {
-    address: "0x2121B21659C60Eadf39a27Fb7B9a8Ec23b215526",
-    name: "ilovepumpkinspice.com",
-    symbol: "ILOVEPUMPKINSPICE",
-    decimals: 6,
-    description: "Fractional ownership of ilovepumpkinspice.com domain",
-    category: "domain",
-    volatilityTier: "high",
-    priceFeedAddress: "0x0000000000000000000000000000000000000000", // Uses DomaRank Oracle
-    hasDomaRankOracle: true,
-    isDomainToken: true,
-    domainMetadata: {
-      image:
-        "https://cdn-testnet.doma.xyz/fractionalization/68ae2ff7-e5a2-4a2c-9d1f-f4c76a835a05/image_1758431790701_007995?timestamp=1758431790701",
-      website: "https://mizu.xyz",
-      twitterLink: "https://x.com/domaprotocol",
-    },
-  },
-  DRINKMIZU: {
-    address: "0xF547543382fe62C6Da7bB862a0765b95E0269661",
-    name: "drinkmizu.com",
-    symbol: "DRINKMIZU.COM",
-    decimals: 6,
-    description:
-      "Drink Mizu — Stay Moist, Bestie. You're 73% water, but actin' like 12%. Fix that with Drink Mizu, the hydration glow-up your cells deserve.",
-    category: "domain",
-    volatilityTier: "high",
-    priceFeedAddress: "0x0000000000000000000000000000000000000000", // Uses DomaRank Oracle
-    hasDomaRankOracle: true,
-    isDomainToken: true,
-    domainMetadata: {
-      image:
-        "https://cdn-testnet.doma.xyz/fractionalization/ccebc3b3-4197-4b3b-b2f8-46587f6cd80d/image_1759385373125_s1qz8p?timestamp=1759385373126",
-      website: "https://mizu.xyz/",
-      twitterLink: "https://x.com/domaprotocol",
-    },
-  },
+  // Domain tokens are now fetched dynamically from GraphQL API
+  // Use getAllSupportedTokens() or getDomaRankTokens() to get the full list
 } as const;
 
-// Get token by address
+// Get token by address (checks both static and cached domain tokens)
 export function getTokenByAddress(address: string): TokenInfo | undefined {
-  return Object.values(SUPPORTED_TOKENS).find(
+  const allTokens = getAllSupportedTokensSync();
+  return allTokens.find(
     (token) => token.address.toLowerCase() === address.toLowerCase()
   );
 }
@@ -204,9 +117,118 @@ export function getTokenBySymbol(symbol: string): TokenInfo | undefined {
   return SUPPORTED_TOKENS[symbol.toUpperCase()];
 }
 
-// Get all supported tokens as array
-export function getAllSupportedTokens(): TokenInfo[] {
-  return Object.values(SUPPORTED_TOKENS);
+// Cached domain tokens
+let cachedDomainTokens: TokenInfo[] | null = null;
+let cacheTimestamp = 0;
+const CACHE_DURATION = 60000; // 1 minute
+
+// Fetch domain tokens from GraphQL API
+async function fetchDomainTokens(): Promise<TokenInfo[]> {
+  try {
+    console.log("[fetchDomainTokens] Starting fetch from GraphQL API...");
+    const response = await fetch("https://api-testnet.doma.xyz/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "API-KEY": process.env.NEXT_PUBLIC_DOMA_API_KEY || "",
+      },
+      body: JSON.stringify({
+        query: FRACTIONAL_TOKENS_QUERY,
+      }),
+    });
+
+    console.log(
+      "[fetchDomainTokens] Response status:",
+      response.status,
+      response.statusText
+    );
+
+    if (!response.ok) {
+      console.warn("Failed to fetch domain tokens from GraphQL");
+      return [];
+    }
+
+    const result: FractionalTokensResponse = await response.json();
+    console.log("[fetchDomainTokens] Full GraphQL response:", result);
+
+    // Check for GraphQL errors
+    if (result.errors && result.errors.length > 0) {
+      console.error("❌ GraphQL errors:", result.errors);
+      return [];
+    }
+
+    if (!result.data || !result.data.fractionalTokens) {
+      console.error("❌ No data in response:", result);
+      return [];
+    }
+
+    const items = result.data.fractionalTokens.items || [];
+
+    console.log(
+      `[fetchDomainTokens] Fetched ${items.length} domain tokens from GraphQL:`,
+      items.map((item: any) => ({
+        address: item.address,
+        symbol: item.params?.symbol,
+        poolAddress: item.poolAddress,
+      }))
+    );
+
+    const domainTokens = items.map((item: any) => ({
+      address: item.address,
+      name: item.name || item.params?.symbol || "Unknown Domain",
+      symbol: item.params?.symbol || "DOMAIN",
+      decimals: Number(item.params?.decimals || 6),
+      description:
+        item.metadata?.description ||
+        item.metadata?.title ||
+        `Fractional ownership of ${item.name || "domain"}`,
+      category: "domain" as const,
+      volatilityTier: "high" as const,
+      priceFeedAddress: "0x0000000000000000000000000000000000000000",
+      hasDomaRankOracle: true,
+      isDomainToken: true,
+      poolAddress: item.poolAddress,
+      domainMetadata: {
+        image: item.metadata?.image,
+        website: item.metadata?.primaryWebsite || "https://mizu.xyz",
+        twitterLink: item.metadata?.xLink || "https://x.com/domaprotocol",
+      },
+    }));
+
+    console.log("[fetchDomainTokens] Processed domain tokens:", domainTokens);
+    return domainTokens;
+  } catch (error) {
+    console.error("Error fetching domain tokens:", error);
+    return [];
+  }
+}
+
+// Get all supported tokens as array (static + dynamic domain tokens)
+// Note: This is an async function - use it once to initialize, then use sync version
+export async function getAllSupportedTokensAsync(): Promise<TokenInfo[]> {
+  const staticTokens = Object.values(SUPPORTED_TOKENS);
+
+  // Check cache
+  const now = Date.now();
+  if (cachedDomainTokens && now - cacheTimestamp < CACHE_DURATION) {
+    return [...staticTokens, ...cachedDomainTokens];
+  }
+
+  // Fetch fresh domain tokens
+  const domainTokens = await fetchDomainTokens();
+  cachedDomainTokens = domainTokens;
+  cacheTimestamp = now;
+
+  console.log(`✅ Fetched ${domainTokens.length} domain tokens from GraphQL`);
+  return [...staticTokens, ...domainTokens];
+}
+
+// Synchronous version that returns static tokens + cached domain tokens
+export function getAllSupportedTokensSync(): TokenInfo[] {
+  const staticTokens = Object.values(SUPPORTED_TOKENS);
+  return cachedDomainTokens
+    ? [...staticTokens, ...cachedDomainTokens]
+    : staticTokens;
 }
 
 // Default collateralization parameters based on asset volatility
@@ -286,26 +308,47 @@ export const TOKEN_CATEGORIES = {
 } as const;
 
 // Get tokens with DomaRank oracle support (domain tokens)
-// Note: This now returns only hardcoded domain tokens
-// For dynamic domain tokens, use useFractionalTokens hook
-export function getDomaRankTokens(): TokenInfo[] {
-  return Object.values(SUPPORTED_TOKENS).filter(
+export async function getDomaRankTokensAsync(): Promise<TokenInfo[]> {
+  const allTokens = await getAllSupportedTokensAsync();
+  return allTokens.filter(
+    (token) => token.hasDomaRankOracle === true && token.isDomainToken === true
+  );
+}
+
+// Synchronous version
+export function getDomaRankTokensSync(): TokenInfo[] {
+  const allTokens = getAllSupportedTokensSync();
+  return allTokens.filter(
     (token) => token.hasDomaRankOracle === true && token.isDomainToken === true
   );
 }
 
 // Get crypto tokens with oracle support (non-domain tokens)
-export function getCryptoTokens(): TokenInfo[] {
-  return Object.values(SUPPORTED_TOKENS).filter(
+export async function getCryptoTokensAsync(): Promise<TokenInfo[]> {
+  const allTokens = await getAllSupportedTokensAsync();
+  return allTokens.filter(
+    (token) => token.hasDomaRankOracle === true && token.isDomainToken !== true
+  );
+}
+
+// Synchronous version
+export function getCryptoTokensSync(): TokenInfo[] {
+  const allTokens = getAllSupportedTokensSync();
+  return allTokens.filter(
     (token) => token.hasDomaRankOracle === true && token.isDomainToken !== true
   );
 }
 
 // Get tokens without DomaRank oracle (standard tokens)
-export function getStandardTokens(): TokenInfo[] {
-  return Object.values(SUPPORTED_TOKENS).filter(
-    (token) => !token.hasDomaRankOracle
-  );
+export async function getStandardTokensAsync(): Promise<TokenInfo[]> {
+  const allTokens = await getAllSupportedTokensAsync();
+  return allTokens.filter((token) => !token.hasDomaRankOracle);
+}
+
+// Synchronous version
+export function getStandardTokensSync(): TokenInfo[] {
+  const allTokens = getAllSupportedTokensSync();
+  return allTokens.filter((token) => !token.hasDomaRankOracle);
 }
 
 // Check if a token has DomaRank oracle support
@@ -356,3 +399,9 @@ export function formatDuration(seconds: number): string {
   }
   return `${minutes} minute${minutes !== 1 ? "s" : ""}`;
 }
+
+// Export the sync version as default for backwards compatibility
+export { getAllSupportedTokensSync as getAllSupportedTokens };
+export { getCryptoTokensSync as getCryptoTokens };
+export { getDomaRankTokensSync as getDomaRankTokens };
+export { getStandardTokensSync as getStandardTokens };

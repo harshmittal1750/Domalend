@@ -4,6 +4,7 @@ import {
   TokenInfo,
   getTokenByAddress,
   DEFAULT_PARAMETERS,
+  getAllSupportedTokensSync,
 } from "@/config/tokens";
 import {
   toBaseUnit,
@@ -94,6 +95,7 @@ export interface TokenPrice {
   domaRankPriceRaw?: bigint; // DomaRank oracle price (raw)
   liveMarketPrice?: string; // Live market price from Doma Subgraph
   hasDomaRankOracle?: boolean; // Whether this token uses DomaRank oracle
+  domaRankScore?: number; // DomaRank score (0-100) for domain tokens
 }
 
 export interface CollateralCalculation {
@@ -121,10 +123,83 @@ export interface CollateralCalculation {
 
 const DREAMLEND_ADDRESS = "0xe268b4ff6Ced7330353eB26015a34fF78e06C8b3"; // DomaLend contract address
 
-export function useTokenPrices(tokens: TokenInfo[]) {
+export function useTokenPrices(initialTokens: TokenInfo[]) {
+  const [tokens, setTokens] = useState<TokenInfo[]>(initialTokens);
   const [prices, setPrices] = useState<Map<string, TokenPrice>>(new Map());
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Initialize tokens with dynamic domain tokens
+  useEffect(() => {
+    const initTokens = async () => {
+      try {
+        const response = await fetch("https://api-testnet.doma.xyz/graphql", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "API-KEY":
+              "v1.b4a015daee86d0f9f02f7fb3705e511209c1ee3273fa430467ba9b5d168c4a6a",
+          },
+          body: JSON.stringify({
+            query: `query FractionalTokens {
+              fractionalTokens {
+                items {
+                  address
+                  name
+                  params {
+                    symbol
+                    decimals
+                  }
+                  metadata {
+                    image
+                    primaryWebsite
+                    xLink
+                    description
+                    title
+                  }
+                }
+              }
+            }`,
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const items = data?.data?.fractionalTokens?.items || [];
+          const staticTokens = getAllSupportedTokensSync();
+          const dynamicTokens = items.map((item: any) => ({
+            address: item.address,
+            name: item.name || item.params?.symbol || "Unknown Domain",
+            symbol: item.params?.symbol || "DOMAIN",
+            decimals: Number(item.params?.decimals || 6),
+            description:
+              item.metadata?.description ||
+              item.metadata?.title ||
+              `Fractional ownership of ${item.name || "domain"}`,
+            category: "domain" as const,
+            volatilityTier: "high" as const,
+            priceFeedAddress: "0x0000000000000000000000000000000000000000",
+            hasDomaRankOracle: true,
+            isDomainToken: true,
+            domainMetadata: {
+              image: item.metadata?.image,
+              website: item.metadata?.primaryWebsite || "https://mizu.xyz",
+              twitterLink: item.metadata?.xLink || "https://x.com/domaprotocol",
+            },
+          }));
+          const allTokens = [...staticTokens, ...dynamicTokens];
+          setTokens(allTokens);
+          console.log(
+            `🔧 Initialized with ${allTokens.length} tokens (${dynamicTokens.length} dynamic domain tokens)`
+          );
+        }
+      } catch (error) {
+        console.error("Failed to fetch dynamic tokens:", error);
+        setTokens(getAllSupportedTokensSync());
+      }
+    };
+    initTokens();
+  }, []);
 
   // Create stable token key for dependency tracking
   const tokenKeys = useMemo(
@@ -149,6 +224,48 @@ export function useTokenPrices(tokens: TokenInfo[]) {
       );
       const newPrices = new Map<string, TokenPrice>();
 
+      // Fetch DomaRank scores and pool prices from backend
+      const backendPrices = new Map<
+        string,
+        { score?: number; poolPrice?: number; valuationUSD?: number }
+      >();
+      try {
+        const backendUrl =
+          process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3001";
+        const response = await fetch(`${backendUrl}/api/domarank/scores`);
+        if (response.ok) {
+          const data = await response.json();
+          console.log("🔍 Backend API Response:", data);
+          if (data.success && data.scores) {
+            Object.entries(data.scores).forEach(
+              ([address, scoreData]: [string, any]) => {
+                const addressLower = address.toLowerCase();
+                backendPrices.set(addressLower, {
+                  score: scoreData.score,
+                  poolPrice: scoreData.poolPrice,
+                  valuationUSD: scoreData.valuationUSD,
+                });
+                console.log(`🏊 Backend data for ${addressLower}:`, {
+                  poolPrice: scoreData.poolPrice,
+                  score: scoreData.score,
+                  valuationUSD: scoreData.valuationUSD,
+                });
+              }
+            );
+            console.log(`✅ Fetched ${backendPrices.size} prices from backend`);
+          } else {
+            console.warn(
+              "⚠️ Backend response missing success or scores:",
+              data
+            );
+          }
+        } else {
+          console.warn(`⚠️ Backend API returned status ${response.status}`);
+        }
+      } catch (error) {
+        console.warn("Failed to fetch backend prices:", error);
+      }
+
       // Fetch Doma market prices from GraphQL for domain tokens
       const domaMarketPrices = new Map<string, number>();
       try {
@@ -165,8 +282,9 @@ export function useTokenPrices(tokens: TokenInfo[]) {
                 fractionalTokens {
                   items {
                     address
-                    currentPrice
                     params {
+                      initialValuation
+                      totalSupply
                       decimals
                     }
                   }
@@ -193,7 +311,7 @@ export function useTokenPrices(tokens: TokenInfo[]) {
             }
           });
           console.log(
-            "✅ Fetched Doma market prices:",
+            "✅ Total initial prices available:",
             domaMarketPrices.size,
             "tokens"
           );
@@ -204,6 +322,9 @@ export function useTokenPrices(tokens: TokenInfo[]) {
 
       // Fetch prices for all tokens in parallel
       const pricePromises = tokens.map(async (token) => {
+        console.log(
+          `🎯 Frontend looking for token: ${token.symbol} at ${token.address.toLowerCase()}`
+        );
         try {
           let priceRaw: bigint = 0n;
           let priceUSD: string = "0";
@@ -219,14 +340,40 @@ export function useTokenPrices(tokens: TokenInfo[]) {
             token.address.toLowerCase()
           );
 
-          if (domaMarketPrice) {
+          // Get backend data for this token (pool price + DomaRank score)
+          const backendData = backendPrices.get(token.address.toLowerCase());
+
+          console.log(
+            `🔍 Processing ${token.symbol} (${token.address.toLowerCase()}):`,
+            {
+              hasBackendData: !!backendData,
+              backendPoolPrice: backendData?.poolPrice,
+              backendScore: backendData?.score,
+              domaMarketPrice,
+            }
+          );
+
+          if (backendData?.poolPrice) {
+            // Use REAL pool price from Uniswap V3 pool (highest priority)
+            priceUSD = backendData.poolPrice.toFixed(6);
+            priceRaw = ethers.parseUnits(priceUSD, 18);
+            console.log(
+              `🏊 Using pool price for ${token.symbol}: $${priceUSD}`
+            );
+          } else if (domaMarketPrice) {
             // Use live market price from Doma
             priceUSD = domaMarketPrice.toFixed(4);
             priceRaw = ethers.parseUnits(priceUSD, 18);
+            console.log(
+              `📊 Using initial price for ${token.symbol}: $${priceUSD}`
+            );
           } else {
             // Default price for mock tokens (stablecoins = $1, others = $100)
             priceUSD = token.symbol.includes("USD") ? "1.00" : "100.00";
             priceRaw = ethers.parseUnits(priceUSD, 18);
+            console.log(
+              `⚠️ Using default price for ${token.symbol}: $${priceUSD} (no data available)`
+            );
           }
 
           // Check if DomaRank oracle has a price for this token
@@ -306,12 +453,17 @@ export function useTokenPrices(tokens: TokenInfo[]) {
               isStale,
               domaRankPrice,
               domaRankPriceRaw,
-              // liveMarketPrice is the actual market price from Doma GraphQL
-              // priceUSD is either the market price or default mock price
-              liveMarketPrice: domaMarketPrice
-                ? domaMarketPrice.toFixed(4)
-                : priceUSD,
+              // liveMarketPrice is the REAL pool price from Uniswap V3
+              // Priority: backend pool price > doma market price > oracle price > default
+              liveMarketPrice: backendData?.poolPrice
+                ? backendData.poolPrice.toFixed(6)
+                : domaMarketPrice
+                  ? domaMarketPrice.toFixed(4)
+                  : domaRankPrice
+                    ? domaRankPrice
+                    : priceUSD,
               hasDomaRankOracle,
+              domaRankScore: backendData?.score, // DomaRank AI score from backend
             },
           };
         } catch (err) {
@@ -328,7 +480,13 @@ export function useTokenPrices(tokens: TokenInfo[]) {
           const addressLower = result.token.address.toLowerCase();
           newPrices.set(addressLower, result.tokenPrice);
           console.log(
-            `📦 Stored price for ${result.token.symbol} (${addressLower}): $${result.tokenPrice.priceUSD}`
+            `📦 Stored price for ${result.token.symbol} (${addressLower}):`,
+            {
+              priceUSD: result.tokenPrice.priceUSD,
+              liveMarketPrice: result.tokenPrice.liveMarketPrice,
+              domaRankPrice: result.tokenPrice.domaRankPrice,
+              domaRankScore: result.tokenPrice.domaRankScore,
+            }
           );
         }
       });

@@ -6,6 +6,7 @@
 import { GraphQLClient, gql } from "graphql-request";
 import { ethers } from "ethers";
 import dotenv from "dotenv";
+import { getTokenPriceUSD } from "./fetch-pool-price.js";
 
 dotenv.config();
 
@@ -94,20 +95,80 @@ const graphQLClient = new GraphQLClient(DOMA_SUBGRAPH_URL, {
 
 /**
  * PHASE 1: Discovery Query - Get list of all fractional tokens
- * Fetches basic info about all fractionalized domains
+ * Fetches comprehensive info about all fractionalized domains
+ *
+ * New fields available:
+ * - status: Token status (active, bought out, etc.)
+ * - metadata: Rich metadata (image, links, title, description)
+ * - poolAddress: Liquidity pool address
+ * - chain: Network information
+ * - graduatedAt: When token graduated from launchpad
+ * - And many more pool/launchpad parameters
  */
 const GET_FRACTIONAL_TOKENS = gql`
   query GetFractionalTokenList {
     fractionalTokens {
       items {
+        id
         name
         address
         fractionalizedAt
-        currentPrice
+        fractionalizedBy
+        boughtOutAt
+        boughtOutBy
+        buyoutPrice
+        status
+        poolAddress
+        graduatedAt
+        launchpadAddress
+        vestingWalletAddress
+        chain {
+          name
+          networkId
+          addressUrlTemplate
+        }
         params {
-          totalSupply
+          initialValuation
+          quoteToken
           name
           symbol
+          decimals
+          totalSupply
+          launchpadSupply
+          launchpadFeeBps
+          poolSupply
+          poolFeeBps
+          poolLiquidityLowerRangePercentBps
+          poolLiquidityUpperRangePercentBps
+          launchStartTime
+          launchEndTime
+          launchpadData
+          bondingCurveModelImpl
+          initialPrice
+          finalPrice
+          bondingCurveModelData
+          liquidityMigratorImpl
+          liquidityMigratorData
+          hook
+          vestingCliffSeconds
+          vestingDurationSeconds
+          initialPoolPrice
+          buySellFeeRecipient
+          metadataURI
+        }
+        fractionalizedTxHash
+        boughtOutTxHash
+        metadataURI
+        metadata {
+          image
+          xLink
+          primaryWebsite
+          title
+          description
+          additionalWebsites {
+            name
+            url
+          }
         }
       }
       totalCount
@@ -137,7 +198,7 @@ const GET_NAME_DETAILS = gql`
         isFractionalized
         fractionalTokenInfo {
           address
-          currentPrice
+          buyoutPrice
         }
       }
     }
@@ -257,6 +318,22 @@ async function getConsolidatedDomainData() {
       continue;
     }
 
+    // Skip inactive/bought out domains (from old contract versions)
+    if (token.status && token.status !== "active") {
+      console.log(
+        `⊘ Skipping ${domainName}: Status is "${token.status}" (not active)`
+      );
+      continue;
+    }
+
+    // Skip domains that have been bought out
+    if (token.boughtOutAt) {
+      console.log(
+        `⊘ Skipping ${domainName}: Domain was bought out at ${token.boughtOutAt}`
+      );
+      continue;
+    }
+
     // Parse domain name and TLD
     const domainInfo = parseDomainName(domainName);
 
@@ -286,14 +363,46 @@ async function getConsolidatedDomainData() {
     // Get active offers count from Phase 2 data
     const activeOffersCount = nameDetails?.activeOffersCount || 0;
 
-    // Parse current price - IMPORTANT: currentPrice is ALWAYS in 8 decimals (Doma standard)
-    // Regardless of token decimals (which are for token amounts, not prices)
-    const currentPriceRaw = parseFloat(token.currentPrice || "0");
-    const livePriceUSD = currentPriceRaw / Math.pow(10, 8); // Doma uses 8 decimals for prices
+    // PHASE 3: Get REAL market price from Uniswap V3 pool
+    let poolPrice = null;
+    if (token.poolAddress && token.poolAddress !== ethers.ZeroAddress) {
+      try {
+        poolPrice = await getTokenPriceUSD(token.address, token.poolAddress);
+        if (poolPrice) {
+          console.log(
+            `  🏊 Pool price fetched for ${domainName}: $${poolPrice.toFixed(6)}`
+          );
+        }
+      } catch (err) {
+        console.log(
+          `  ⚠️ Failed to fetch pool price for ${domainName}:`,
+          err.message
+        );
+      }
+    }
 
-    console.log(
-      `  💰 ${domainName}: ${currentPriceRaw} raw → $${livePriceUSD.toFixed(2)} USD (price decimals: 8)`
-    );
+    // Fallback: Calculate initial price from fractionalization params
+    const initialValuation = Number(token.params?.initialValuation || 0);
+    const totalSupply = Number(token.params?.totalSupply || 0);
+    const decimals = Number(token.params?.decimals || 6);
+
+    let initialPriceUSD = 0;
+    if (totalSupply > 0 && initialValuation > 0) {
+      initialPriceUSD = initialValuation / totalSupply;
+    }
+
+    // Use pool price (REAL market price) if available, otherwise use initial price
+    let livePriceUSD = poolPrice || initialPriceUSD;
+
+    if (poolPrice) {
+      console.log(
+        `  💰 ${domainName}: POOL PRICE = $${poolPrice.toFixed(6)} (initial was $${initialPriceUSD.toFixed(6)})`
+      );
+    } else {
+      console.log(
+        `  💰 ${domainName}: Using initial price = $${initialPriceUSD.toFixed(6)} (no pool found)`
+      );
+    }
 
     consolidatedData.push({
       fractionalTokenAddress: token.address,
@@ -305,12 +414,15 @@ async function getConsolidatedDomainData() {
       salesHistoryCount: 0, // Not available in current queries
       activeOffersCount: activeOffersCount,
       livePriceUSD: livePriceUSD,
-      totalSupply: token.params?.totalSupply?.toString() || "0",
+      totalSupply: totalSupply.toString(),
+      decimals: decimals,
       symbol: token.params?.symbol || "",
+      status: token.status || "active",
+      metadata: token.metadata || null,
     });
 
     console.log(
-      `✓ [${i + 1}/${tokens.length}] ${domainName} - Price: $${livePriceUSD.toFixed(2)}, Offers: ${activeOffersCount}`
+      `✓ [${i + 1}/${tokens.length}] ${domainName} - Price: $${livePriceUSD.toFixed(2)}, Status: ${token.status || "active"}, Offers: ${activeOffersCount}`
     );
 
     // Small delay to avoid rate limiting
@@ -375,51 +487,79 @@ function calculateLengthScore(length) {
  */
 function calculateDomaRank(domainData) {
   // ========================================
-  // 1. Age & Longevity Score (out of 10)
+  // 1. Age & Longevity Score (out of 100) - Weight: 15%
   // ========================================
-  const ageComponent = Math.min(domainData.yearsOnChain * 2, 5);
-  const expiryComponent = Math.min(domainData.yearsUntilExpiry * 1, 5);
-  const ageScore = ageComponent + expiryComponent;
+  // More generous scoring: Even new domains can get decent scores
+  const ageComponent = Math.min(domainData.yearsOnChain * 5 + 5, 50); // 5-50 points
+  const expiryComponent = Math.min(domainData.yearsUntilExpiry * 10, 50); // 0-50 points
+  const ageScore = (ageComponent + expiryComponent) / 10; // Scale to 0-10
 
   // ========================================
-  // 2. Market Demand Score (out of 10)
+  // 2. Market Demand Score (out of 100) - Weight: 10%
   // ========================================
-  const demandScore = Math.min(domainData.activeOffersCount * 2, 10);
+  // Base score of 50 for any listed domain, +10 per offer
+  const baseDemandScore = 50; // Being listed/fractionalized is already valuable
+  const offerBonus = Math.min(domainData.activeOffersCount * 10, 50);
+  const demandScore = (baseDemandScore + offerBonus) / 10; // Scale to 0-10
 
   // ========================================
-  // 3. Keyword & TLD Score (out of 10)
+  // 3. Quality Score (out of 100) - Weight: 75%
   // ========================================
-  const tldScore = calculateTldScore(domainData.tld);
-  const keywordScore = calculateKeywordScore(domainData.domainName);
-  const lengthScore = calculateLengthScore(domainData.nameLength);
+  // This is the most important factor for new domains
+  const tldScore = calculateTldScore(domainData.tld); // 0-10
+  const keywordScore = calculateKeywordScore(domainData.domainName); // 0-10
+  const lengthScore = calculateLengthScore(domainData.nameLength); // 0-10
 
-  const combinedKeywordScore =
-    tldScore * 0.5 + keywordScore * 0.3 + lengthScore * 0.2;
+  // Weighted combination favoring quality indicators
+  const qualityScore =
+    tldScore * 0.4 + // TLD quality: 40% weight
+    keywordScore * 0.35 + // Keyword value: 35% weight
+    lengthScore * 0.25; // Length premium: 25% weight
 
   // ========================================
   // 4. Final DomaRank (out of 100)
   // ========================================
-  const domaRank = ageScore * 2 + demandScore * 5 + combinedKeywordScore * 3;
+  // Rebalanced weights: Quality matters most for new domains
+  const domaRank =
+    ageScore * 1.5 + // Age: 15% weight (max 15 points)
+    demandScore * 1.0 + // Demand: 10% weight (max 10 points)
+    qualityScore * 7.5; // Quality: 75% weight (max 75 points)
 
   // ========================================
-  // 5. Risk-Adjusted Valuation
+  // 5. Quality-Adjusted Valuation (Better Domains = Higher Valuation)
   // ========================================
-  const riskAdjustmentFactor = domaRank / 100;
-  const finalValuationUSD = domainData.livePriceUSD * riskAdjustmentFactor;
+  // Map DomaRank (0-100) to Quality Multiplier (0.5x - 1.2x)
+  // Low quality (0-30): 0.5x-0.7x → Requires more collateral
+  // Medium quality (30-70): 0.7x-1.0x → Moderate collateral
+  // High quality (70-100): 1.0x-1.2x → Requires less collateral (trusted)
+
+  let qualityMultiplier;
+  if (domaRank <= 30) {
+    // Low quality: 0.5x to 0.7x
+    qualityMultiplier = 0.5 + (domaRank / 30) * 0.2;
+  } else if (domaRank <= 70) {
+    // Medium quality: 0.7x to 1.0x
+    qualityMultiplier = 0.7 + ((domaRank - 30) / 40) * 0.3;
+  } else {
+    // High quality: 1.0x to 1.2x
+    qualityMultiplier = 1.0 + ((domaRank - 70) / 30) * 0.2;
+  }
+
+  const finalValuationUSD = domainData.livePriceUSD * qualityMultiplier;
 
   // Log calculation breakdown
   console.log(`\n  📊 DomaRank Calculation for ${domainData.domainName}:`);
-  console.log(`    Age Score: ${ageScore.toFixed(2)}/10`);
-  console.log(`    Demand Score: ${demandScore.toFixed(2)}/10`);
-  console.log(`    Keyword Score: ${combinedKeywordScore.toFixed(2)}/10`);
-  console.log(`    → DomaRank: ${domaRank.toFixed(2)}/100`);
+  console.log(`    Age & Longevity: ${ageScore.toFixed(2)}/10 (15% weight)`);
+  console.log(`    Market Demand: ${demandScore.toFixed(2)}/10 (10% weight)`);
   console.log(
-    `    → Risk Adjustment: ${(riskAdjustmentFactor * 100).toFixed(2)}%`
+    `    Quality (TLD+Keywords+Length): ${qualityScore.toFixed(2)}/10 (75% weight)`
   );
-  console.log(`    Live Market Price: $${domainData.livePriceUSD.toFixed(2)}`);
-  console.log(`    AI Oracle Price: $${finalValuationUSD.toFixed(2)}`);
+  console.log(`    → DomaRank: ${domaRank.toFixed(2)}/100`);
+  console.log(`    → Quality Multiplier: ${qualityMultiplier.toFixed(3)}x`);
+  console.log(`    Live Market Price: $${domainData.livePriceUSD.toFixed(6)}`);
+  console.log(`    AI Oracle Price: $${finalValuationUSD.toFixed(6)}`);
   console.log(
-    `    Safety Margin: ${((1 - riskAdjustmentFactor) * 100).toFixed(2)}%\n`
+    `    Collateral Impact: ${qualityMultiplier > 1.0 ? "Less" : "More"} collateral required (${Math.abs((1 - qualityMultiplier) * 100).toFixed(1)}% ${qualityMultiplier > 1.0 ? "reduction" : "increase"})\n`
   );
 
   // Convert to 18 decimals for blockchain
@@ -437,10 +577,11 @@ function calculateDomaRank(domainData) {
     breakdown: {
       ageScore: parseFloat(ageScore.toFixed(2)),
       demandScore: parseFloat(demandScore.toFixed(2)),
-      keywordScore: parseFloat(combinedKeywordScore.toFixed(2)),
+      qualityScore: parseFloat(qualityScore.toFixed(2)),
       tldScore: parseFloat(tldScore.toFixed(2)),
+      keywordScore: parseFloat(keywordScore.toFixed(2)),
       lengthScore: parseFloat(lengthScore.toFixed(2)),
-      riskAdjustmentFactor: parseFloat(riskAdjustmentFactor.toFixed(4)),
+      qualityMultiplier: parseFloat(qualityMultiplier.toFixed(4)),
       livePriceUSD: domainData.livePriceUSD,
     },
   };

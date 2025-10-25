@@ -156,6 +156,9 @@ const indexer = new EventIndexer({
   pollInterval: CONFIG.pollInterval,
 });
 
+// Store DomaRank scores in memory
+const domaRankScores = new Map(); // tokenAddress => { score, timestamp, valuation }
+
 // Initialize GraphQL/REST Server
 console.log("🌐 Initializing API Server...");
 const server = new IndexerServer({
@@ -163,6 +166,33 @@ const server = new IndexerServer({
   indexer: indexer,
   cors: {
     origin: CONFIG.corsOrigin,
+  },
+  customRoutes: (app) => {
+    // Add DomaRank scores API endpoint BEFORE 404 handler
+    app.get("/api/domarank/scores", (req, res) => {
+      try {
+        const scores = {};
+        for (const [address, data] of domaRankScores.entries()) {
+          scores[address.toLowerCase()] = data;
+        }
+        res.json({
+          success: true,
+          scores,
+          count: domaRankScores.size,
+          lastUpdated:
+            domaRankScores.size > 0
+              ? Math.max(
+                  ...Array.from(domaRankScores.values()).map((d) => d.timestamp)
+                )
+              : 0,
+        });
+      } catch (error) {
+        res.status(500).json({
+          success: false,
+          error: error.message,
+        });
+      }
+    });
   },
 });
 
@@ -195,12 +225,23 @@ async function runOracleCycle() {
       const valuation = calculateDomaRank(domainData);
       valuations.push(valuation);
 
+      // Store DomaRank score in memory for API access
+      domaRankScores.set(valuation.fractionalTokenAddress.toLowerCase(), {
+        score: valuation.domaRank,
+        valuationUSD: valuation.finalValuationUSD,
+        domainName: valuation.domainName,
+        breakdown: valuation.breakdown,
+        poolPrice: domainData.livePriceUSD, // Pool price (real market price)
+        timestamp: Date.now(),
+      });
+
       console.log(`✓ ${valuation.domainName}`);
       console.log(`  DomaRank: ${valuation.domaRank}/100`);
       console.log(`  AI Valuation: $${valuation.finalValuationUSD}`);
     }
 
     console.log(`\n✅ Calculated ${valuations.length} AI valuations\n`);
+    console.log(`✅ Stored ${domaRankScores.size} DomaRank scores in memory\n`);
 
     // Step 3: Broadcast prices on-chain
     if (valuations.length > 0) {

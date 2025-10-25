@@ -17,6 +17,7 @@ export class IndexerServer {
     this.config = {
       port: config.port || 3001,
       indexer: config.indexer,
+      customRoutes: config.customRoutes,
     };
 
     this.app = express();
@@ -60,7 +61,7 @@ export class IndexerServer {
     this.app.post("/graphql", async (req, res) => {
       try {
         const { query, variables } = req.body;
-        
+
         // Validate query exists
         if (!query) {
           return res.status(400).json({
@@ -72,7 +73,7 @@ export class IndexerServer {
             ],
           });
         }
-        
+
         const result = await this.handleGraphQLQuery(query, variables);
         res.json(result);
       } catch (error) {
@@ -179,7 +180,15 @@ export class IndexerServer {
       res.json(data);
     });
 
-    // 404 handler
+    // Add custom routes if provided (before 404 handler)
+    if (
+      this.config.customRoutes &&
+      typeof this.config.customRoutes === "function"
+    ) {
+      this.config.customRoutes(this.app);
+    }
+
+    // 404 handler (must be last)
     this.app.use((req, res) => {
       res.status(404).json({
         error: "Not found",
@@ -194,16 +203,16 @@ export class IndexerServer {
    */
   async handleGraphQLQuery(query, variables = {}) {
     // Validate query is a string
-    if (typeof query !== 'string') {
-      throw new Error('Query must be a string');
+    if (typeof query !== "string") {
+      throw new Error("Query must be a string");
     }
-    
+
     // Parse the query to determine what data to return
     const result = { data: {} };
 
     // Extract query parameters from GraphQL query string
     const parseOptions = (queryString) => {
-      if (!queryString || typeof queryString !== 'string') {
+      if (!queryString || typeof queryString !== "string") {
         return {
           first: 100,
           skip: 0,
@@ -211,7 +220,7 @@ export class IndexerServer {
           orderDirection: "desc",
         };
       }
-      
+
       const firstMatch = queryString.match(/first:\s*(\d+)/);
       const skipMatch = queryString.match(/skip:\s*(\d+)/);
       const orderByMatch = queryString.match(/orderBy:\s*(\w+)/);

@@ -1,0 +1,12 @@
+# Cursor AI Rules for this project
+
+## Documentation Files
+
+- Do NOT create documentation files (\*.md, README files, etc.) unless explicitly requested by the user
+- Only create documentation when the user specifically asks for it
+- Focus on code implementation rather than documentation generation
+
+## General Guidelines
+
+- Prioritize code changes and functionality over documentation
+- Ask for clarification if documentation is needed rather than assuming

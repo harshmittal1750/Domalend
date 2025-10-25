@@ -21,6 +21,7 @@ export const FRACTIONAL_TOKENS_QUERY = `
         }
         params {
           initialValuation
+          quoteToken
           name
           symbol
           decimals
@@ -29,13 +30,22 @@ export const FRACTIONAL_TOKENS_QUERY = `
           launchpadFeeBps
           poolSupply
           poolFeeBps
-          initialPrice
+          poolLiquidityLowerRangePercentBps
+          poolLiquidityUpperRangePercentBps
           launchStartTime
           launchEndTime
           launchpadData
+          bondingCurveModelImpl
+          initialPrice
+          finalPrice
+          bondingCurveModelData
+          liquidityMigratorImpl
+          liquidityMigratorData
+          hook
           vestingCliffSeconds
           vestingDurationSeconds
           initialPoolPrice
+          buySellFeeRecipient
           metadataURI
         }
         fractionalizedTxHash

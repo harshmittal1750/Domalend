@@ -12,7 +12,7 @@ export const DREAMLEND_CONTRACT_ADDRESS: string =
 
 export const DOMA_RANK_ORACLE_ADDRESS: string =
   process.env.NEXT_PUBLIC_DOMA_RANK_ORACLE_ADDRESS ??
-  "0x0000000000000000000000000000000000000000"; // Update after deployment
+  "0xccC7F3bD5aB3E0A3f1e54D29a4F3D3430Cde06De"; // DomaRank Oracle on Doma Testnet
 
 export const DREAMLEND_ABI = [
   {

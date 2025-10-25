@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -36,7 +36,11 @@ import {
 import { useP2PLending } from "@/hooks/useP2PLending";
 import { useAllLoansWithStatus } from "@/hooks/useSubgraphQuery";
 import { useTokenPrices } from "@/hooks/useTokenPrices";
-import { getTokenByAddress, getAllSupportedTokens } from "@/config/tokens";
+import {
+  getTokenByAddress,
+  getAllSupportedTokens,
+  getAllSupportedTokensAsync,
+} from "@/config/tokens";
 import { DualPriceDisplay } from "@/components/DualPriceDisplay";
 import { DomaRankBadge } from "@/components/DomaRankBadge";
 import { TransactionModal } from "@/components/TransactionModal";
@@ -47,6 +51,25 @@ export default function LoanDetailPage() {
   const params = useParams();
   const router = useRouter();
   const loanId = params.id as string;
+
+  // Initialize token cache on mount (CRITICAL for domain token data)
+  useEffect(() => {
+    console.log("[LoanDetailPage] Initializing token cache...");
+    getAllSupportedTokensAsync()
+      .then((tokens) => {
+        console.log(
+          "[LoanDetailPage] Token cache initialized with",
+          tokens.length,
+          "tokens"
+        );
+      })
+      .catch((error) => {
+        console.error(
+          "[LoanDetailPage] Failed to initialize token cache:",
+          error
+        );
+      });
+  }, []);
 
   const {
     acceptLoanOffer,
@@ -74,6 +97,12 @@ export default function LoanDetailPage() {
     ? getTokenByAddress(loan.collateralAddress)
     : null;
 
+  // Get token prices with DomaRank scores
+  const tokenPrice = loan ? prices.get(loan.tokenAddress.toLowerCase()) : null;
+  const collateralPrice = loan
+    ? prices.get(loan.collateralAddress.toLowerCase())
+    : null;
+
   // Format loan data
   const loanData = useMemo(() => {
     if (!loan || !tokenInfo || !collateralInfo) return null;
@@ -83,9 +112,6 @@ export default function LoanDetailPage() {
       loan.collateralAmount,
       collateralInfo.decimals
     );
-
-    const tokenPrice = prices.get(loan.tokenAddress.toLowerCase());
-    const collateralPrice = prices.get(loan.collateralAddress.toLowerCase());
 
     const loanValueUSD = tokenPrice
       ? parseFloat(formattedAmount) * parseFloat(tokenPrice.priceUSD)
@@ -114,10 +140,10 @@ export default function LoanDetailPage() {
       totalInterest,
       totalRepayment,
       dailyInterest,
-      tokenPrice,
-      collateralPrice,
+      tokenPrice: tokenPrice || undefined,
+      collateralPrice: collateralPrice || undefined,
     };
-  }, [loan, tokenInfo, collateralInfo, prices]);
+  }, [loan, tokenInfo, collateralInfo, tokenPrice, collateralPrice]);
 
   const handleAccept = async () => {
     if (!loan || !address) return;
@@ -262,9 +288,9 @@ export default function LoanDetailPage() {
                   </p>
                 </div>
               </div>
-              {tokenInfo.isDomainToken && (
+              {tokenInfo.isDomainToken && tokenPrice?.domaRankScore && (
                 <DomaRankBadge
-                  score={75 + Math.floor(Math.random() * 20)}
+                  score={tokenPrice.domaRankScore}
                   size="md"
                   showTooltip={true}
                 />
@@ -299,13 +325,14 @@ export default function LoanDetailPage() {
                   </p>
                 </div>
               </div>
-              {collateralInfo.isDomainToken && (
-                <DomaRankBadge
-                  score={75 + Math.floor(Math.random() * 20)}
-                  size="md"
-                  showTooltip={true}
-                />
-              )}
+              {collateralInfo.isDomainToken &&
+                collateralPrice?.domaRankScore && (
+                  <DomaRankBadge
+                    score={collateralPrice.domaRankScore}
+                    size="md"
+                    showTooltip={true}
+                  />
+                )}
             </div>
           </div>
 

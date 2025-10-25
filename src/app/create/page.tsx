@@ -13,13 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+
 import { useP2PLending, LoanOfferFormData } from "@/hooks/useP2PLending";
 import {
   CheckCircle,
@@ -45,6 +39,7 @@ import {
   formatBasisPoints,
   formatDuration,
   percentageToBasisPoints,
+  getAllSupportedTokensAsync,
   // basisPointsToPercentage,
 } from "@/config/tokens";
 import { useCollateralCalculation } from "@/hooks/useTokenPrices";
@@ -149,6 +144,22 @@ export default function CreateLoanOfferPage() {
       }
     }
   }, [formErrors]);
+
+  // Initialize token cache on mount
+  useEffect(() => {
+    console.log("[CreatePage] Initializing token cache...");
+    getAllSupportedTokensAsync()
+      .then((tokens) => {
+        console.log(
+          "[CreatePage] Token cache initialized with",
+          tokens.length,
+          "tokens"
+        );
+      })
+      .catch((error) => {
+        console.error("[CreatePage] Failed to initialize token cache:", error);
+      });
+  }, []);
 
   // Get token balances for amount input UX
   const {

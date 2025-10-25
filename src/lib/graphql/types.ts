@@ -50,6 +50,7 @@ export interface Chain {
 
 export interface Params {
   initialValuation: number;
+  quoteToken: string;
   name: string;
   symbol: string;
   decimals: number;
@@ -58,13 +59,22 @@ export interface Params {
   launchpadFeeBps: number;
   poolSupply: number;
   poolFeeBps: number;
-  initialPrice: number;
+  poolLiquidityLowerRangePercentBps: number;
+  poolLiquidityUpperRangePercentBps: number;
   launchStartTime: number;
   launchEndTime: number;
   launchpadData: string;
+  bondingCurveModelImpl: string;
+  initialPrice: number;
+  finalPrice: number;
+  bondingCurveModelData: string;
+  liquidityMigratorImpl: string;
+  liquidityMigratorData: string;
+  hook: string;
   vestingCliffSeconds: number;
   vestingDurationSeconds: number;
   initialPoolPrice: number;
+  buySellFeeRecipient: string;
   metadataURI: string;
 }
 
